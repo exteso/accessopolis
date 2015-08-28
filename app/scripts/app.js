@@ -19,5 +19,6 @@ angular.module('accessopolisApp', [
     'ngTouch',
     'firebase',
     'firebase.ref',
-    'firebase.auth'
+    'firebase.auth',
+    'accessopolis.navigation'
   ]);

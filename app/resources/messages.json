@@ -1,0 +1,24 @@
+{
+    "navigation": {
+        "public-transport": {
+            "airports": {
+                "it":"Aeroporti"
+            },
+            "train-stations": {
+                "it": "Stazioni"
+            },
+            "bus": {
+                "it": "Bus"
+            },
+            "taxis": {
+                "it": "Taxi"
+            },
+            "ships": {
+                "it": "Navigazione"
+            }
+        },
+        "holidays": {
+
+        }
+    }
+}
