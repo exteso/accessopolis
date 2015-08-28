@@ -16,7 +16,7 @@
         this.loadNavigationElements = function () {
             return $q(function (resolve, reject) {
                 resolve([{
-                        key: 'navigation.public-transport',
+                        key: 'public-transport',
                         children: [
                             'airports',
                             'train-stations',
@@ -25,7 +25,7 @@
                             'ships'
                         ]
                     }, {
-                        key: 'navigation.holidays',
+                        key: 'holidays',
                         children: [
                             'hotels',
                             'hostels',
