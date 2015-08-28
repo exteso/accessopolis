@@ -10,7 +10,8 @@ angular.module('accessopolisApp')
   .controller('LoginCtrl', function ($scope, Auth, $location) {
     $scope.oauthLogin = function(provider) {
       $scope.err = null;
-      Auth.$authWithOAuthPopup(provider, {rememberMe: true}).then(redirect, showError);
+      Auth.$authWithOAuthPopup(provider, { scope: 'email' }).then(redirect, showError);
+
     };
 
     $scope.anonymousLogin = function() {
@@ -18,7 +19,7 @@ angular.module('accessopolisApp')
       Auth.$authAnonymously({rememberMe: true}).then(redirect, showError);
     };
 
-    
+
 
     function redirect() {
       $location.path('/account');
