@@ -2,19 +2,92 @@
     "-Jxq25S1MFuBM7l_RRRRRR1" : {
         "locationId" : "-Jxq25S1MFuBM7l_FFFFFF",
         "userId" : "google:105168088975427596321",
-        "type": "public",
+        "userType": "public",
+        "rateKind": "global",
         "rate": 9.0
     },
     "-Jxq25S1MFuBM7l_RRRRRR2": {
         "locationId" : "-Jxq25S1MFuBM7l_FFFFFF2",
         "userId" : "google:105168088975427596321",
-        "type": "public",
+        "userType": "public",
+        "rateKind": "global",
         "rate": 7.0
     },
     "-Jxq25S1MFuBM7l_RRRRRR3": {
         "locationId" : "-Jxq25S1MFuBM7l_FFFFFF",
         "userId" : "google:111543200417842298499",
-        "type": "public",
+        "userType": "public",
+        "rateKind": "global",
         "rate": 5.0
+    },
+    "-Jxq25S1MFuBM7l_RRRRRR10" : {
+        "locationId" : "-Jxq25S1MFuBM7l_FFFFFF",
+        "userId" : "google:108717000654527974181",
+        "userType": "staff",
+        "rateKind": "mobility",
+        "rate": 9.0
+    },
+    "-Jxq25S1MFuBM7l_RRRRRR11" : {
+        "locationId" : "-Jxq25S1MFuBM7l_FFFFFF",
+        "userId" : "google:108717000654527974181",
+        "userType": "staff",
+        "rateKind": "hearing",
+        "rate": 8.0
+    },
+    "-Jxq25S1MFuBM7l_RRRRRR12" : {
+        "locationId" : "-Jxq25S1MFuBM7l_FFFFFF",
+        "userId" : "google:108717000654527974181",
+        "userType": "staff",
+        "rateKind": "mobility",
+        "rate": 9.0
+    },
+    "-Jxq25S1MFuBM7l_RRRRRR20": {
+        "locationId" : "-Jxq25S1MFuBM7l_FFFFFF2",
+        "userId" : "google:108717000654527974181",
+        "userType": "staff",
+        "rateKind": "mobility",
+        "rate": 4.0
+    },
+    "-Jxq25S1MFuBM7l_RRRRRR21": {
+        "locationId" : "-Jxq25S1MFuBM7l_FFFFFF2",
+        "userId" : "google:108717000654527974181",
+        "userType": "staff",
+        "rateKind": "hearing",
+        "rate": 6.0
+    },
+    "-Jxq25S1MFuBM7l_RRRRRR22": {
+        "locationId" : "-Jxq25S1MFuBM7l_FFFFFF2",
+        "userId" : "google:108717000654527974181",
+        "userType": "staff",
+        "rateKind": "vision",
+        "rate": 6.0
+    },
+    "-Jxq25S1MFuBM7l_RRRRRR30": {
+        "locationId" : "-Jxq25S1MFuBM7l_FFFFFF3",
+        "userId" : "google:108717000654527974181",
+        "userType": "staff",
+        "rateKind": "mobility",
+        "rate": 8.0
+    },
+    "-Jxq25S1MFuBM7l_RRRRRR31": {
+        "locationId" : "-Jxq25S1MFuBM7l_FFFFFF3",
+        "userId" : "google:108717000654527974181",
+        "userType": "staff",
+        "rateKind": "hearing",
+        "rate": 8.0
+    },
+    "-Jxq25S1MFuBM7l_RRRRRR32": {
+        "locationId" : "-Jxq25S1MFuBM7l_FFFFFF3",
+        "userId" : "google:108717000654527974181",
+        "userType": "staff",
+        "rateKind": "vision",
+        "rate": 7.0
+    },
+    "-Jxq25S1MFuBM7l_RRRRRR33": {
+        "locationId" : "-Jxq25S1MFuBM7l_FFFFFF3",
+        "userId" : "google:108717000654527974181",
+        "userType": "staff",
+        "rateKind": "mental",
+        "rate": 9.0
     }
 }

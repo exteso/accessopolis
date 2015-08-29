@@ -21,7 +21,7 @@
                         $location.path('/locations/'+self.location.$id);
                     }
                 },
-                controllerAs: 'ctrl',
+                controllerAs: 'ctrlLoc',
                 bindToController: {
                     location: '='
                 },

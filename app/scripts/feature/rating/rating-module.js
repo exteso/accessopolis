@@ -15,14 +15,41 @@
             }
         });
 
+    function calculateRate(total, list){
+        if (!list || list.length == 0){
+            return undefined;
+        }
+        var calc =  total/list.length;
+        return calc
+    };
+
     function RatingService($q, Ref, $firebaseArray) {
         this.getRating = function(locationObj) {
             var locObj = locationObj;
             return $q(function(resolve, reject) {
                 var ratingsByLocation = $firebaseArray(Ref.child('ratings').orderByChild('locationId').equalTo(locObj.$id));
                 ratingsByLocation.$loaded(function(data) {
-                    var total = _.sum(data, 'rate');
-                    resolve({public: total/data.length, staff : 0});
+                    var ratingByType = _.groupBy(data, 'userType');
+
+                    var totalStaff = _.sum(ratingByType['staff'], 'rate');
+                    var totalPublic = _.sum(ratingByType['public'], 'rate');
+
+                    var ratingByKind = _.groupBy(data, 'rateKind');
+
+                    var totalMobility = _.sum(ratingByKind['mobility'], 'rate');
+                    var totalHearing = _.sum(ratingByKind['hearing'], 'rate');
+                    var totalVision = _.sum(ratingByKind['vision'], 'rate');
+                    var totalMental = _.sum(ratingByKind['mental'], 'rate');
+
+                    //TODO switch to use numeral.js
+                    resolve({
+                        public: calculateRate(totalPublic, ratingByType['public']),
+                        staff : calculateRate(totalStaff, ratingByType['staff']),
+                        mobility : calculateRate(totalMobility, ratingByKind['mobility']),
+                        hearing : calculateRate(totalHearing, ratingByKind['hearing']),
+                        vision : calculateRate(totalVision, ratingByKind['vision']),
+                        mental : calculateRate(totalMental, ratingByKind['mental'])
+                    });
                 })
             });
         };
@@ -35,8 +62,7 @@
         var self = this;
 
         RatingService.getRating(self.rating).then(function(rating) {
-            self.publicRating = rating.public;
-            self.staffRating = rating.staff;
+            self.rate = rating;
         });
 
     }
