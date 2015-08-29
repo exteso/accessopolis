@@ -20,9 +20,8 @@
             return undefined;
         }
         var number = numeral(total);
-        var calc = number.divide(list.length).format('0.0');
-        return calc
-    };
+        return number.divide(list.length).format('0.0');
+    }
 
     function RatingService($q, Ref, $firebaseArray) {
         this.getRating = function(locationObj) {
@@ -42,7 +41,6 @@
                     var totalVision = _.sum(ratingByKind['vision'], 'rate');
                     var totalMental = _.sum(ratingByKind['mental'], 'rate');
 
-                    //TODO switch to use numeral.js
                     resolve({
                         public: calculateRate(totalPublic, ratingByType['public']),
                         staff : calculateRate(totalStaff, ratingByType['staff']),
@@ -61,7 +59,6 @@
     function RatingController(RatingService) {
 
         var self = this;
-
         RatingService.getRating(self.rating).then(function(rating) {
             self.rate = rating;
         });

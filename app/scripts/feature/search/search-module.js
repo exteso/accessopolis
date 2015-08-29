@@ -1,6 +1,6 @@
 (function() {
     "use strict";
-    angular.module('accessopolis.search', [])
+    angular.module('accessopolis.search', ['accessopolis.rating'])
         .service('LocationSearchService', LocationSearchService)
         .directive('locationSearch', function() {
             return {
@@ -69,6 +69,7 @@
             LocationSearchService.search({type: subcategory}).then(function(result) {
                 self.resultList = result;
             });
+            self.subcategorySelected = subcategory;
         });
 
         this.searchParam = undefined;
