@@ -1,0 +1,48 @@
+<div>
+    <form name="newLocationForm" data-ng-submit="ctrl.save(newLocationForm)" novalidate>
+        <label data-translate for="description">accessopolis.location.description</label>
+        <input type="text" name="text" data-ng-model="ctrl.location.text" id="description" required="required" />
+        <div class="help-block" data-ng-messages="newLocationForm.text.$error" data-ng-if="newLocationForm.text.$touched">
+            <p data-ng-message="minlength" data-translate>accessopolis.error.minlength</p>
+            <p data-ng-message="maxlength">accessopolis.error.maxlength</p>
+            <p data-ng-message="required">accessopolis.error.required</p>
+        </div>
+
+        <label data-translate for="type">accessopolis.location.type</label>
+        <select name="type" data-ng-model="ctrl.location.type" data-ng-options="item for item in ctrl.subtypes" id="type" required="required"></select>
+        <div class="help-block" data-ng-messages="newLocationForm.type.$error" data-ng-if="newLocationForm.type.$touched">
+            <p data-ng-message="minlength" data-translate>accessopolis.error.minlength</p>
+            <p data-ng-message="maxlength">accessopolis.error.maxlength</p>
+            <p data-ng-message="required">accessopolis.error.required</p>
+        </div>
+
+        <label data-translate for="address" data-ng-minlenght="5">accessopolis.location.address</label>
+        <input type="text" id="address" name="address" data-ng-model="ctrl.location.address" required="required" />
+        <div class="help-block" data-ng-messages="newLocationForm.address.$error" data-ng-if="newLocationForm.address.$touched">
+            <p data-ng-message="minlength" data-translate>accessopolis.error.minlength</p>
+            <p data-ng-message="maxlength">accessopolis.error.maxlength</p>
+            <p data-ng-message="required">accessopolis.error.required</p>
+        </div>
+
+        <!--<label data-translate for="rating">accessopolis.location.rating</label>-->
+        <!--<select name="rating" id="rating" data-ng-options="star in ctrl.stars" data-ng-model="ctrl.location.rating"></select>-->
+
+        <!--<label data-translate for="video">accessopolis.location.video</label>-->
+        <!--<input type="url" data-ng-model="ctrl.location.videoUrl" id="video" name="video"/>-->
+        <!--<div class="help-block" data-ng-messages="newLocationForm.video.$error" data-ng-if="newLocationForm.video.$touched">-->
+            <!--<p data-ng-message="url">accessopolis.error.url</p>-->
+        <!--</div>-->
+
+        <!--<label data-translate for="comment">accessopolis.location.comment</label>-->
+        <!--<textarea name="comment" id="comment" data-ng-model="ctrl.location.comment"></textarea>-->
+        <!--<div class="help-block" data-ng-messages="newLocationForm.comment.$error" data-ng-if="newLocationForm.comment.$touched">-->
+            <!--<p data-ng-message="minlength" data-translate>accessopolis.error.minlength</p>-->
+            <!--<p data-ng-message="maxlength">accessopolis.error.maxlength</p>-->
+            <!--<p data-ng-message="required">accessopolis.error.required</p>-->
+        <!--</div>-->
+
+        <button type="submit" data-translate>accessopolis.save</button>
+        <button type="button" data-translate>accessopolis.cancel</button>
+
+    </form>
+</div>
