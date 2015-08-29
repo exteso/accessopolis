@@ -1,4 +1,4 @@
-angular.module('ionic-firebase-seed', ['ionic', 'firebase'])
+angular.module('ionic-firebase-seed', ['ionic', 'firebase', 'starter.controllers'])
 
 // TODO: Replace this with your own Firebase URL: https://firebase.com/signup
 .constant('FBURL', 'https://accessopolis.firebaseio.com/')

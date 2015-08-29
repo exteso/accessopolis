@@ -26,6 +26,7 @@
 
     <!-- your app's js -->
     <script src="js/app.js"></script>
+    <script src="js/controllers.js"></script>
   </head>
   <body ng-app="ionic-firebase-seed" ng-controller="AppCtrl">
 
@@ -61,14 +62,11 @@
             </div>
           </div>
 
-        <div ng-show="loggedInUser" id="message-list">
-          <div class="card" ng-repeat="message in messages | orderBy:'-time'">
-            <div class="item item-text-wrap">
-              <span style="font-weight: bold;">{{message.email}}</span>:
-              {{message.text}}
-            </div>
-          </div>
-        </div>
+        <ion-list ng-controller="ToDoListCtrl">
+          <ion-item ng-repeat="item in toDoListItems">
+            {{item.task}}
+          </ion-item>
+        </ion-list>
       </ion-content>
 
       <ion-footer-bar align-title="left" ng-show="loggedInUser">
