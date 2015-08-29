@@ -12,46 +12,15 @@
             }
         });
 
-    function NavigationService($q) {
+    function NavigationService($q, Ref, $firebaseArray) {
         this.loadNavigationElements = function () {
             return $q(function (resolve, reject) {
-                resolve([{
-                        key: 'public-transport',
-                        children: [
-                            'airports',
-                            'train-stations',
-                            'bus',
-                            'taxis',
-                            'ships'
-                        ]
-                    }, {
-                        key: 'holidays',
-                        children: [
-                            'hotels',
-                            'hostels',
-                            'farmhouse',
-                            'camping'
-                        ]
-                    }, {
-                        key: 'food',
-                        children: [
-                            'restaurant',
-                            'bar',
-                            'pub'
-                        ]
-                    }, {
-                        key: 'religion',
-                        children: [
-                            'church',
-                            'mosque',
-                            'synagogue'
-                        ]
-                }]);
+                resolve($firebaseArray(Ref.child('categories')));
             });
         };
     }
 
-    NavigationService.prototype.$inject = ['$q'];
+    NavigationService.prototype.$inject = ['$q', 'Ref', '$firebaseArray'];
 
     function NavigationController(NavigationService, $rootScope) {
         var self = this;
