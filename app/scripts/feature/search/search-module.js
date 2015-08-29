@@ -29,45 +29,37 @@
             }
         }]);
 
-    function LocationSearchService($q) {
+    function LocationSearchService($q, Ref, $firebaseArray) {
         this.search = function(criterion) {
             return $q(function(resolve, reject) {
-                var list = [{
-                    id: 0,
-                    name: 'Ristorante Indipendenza',
-                    address: 'Piazza Indipendenza, Chiasso',
-                    type: 'bar'
-                }, {
-                    id: 1,
-                    name: 'Hotel Ristorante Mövenpick',
-                    address: 'Piazza Indipendenza, Chiasso',
-                    type: 'hotels'
-                }, {
-                    id: 2,
-                    name: 'Ufficio Postale Chiasso',
-                    address: 'Piazza Indipendenza, Chiasso',
-                    type: 'pub'
-                }];
-                resolve(_.chain(list)
-                    .filter(function(e) {
-                        if(angular.isDefined(criterion.type)) {
-                            return e.type === criterion.type;
-                        }
-                        return true;
-                    })
-                    .filter(function(e) {
-                        if(angular.isDefined(criterion.text)) {
-                            return e.name.toLowerCase().indexOf(criterion.text.toLowerCase()) > -1;
-                        }
-                        return true;
-                    }).value());
+                var list = $firebaseArray(Ref.child('locations'));
+                list.$loaded(function(data) {
+                    var filteredResults = _.chain(data)
+                        .filter(function(e) {
+                            if(angular.isDefined(criterion.type)) {
+                                return e.type === criterion.type;
+                            }
+                            return true;
+                        })
+                        .filter(function(e) {
+                            if(angular.isDefined(criterion.text)) {
+                                var split = criterion.text.split(/[\s,]/);
+                                var minimumScore = Math.max(1, split.length -1);
+                                return _.filter(split, function(w) {
+                                        return e.text.toLowerCase().indexOf(w.toLowerCase()) > -1;
+                                    }).length >= minimumScore;
+                            }
+                            return true;
+                        }).value();
+                    resolve(filteredResults);
+                }, reject);
             });
         };
     }
 
 
 
-    LocationSearchService.prototype.$inject = ['$q'];
+    LocationSearchService.prototype.$inject = ['$q', 'Ref', '$firebaseArray'];
 
     function LocationSearchController(LocationSearchService, $rootScope) {
 

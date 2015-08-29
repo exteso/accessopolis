@@ -1,0 +1,23 @@
+{
+    "-Jxq25S1MFuBM7l_FFFFFF" : {
+        "text" : "Ristorante Indipendenza",
+        "address": "Piazza Indipendenza, Chiasso",
+        "type": "bar",
+        "lat": 45.833376,
+        "long": 9.030515
+    },
+    "-Jxq25S1MFuBM7l_FFFFFF2": {
+        "text" : "Hotel Ristorante Mövenpick",
+        "address": "Piazza Indipendenza, Chiasso",
+        "type": "hotels",
+        "lat": 45.833376,
+        "long": 9.030515
+    },
+    "-Jxq25S1MFuBM7l_FFFFFF3": {
+        "text" : "Trinity Irish Pub",
+        "address": "Via Luigi Canonica 19, 6900 Lugano, Switzerland",
+        "type": "pub",
+        "lat": 46.007121,
+        "long": 8.959833
+    }
+}
