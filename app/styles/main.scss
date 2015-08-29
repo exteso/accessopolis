@@ -11,8 +11,12 @@ $icon-font-path: "../bower_components/bootstrap-sass-official/assets/fonts/boots
   padding: 0.2em 0;
 }
 
+$body-font: "Helvetica Neue", Arial, sans-serif;
+
 body {
-  padding: 0;
+    font-family: $body-font;
+    padding: 0;
+    &.accessopolis-bg {  background: url('../images/bg_1.jpg'); background-size: 140% auto;}
 }
 
 /* Everything but the jumbotron gets side spacing for mobile first views */
@@ -71,7 +75,7 @@ body {
 /* Responsive: Portrait tablets and up */
 @media screen and (min-width: 768px) {
   .container {
-    max-width: 730px;
+    max-width: 960px;
   }
 
   /* Remove the padding we set earlier */
@@ -89,4 +93,91 @@ body {
   .jumbotron {
     border-bottom: 0;
   }
+}
+
+
+.accessopolis-navigation-bar-category {
+    width: 100%;
+    background: rgba(255, 255, 255, .9);
+    height: 100px;
+   // line-height: 100px;
+    margin: 0px;
+    li {
+        float: left;
+        text-align: center;
+        min-width: 100px;
+        height: 100px;
+        overflow: hidden;
+        border-left: 1px solid #ccc;
+    }
+}
+
+.accessopolis-navigation-bar-sub-category {
+    width: 100%;
+    margin: 0px;
+    background: red;
+    height: 30px;
+    line-height: 30px;
+    li {
+        float: left;
+        background: green;
+        border-left: 1px solid #ccc;
+        width: 100px;
+    }
+}
+
+.accessopolis-header {
+        margin: 0px;
+        padding: 0px;
+        background: #fff;
+        height: 70px;
+        line-height: 70px;
+        .accessopolis-header-content {
+            width: 100%;
+            .accessopolis-header-logo {
+                font-size: 3em;
+                line-height: 100%;
+            }
+        }
+}
+
+
+.accessopolis-search {
+    width: 100%;
+    min-height: 400px;
+    .accessopolis-search-field {
+        width: 100%;
+        margin-top: 8%;
+        padding: 5px 30px 40px 30px;
+        background: rgba(255, 255, 255, 0.6);
+        border-radius: 3px;
+        .accessopolis-search-field-header {
+            float: left;
+            line-height: 30px;
+            height: 30px;
+            color: #fff;
+            text-shadow: 1px 1px 2px black;}
+        .accessopolis-search-field-btn {
+            float: right;
+            margin-top: 3px;
+        }
+    }
+    .accessopolis-search-result_list {
+        width: 100%;
+        margin-top: 10px; }
+}
+
+.accessopolis-lacation { width: 100%; height: 160px; padding: 5px; float: left; background: rgba(255, 255,255,.9);
+        .accessopolis-lacation-icon { width: 150px; float: left; height: 150px; line-height: 150px; font-size: 2.5em; text-align: center; background: rgb(255,255,255);}
+        .accessopolis-lacation-data { float: left; padding-left: 10px; width: calc(100% - 160px);  height: 150px;
+            .accessopolis-lacation-data-info { float: left;}
+            .accessopolis-lacation-data-rating { float: right; background: rgba(255, 255, 255, 0.8); width: 180px; height: calc(100% - 25px); padding: 5px;  margin-top: 10px; overflow: hidden;}
+        }
+}
+
+
+.accessopolis-rating-item { width:85px; float: left;   height: 100%;
+    &:first-child { border-right: 1px solid #000;}
+    .accessopolis-rating-item-val { float:left; width: 100%; vertical-align: middle; padding-top: 10px; height: 50%; text-align: center; font-size: 2em; }
+    .accessopolis-rating-item-icon {float:left; width: 100%; vertical-align: middle; padding-top: 10px; height: 50%; text-align: center; font-size: 2em; }
 }

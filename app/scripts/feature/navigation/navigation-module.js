@@ -27,9 +27,15 @@
         NavigationService.loadNavigationElements().then(function(data) {
             self.items = data;
         });
-        this.showLocations = function(item) {
+        this.showLocations = function(item, $event) {
+            self.itemExpanded = undefined;
             $rootScope.$broadcast('SubcategorySelected', item);
+            $event.stopPropagation();
         };
+        this.displaySubMenu = function(item){
+            self.itemExpanded = item.$id;
+        };
+
     }
 
     NavigationController.prototype.$inject = ['NavigationService', '$rootScope'];

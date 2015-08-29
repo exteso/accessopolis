@@ -1,5 +1,27 @@
-<ul class="list-inline">
-    <li data-ng-repeat="item in ctrl.items" data-ng-click="item.expanded = !item.expanded">{{item.text}}
-        <ul data-ng-if="item.expanded" class="list-inline"><li data-ng-repeat="child in item.subcategory" data-ng-click="ctrl.showLocations(child)">{{child}}</li></ul>
+
+
+
+<ul class="list-inline accessopolis-navigation-bar-category" >
+    <li data-ng-repeat="item in ctrl.items" data-ng-click="ctrl.displaySubMenu(item)"
+        style=" width: calc(100% / {{ctrl.items.length}});">
+        <div style="float: left; width: 100%; height: 50px; padding-top: 20px; line-height: 50px;">
+            <span class="fa fa-camera" style="font-size: 2em;"></span>
+        </div>
+        <div style="float: left; width: 100%; height: 50px;line-height: 50px;">{{item.text}}</div>
+
+        <ul style="position: absolute; width: 250px; margin-left: 5px; float: left; margin-top: 105px; background: #fff; border: 1px solid #ccc;"
+            data-ng-if="ctrl.itemExpanded === item.$id" class="list-inline">
+            <li style="float:left; line-height: 60px; height: 60px; text-align: left; width: 100%; clear: both;  border-bottom: 1px solid #ccc;"
+                data-ng-repeat="child in item.subcategory"
+                data-ng-click="ctrl.showLocations(child, $event); ">
+
+                <div style="float: left; width: 30px; height: 60px; padding-top: 8px; padding-left: 10px; line-height: 60px;">
+                    <span class="fa fa-camera" style="font-size: 2em;"></span>
+                </div>
+                <div style="float: left; width: calc(100% - 50px); margin-left: 20px;  height: 60px; line-height: 65px;">{{child}}</div>
+
+            </li>
+        </ul>
+
     </li>
 </ul>

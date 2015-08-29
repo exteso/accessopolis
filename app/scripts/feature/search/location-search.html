@@ -1,8 +1,36 @@
-<div>
-    <input type="text" data-ng-model="ctrl.searchParam" ><button data-ng-click="ctrl.performSearch()">search</button>
-    <div>
-        <div data-ng-repeat="result in ctrl.resultList">
+<div class="accessopolis-search">
+    <div  class="accessopolis-search-field"  >
+        <div class="accessopolis-search-field-header"> Cerca:</div>
+        <input type="text" data-ng-model="ctrl.searchParam" class="form-control"  >
+        <button class="accessopolis-search-field-btn btn btn-primary btn-sm" data-ng-click="ctrl.performSearch()" >search</button>
+    </div>
+
+    <div class="accessopolis-search-result_list" >
+        <div data-ng-repeat="result in ctrl.resultList" style="float:left; width: 100%; margin-bottom: 10px;">
+            <div data-location="result"></div>
+        </div>
+        <div data-ng-repeat="result in ctrl.resultList" style="float:left; width: 100%; margin-bottom: 10px;">
+            <div data-location="result"></div>
+        </div>
+        <div data-ng-repeat="result in ctrl.resultList" style="float:left; width: 100%; margin-bottom: 10px;">
+            <div data-location="result"></div>
+        </div>
+        <div data-ng-repeat="result in ctrl.resultList" style="float:left; width: 100%; margin-bottom: 10px;">
+            <div data-location="result"></div>
+        </div>
+        <div data-ng-repeat="result in ctrl.resultList" style="float:left; width: 100%; margin-bottom: 10px;">
+            <div data-location="result"></div>
+        </div>
+        <div data-ng-repeat="result in ctrl.resultList" style="float:left; width: 100%; margin-bottom: 10px;">
+            <div data-location="result"></div>
+        </div>
+        <div data-ng-repeat="result in ctrl.resultList" style="float:left; width: 100%; margin-bottom: 10px;">
+            <div data-location="result"></div>
+        </div>
+        <div data-ng-repeat="result in ctrl.resultList" style="float:left; width: 100%; margin-bottom: 10px;">
             <div data-location="result"></div>
         </div>
     </div>
+
+
 </div>
