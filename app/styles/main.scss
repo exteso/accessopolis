@@ -118,7 +118,7 @@ body {
         }
 
         ul.accessopolis-navigation-bar-sub-category {
-            position: absolute; width: 250px; margin-left: 5px; float: left; margin-top: 105px; background: #fff; list-style: none; border: 1px solid #ccc; padding: 0px;
+            position: absolute; width: 250px; margin-left: 5px; float: left; margin-top: 105px; background: #fff; list-style: none; border: 1px solid #ccc; padding: 0px;z-index:99;
             li { float:left; line-height: 60px; height: 60px; text-align: left;  width: 100%; clear: both;  border-bottom: 1px solid #ccc;
                 .accessopolis-navigation-bar-sub-category-icon { float: left; width: 30px; height: 60px; padding-top: 8px; padding-left: 10px; line-height: 60px;
                     span { font-size: 2em;}
@@ -157,12 +157,15 @@ body {
         padding: 5px 30px 40px 30px;
         background: rgba(255, 255, 255, 0.6);
         border-radius: 3px;
+        position:relative;
         .accessopolis-search-field-header {
-            float: left;
+            float: right;
             line-height: 30px;
-            height: 30px;
+            height: 40px;
+            width:100%;
             color: #fff;
-            text-shadow: 1px 1px 2px black;}
+            text-shadow: 1px 1px 2px black;
+        }
         .accessopolis-search-field-btn {
             float: right;
             margin-top: 3px;
@@ -218,4 +221,15 @@ body {
 
 input.ng-invalid.ng-touched, select.ng-invalid.ng-touched, textarea.ng-invalid.ng-touched {
     border:1px solid #d9534f;
+}
+
+.accessopolis-badge {
+    font-size: 1.2em;
+    position:absolute;
+    top:45px;
+    right:4px;
+}
+
+.accessopolis-search-box {
+    position:relative;
 }

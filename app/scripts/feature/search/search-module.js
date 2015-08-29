@@ -74,6 +74,11 @@
 
         this.searchParam = undefined;
 
+        this.clearSubcategory = function($event) {
+            self.subcategorySelected = undefined;
+            $event.stopPropagation();
+        };
+
         this.performSearch = function() {
             LocationSearchService.search({text: self.searchParam}).then(function(result) {
                 self.resultList = result;

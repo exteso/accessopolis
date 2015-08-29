@@ -1,7 +1,17 @@
 <div class="accessopolis-search">
-    <div  class="accessopolis-search-field"  >
-        <div class="accessopolis-search-field-header"> Cerca:</div>
-        <input type="text" data-ng-model="ctrl.searchParam" class="form-control"  >
+    <div class="accessopolis-search-field" >
+        <div class="accessopolis-search-field-header">
+
+        </div>
+
+            <div class="accessopolis-search-box">
+                <input type="text" data-ng-model="ctrl.searchParam" class="form-control">
+                <div data-ng-if="ctrl.subcategorySelected">
+                    <span class="sr-only" data-translate>accessopolis.selected.categories</span>
+                    <span class="badge accessopolis-badge" data-translate>{{ctrl.subcategorySelected}} <a href="#" data-ng-click="ctrl.clearSubcategory($event)"><i class="fa fa-close"></i></a></span>
+                </div>
+            </div>
+
         <button class="accessopolis-search-field-btn btn btn-primary btn-sm" data-ng-click="ctrl.performSearch()" >search</button>
     </div>
 
