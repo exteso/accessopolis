@@ -18,7 +18,7 @@
                 controller: function() {
                     var self = this;
                     this.showDetail = function() {
-                        $location.path('/locations/'+self.location.id);
+                        $location.path('/locations/'+self.location.$id);
                     }
                 },
                 controllerAs: 'ctrl',

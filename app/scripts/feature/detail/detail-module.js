@@ -11,33 +11,20 @@
                 });
         }]);
 
-    function LocationDetailService($q) {
+    function LocationDetailService($q, $firebaseObject, Ref) {
         this.find = function(id) {
             return $q(function(resolve, reject) {
-                var list = [{
-                    id: 0,
-                    name: 'Ristorante Indipendenza',
-                    address: 'Piazza Indipendenza, Chiasso',
-                    type: 'bar'
-                }, {
-                    id: 1,
-                    name: 'Hotel Ristorante Mövenpick',
-                    address: 'Piazza Indipendenza, Chiasso',
-                    type: 'hotels'
-                }, {
-                    id: 2,
-                    name: 'Ufficio Postale Chiasso',
-                    address: 'Piazza Indipendenza, Chiasso',
-                    type: 'pub'
-                }];
-                resolve(_.find(list, function(e) {return e.id === parseInt(id)}));
+                var obj = $firebaseObject(Ref.child('locations').orderByKey().equalTo(id));
+                obj.$loaded(function(val) {
+                    resolve(val[id]);
+                });
             });
         };
     }
 
 
 
-    LocationDetailService.prototype.$inject = ['$q'];
+    LocationDetailService.prototype.$inject = ['$q', '$firebaseObject', 'Ref'];
 
     function LocationDetailController(LocationDetailService, $routeParams, $location) {
 
