@@ -7,13 +7,11 @@
  * A CRUD tool for managing Categories using AngularFire to manage a synchronized list.
  */
 angular.module('accessopolisApp')
-  .controller('CategoryCtrl', function ($scope, Ref, $firebaseArray, $timeout) {
+  .controller('CategoryCtrl', function ($scope, Ref, $firebaseArray, $firebaseObject, $timeout) {
     // synchronize a read-only, synchronized array of messages, limit to most recent 10
     $scope.categories = $firebaseArray(Ref.child('categories').limitToLast(10));
 
-
-
-      // display any errors
+    // display any errors
     $scope.categories.$loaded().catch(alert);
 
     // provide a method for adding a Category
@@ -29,23 +27,14 @@ angular.module('accessopolisApp')
     $scope.addSubcategory = function(category, newSubcategory){
       if( newSubcategory ) {
 
-        var indexRef = Ref.child('categories/-Jxq25S1MFuBM7l_lJlM');
+        var catRef = $firebaseObject(Ref.child('categories/'+category.$id));
+        catRef.$bindTo($scope, 'selectedCat').then(function() {
 
-        // synchronize a read-only, synchronized array of messages, limit to most recent 10
-        $scope.categories = $firebaseArray(Ref.child('categories').limitToLast(10));
-
-        // display any errors
-        $scope.categories.$loaded().catch(alert);
-
-        var selectedCat = $scope.categories.$getRecord(category.$id);
-
-        var selectedCat1 = $firebaseObject(selectedCat);
-        //$scope.selectedCat = Ref.child('categories').$getRecord(category.$id);
-        // push a subcategory to the end of the array
-        var selectedCatSubCategories = $firebaseArray(selectedCat.subcategory);
-        selectedCatSubCategories.$add({text: newSubcategory})
-          // display any errors
-            .catch(alert);
+          //var subcatRef = $firebaseArray(Ref.child('categories/'+category.$id+'/subcategory'));
+          var subcatRef = $firebaseArray(Ref.child('categories/'+category.$id+'/subcategory'))
+          subcatRef.$add(newSubcategory);  // will be saved to the database
+          //ref.set({ foo: "baz" });  // this would update the database and $scope.data
+        });
       }
     };
 

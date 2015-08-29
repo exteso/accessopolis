@@ -9,7 +9,7 @@
 <ul id="categories" ng-show="categories.length">
   <li ng-repeat="category in categories | reverse">{{category.text}}
   <ul>
-    <li ng-repeat="subcat in category.subcategory">{{subcat.text}}</li>
+    <li ng-repeat="subcat in category.subcategory">{{subcat}}</li>
     <input type="text"  ng-model="newSubcategory"/><a ng-click="addSubcategory(category, newSubcategory)"><span class="fa fa-plus-circle"/> </a>
    </ul>
   </li>
