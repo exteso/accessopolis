@@ -24,11 +24,11 @@
 
     <div class="header accessopolis-header" ng-cloak=""  >
 
-        <div class="container" >
-            <div class="navbar-header accessopolis-header-content" >
+        <div class="container">
+            <div class="navbar-header accessopolis-header-content" ng-controller="AppCtrl">
                 <a class="navbar-brand accessopolis-header-logo" href="#/">Accessopolis</a>
-                <button data-ng-controller="LoginCtrl"  class="btn btn-primary btn-lg"  ng-click="oauthLogin('google')" >Accedi con Google</button>
-                <!--  li><span ng-show-auth="">{{user.google.email}}</span></li-->
+                <button ng-hide-auth="" data-ng-controller="LoginCtrl"  class="btn btn-primary btn-lg"  ng-click="oauthLogin('google')" >Accedi con Google</button>
+                <span ng-show-auth="" class="btn btn-primary btn-lg">{{user.google.email}}</span>
             </div>
 
         </div>
