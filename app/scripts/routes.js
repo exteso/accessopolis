@@ -52,6 +52,11 @@ angular.module('accessopolisApp')
       return $routeProvider;
     };
   }])
+    .provider('user', function UserProvider() {
+        this.$get = ['Auth', function(Auth) {
+            return Auth.$requireAuth();
+        }];
+    })
 
   // configure views; whenAuthenticated adds a resolve method to ensure users authenticate
   // before trying to access that route
