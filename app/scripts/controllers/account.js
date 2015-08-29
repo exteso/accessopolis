@@ -14,5 +14,9 @@ angular.module('accessopolisApp')
     $scope.email = user.google.email;
     $scope.messages = [];
     var profile = $firebaseObject(Ref.child('users/'+user.uid));
-    profile.$bindTo($scope, 'profile');
+    profile.$bindTo($scope, 'profile').then(function() {
+
+        $scope.profile.email = user.google.email;  // will be saved to the database
+        //ref.set({ foo: "baz" });  // this would update the database and $scope.data
+      });
   });

@@ -70,6 +70,10 @@ angular.module('accessopolisApp')
         templateUrl: 'views/login.html',
         controller: 'LoginCtrl'
       })
+      .when('/category', {
+          templateUrl: 'views/category.html',
+          controller: 'CategoryCtrl'
+        })
       .whenAuthenticated('/account', {
         templateUrl: 'views/account.html',
         controller: 'AccountCtrl'
