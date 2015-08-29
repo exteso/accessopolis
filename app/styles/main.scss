@@ -179,11 +179,33 @@ body {
     }
 }
 
-.accessopolis-lacation { width: 100%; height: 160px; padding: 5px; float: left; background: rgba(255, 255,255,.9);
-        .accessopolis-lacation-icon { width: 150px; float: left; height: 150px; line-height: 150px; font-size: 2.5em; text-align: center; background: rgb(255,255,255);}
-        .accessopolis-lacation-data { float: left; padding-left: 10px; width: calc(100% - 160px);  height: 150px;
-            .accessopolis-lacation-data-info { float: left;}
-            .accessopolis-lacation-data-rating { float: right; background: rgba(255, 255, 255, 0.8); width: 180px; height: calc(100% - 25px); padding: 5px;  margin-top: 10px; overflow: hidden;}
+.accessopolis-location { width: 100%; height: 160px; padding: 5px; float: left; background: rgba(255, 255,255,.9);
+        .accessopolis-location-icon {
+            width: 150px;
+            float: left;
+            height: 150px;
+            line-height: 150px;
+            font-size: 2.5em;
+            text-align: center;
+            background: rgb(255,255,255);
+            border: 1px solid #ccc;
+        }
+        .accessopolis-location-data {
+            float: left;
+            padding-left: 10px;
+            width: calc(100% - 160px);
+            height: 150px;
+            .accessopolis-location-data-info { float: left;
+                .accessopolis-location-rating-item {
+                    float: left;
+                    width: 50px; height: 50px;
+                    margin-left: 10px; margin-right: 10px;
+                    border-radius: 50%;
+                    border: 5px solid red;
+                    &:first-child { margin-left: 0px; background: green;}
+                }
+            }
+            .accessopolis-location-data-rating { float: right; background: rgba(255, 255, 255, 0.8); width: 180px; height: calc(100% - 25px); padding: 5px;  margin-top: 10px; overflow: hidden;}
         }
 }
 
