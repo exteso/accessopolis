@@ -62,9 +62,9 @@
 
     LocationSearchService.prototype.$inject = ['$q', 'Ref', '$firebaseArray'];
 
-    function LocationSearchController(LocationSearchService, $rootScope, $scope) {
+    function LocationSearchController(LocationSearchService, $rootScope) {
 
-        var self = $scope;
+        var self = this;
 
         $rootScope.$on('SubcategorySelected', function(event, subcategory) {
             LocationSearchService.search({type: subcategory}).then(function(result) {
@@ -73,14 +73,14 @@
             self.subcategorySelected = subcategory;
         });
 
-        $scope.searchParam = undefined;
+        this.searchParam = undefined;
 
-        $scope.performSearch = function() {
+        this.performSearch = function() {
             LocationSearchService.search({text: self.searchParam}).then(function(result) {
                 self.resultList = result;
             });
         };
     }
 
-    LocationSearchController.prototype.$inject = ['LocationSearchService', '$rootScope', '$scope'];
+    LocationSearchController.prototype.$inject = ['LocationSearchService', '$rootScope'];
 })();

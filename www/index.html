@@ -64,14 +64,14 @@
             </div>
           </div>
 
-        <ion-list ng-controller="LocationSearchController">
+        <ion-list ng-controller="LocationSearchController as ctrl">
           <label class="item item-input">
-              <input type="text" placeholder="Search" ng-model="searchParam">
+              <input type="text" placeholder="Search" ng-model="ctrl.searchParam">
             </label>
-             <button class="button button-positive login" ng-click="performSearch()">
+             <button class="button button-positive login" ng-click="ctrl.performSearch()">
                 Search
               </button>
-          <ion-item ng-repeat="item in resultList">
+          <ion-item ng-repeat="item in ctrl.resultList">
             {{item.text}}
           </ion-item>
         </ion-list>
