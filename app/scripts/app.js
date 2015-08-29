@@ -24,4 +24,8 @@ angular.module('accessopolisApp', [
     'accessopolis.search',
     'accessopolis.locationDetail',
     'accessopolis.rating'
-  ]);
+  ])
+
+    .controller('AppCtrl', function ($scope, Auth) {
+        $scope.user = Auth.$getAuth();
+    });
