@@ -193,3 +193,7 @@ body {
     .accessopolis-rating-item-val { float:left; width: 100%; vertical-align: middle; padding-top: 10px; height: 50%; text-align: center; font-size: 2em; }
     .accessopolis-rating-item-icon {float:left; width: 100%; vertical-align: middle; padding-top: 10px; height: 50%; text-align: center; font-size: 2em; }
 }
+
+input.ng-invalid.ng-touched, select.ng-invalid.ng-touched, textarea.ng-invalid.ng-touched {
+    border:1px solid #d9534f;
+}
