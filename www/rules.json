@@ -1,0 +1,25 @@
+{
+    "rules": {
+        // .read: false is the default setting, unless I add a .read node here.
+        // This means nothing in my Firebase database can be read or written by anyone
+
+        "messages": {
+          // Allow anyone to read from the messages/ node
+          ".read": true,
+          // Only authenticated users can write to the messages/ node
+          ".write": "auth != null",
+            // $variables let you specify dynamic paths.
+            // The rules here apply to any child of /messages/
+            "$message": {
+                // The "text" field is required when creating a message
+                // .validate rules are run after .write rules succeed
+                ".validate": "newData.hasChild('text')",
+
+                "text": {
+                    // The message field must be a string
+                    ".validate": "newData.isString()"
+                }
+            }
+        }
+    }
+}

@@ -1,5 +1,0 @@
-<ul class="list-inline">
-    <li data-ng-repeat="item in ctrl.items" data-ng-click="item.expanded = !item.expanded">{{item.text}}
-        <ul data-ng-if="item.expanded" class="list-inline"><li data-ng-repeat="child in item.subcategory" data-ng-click="ctrl.showLocations(child)">{{child}}</li></ul>
-    </li>
-</ul>

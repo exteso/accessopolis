@@ -1,26 +1,10 @@
 {
-  "name": "accessopolis",
-  "version": "0.0.0",
-  "dependencies": {
-    "angular": "^1.3.0",
-    "angular-animate": "^1.3.0",
-    "angular-aria": "^1.3.0",
-    "angular-cookies": "^1.3.0",
-    "angular-messages": "^1.3.0",
-    "angular-resource": "^1.3.0",
-    "angular-route": "^1.3.0",
-    "angular-sanitize": "^1.3.0",
-    "angular-touch": "^1.3.0",
-    "angularfire": "1.0.0",
-    "bootstrap-sass-official": "^3.2.0",
-    "firebase": "2.2.2",
-    "font-awesome": "~4.4.0",
-    "lodash": "~3.10.1"
-  },
+  "name": "HelloIonic",
+  "private": "true",
   "devDependencies": {
-    "mockfirebase": "0.11.0",
-    "angular-mocks": "^1.3.0"
+    "ionic": "driftyco/ionic-bower#1.0.0"
   },
-  "appPath": "app",
-  "moduleName": "accessopolisApp"
+  "dependencies": {
+    "angular": "~1.4.1"
+  }
 }
