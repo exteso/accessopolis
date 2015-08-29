@@ -1,14 +1,12 @@
-angular.module('ionic-firebase-seed', ['ionic', 'firebase', 'starter.controllers','accessopolis.search'])
+angular.module('ionic-firebase-seed', ['ionic', 'firebase'])
 
 // TODO: Replace this with your own Firebase URL: https://firebase.com/signup
 .constant('FBURL', 'https://accessopolis.firebaseio.com/')
- .factory('Ref', ['$window', 'FBURL', function($window, FBURL) {
-    'use strict';
-    return new $window.Firebase(FBURL);
-  }])
-  .factory('Auth', function($firebaseAuth, Ref, $window) {
-    return $firebaseAuth(Ref);
-  })
+
+.factory('Auth', function($firebaseAuth, FBURL, $window) {
+  var ref = new $window.Firebase(FBURL);
+  return $firebaseAuth(ref);
+})
 
 .factory('Messages', function($firebaseArray, FBURL, $window) {
   var ref = new $window.Firebase(FBURL + '/messages');
