@@ -15,7 +15,8 @@
     "bootstrap-sass-official": "^3.2.0",
     "firebase": "2.2.2",
     "font-awesome": "~4.4.0",
-    "lodash": "~3.10.1"
+    "lodash": "~3.10.1",
+    "numeral": "numeraljs#~1.5.3"
   },
   "devDependencies": {
     "mockfirebase": "0.11.0",

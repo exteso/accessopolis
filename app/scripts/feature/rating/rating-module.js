@@ -19,7 +19,8 @@
         if (!list || list.length == 0){
             return undefined;
         }
-        var calc =  total/list.length;
+        var number = numeral(total);
+        var calc = number.divide(list.length).format('0.0');
         return calc
     };
 
