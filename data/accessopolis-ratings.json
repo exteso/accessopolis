@@ -1,0 +1,20 @@
+{
+    "-Jxq25S1MFuBM7l_RRRRRR1" : {
+        "locationId" : "-Jxq25S1MFuBM7l_FFFFFF",
+        "userId" : "google:105168088975427596321",
+        "type": "public",
+        "rate": 9.0
+    },
+    "-Jxq25S1MFuBM7l_RRRRRR2": {
+        "locationId" : "-Jxq25S1MFuBM7l_FFFFFF2",
+        "userId" : "google:105168088975427596321",
+        "type": "public",
+        "rate": 7.0
+    },
+    "-Jxq25S1MFuBM7l_RRRRRR3": {
+        "locationId" : "-Jxq25S1MFuBM7l_FFFFFF",
+        "userId" : "google:111543200417842298499",
+        "type": "public",
+        "rate": 5.0
+    }
+}

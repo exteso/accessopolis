@@ -22,5 +22,6 @@ angular.module('accessopolisApp', [
     'firebase.auth',
     'accessopolis.navigation',
     'accessopolis.search',
-    'accessopolis.locationDetail'
+    'accessopolis.locationDetail',
+    'accessopolis.rating'
   ]);
