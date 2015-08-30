@@ -83,6 +83,20 @@ angular.module('accessopolisApp')
         templateUrl: 'views/account.html',
         controller: 'AccountCtrl'
       })
+      .when('/locations/:id', {
+        templateUrl: 'scripts/feature/detail/detail.html',
+        controller: 'LocationDetailController',
+        controllerAs: 'ctrl',
+          resolve: {
+            user: ['Auth', function(Auth) {
+              return Auth.$getAuth();
+            }]
+          }
+      }).when('/new-location', {
+        templateUrl: 'scripts/feature/detail/new.html',
+        controller: 'NewLocationController',
+        controllerAs: 'ctrl'
+      })
       .otherwise({redirectTo: '/'});
   }])
 
