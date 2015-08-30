@@ -13,6 +13,18 @@
                 },
                 templateUrl: 'scripts/feature/rating/rating.html'
             }
+        })
+        .directive('ratings', function() {
+            return {
+                restrict: 'A',
+                scope: true,
+                controller: RatingController,
+                controllerAs: 'ctrlRatings',
+                bindToController: {
+                    rating: '=ratings'
+                },
+                templateUrl: 'scripts/feature/rating/ratings.html'
+            }
         });
 
     function calculateRate(total, list){

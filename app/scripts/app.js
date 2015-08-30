@@ -50,6 +50,10 @@ angular.module('accessopolisApp', [
             'accessopolis.rating.expert': 'Experts',
             'accessopolis.rating.public': 'Public',
             'accessopolis.accessibility-evaluation': 'Accessibility Evaluation',
+            'accessopolis.accessibility-evaluation-mobility': 'Mobility',
+            'accessopolis.accessibility-evaluation-hearing': 'Hearing',
+            'accessopolis.accessibility-evaluation-vision': 'Vision',
+            'accessopolis.accessibility-evaluation-mental': 'Mental',
             'accessopolis.insert-new-location': 'Insert new location',
             'accessopolis.location.description': 'Location Description',
             'accessopolis.error.minlength': 'The value inserted is not valid',
@@ -87,6 +91,12 @@ angular.module('accessopolisApp', [
             'accessopolis.rating.expert': 'Esperti',
             'accessopolis.rating.public': 'Pubblico',
             'accessopolis.accessibility-evaluation': 'Valutazione Accessibilità',
+
+            'accessopolis.accessibility-evaluation-mobility': 'Fisiche',
+            'accessopolis.accessibility-evaluation-hearing': 'Uditive',
+            'accessopolis.accessibility-evaluation-vision': 'Visive',
+            'accessopolis.accessibility-evaluation-mental': 'Mentali',
+
             'accessopolis.insert-new-location': 'Inserire una nuova struttura',
             'accessopolis.location.description': 'Descrizione della struttura',
             'accessopolis.error.minlength': 'Il valore inserito non è valido',
