@@ -465,7 +465,6 @@ input.ng-invalid.ng-touched, select.ng-invalid.ng-touched, textarea.ng-invalid.n
     .accessopolis-location-detail-content-rating-evaluation {
         height: 400px;
         margin-top: -1px;
-        box-shadow: -1px 1px 1px 0px rgba(0, 0, 0, 0.8);
         padding: 5px;
         .accessopolis-location-detail-content-rating-evaluation-title {
             line-height: 20px;
@@ -474,24 +473,26 @@ input.ng-invalid.ng-touched, select.ng-invalid.ng-touched, textarea.ng-invalid.n
         }
     }
     .accessopolis-location-detail-content-slide {
-        height: 400px;
+        min-height: 400px;
         margin-top: -1px;
-        box-shadow: -1px 1px 1px 0px rgba(0, 0, 0, 1);
         padding: 0px;
         .accessopolis-location-detail-content-slide-main {
-            height: 400px;
+            min-height: 400px;
             overflow: auto;
-
             margin: 0px;
             padding: 0px !important;
             .accessopolis-location-detail-content-slide-main-content {
                 width: 100%;
                 height: 100%;
-                background: #93999a;
+                min-height: 390px;
+                max-height: 390px;
+                overflow: hidden;
+                background: #000;
                 line-height: 380px;
                 text-align: center;
                 font-size: 5em;
                 margin: 5px !important;
+                box-shadow: -1px 1px 1px 0px rgba(0, 0, 0, 0.7);
 
             }
         }
