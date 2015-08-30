@@ -66,7 +66,10 @@ angular.module('accessopolisApp', [
             'accessopolis.selected.categories': 'Selected Categories',
             'accessopolis.location.not-found': 'No locations found',
             'accessopolis.location.new': 'Add Location',
-            'report-a-problem': 'Report a problem'
+            'report-a-problem': 'Report a problem',
+            'accessopolis.back-to-list': 'Back to list',
+            'accessopolis.vote.now' : 'Leave your vote',
+            'accessopolis.voting': 'Vote!'
         });
         $translateProvider.translations('it', {
             'public-transport': 'Trasporti Pubblici',
@@ -110,7 +113,10 @@ angular.module('accessopolisApp', [
             'accessopolis.selected.categories': 'Categorie Selezionate',
             'accessopolis.location.not-found': 'Nessuna struttura trovata',
             'accessopolis.location.new': 'Aggiungi',
-            'report-a-problem': 'Segnala un problema'
+            'accessopolis.back-to-list': 'Torna alla lista',
+            'report-a-problem': 'Segnala un problema',
+            'accessopolis.vote.now' : 'Dai il tuo voto',
+            'accessopolis.voting': 'Vota!'
         });
         $translateProvider.preferredLanguage('it');
     }])
@@ -702,13 +708,15 @@ angular.module('accessopolisApp')
             }
 
         }])
-        .directive('videoReview', function() {
+        .directive('locationVideo', function() {
             return {
                 restrict: 'A',
                 scope: true,
-                controller: function() {},
-                bindToController: true,
-                controllerAs: 'videoController',
+                controllerAs: 'videoCtrl',
+                controller: LocationVideoController,
+                bindToController: {
+                    locationVideo: '='
+                },
                 templateUrl: 'scripts/feature/detail/video.html'
             }
         })
@@ -743,14 +751,31 @@ angular.module('accessopolisApp')
             });
         };
 
+        this.getComments = function(id) {
+            return $q(function(resolve, reject) {
+                var obj = $firebaseArray(Ref.child('comments/'+id));
+                obj.$loaded(function(val) {
+                    resolve(val);
+                });
+            });
+        };
+
         this.create = function(location) {
             var mock = {lat: 45.833376, long: 9.030515};
             return $firebaseArray(Ref.child('locations')).$add(angular.extend(mock, location));
-        }
+        };
 
         this.rate = function(newRate){
             return $firebaseArray(Ref.child('ratings')).$add(newRate);
-        }
+        };
+
+        this.retrieveVideo = function(locationId) {
+            return $q(function(resolve, reject) {
+                $firebaseArray(Ref.child('videos').orderByChild('locationId').equalTo(locationId)).$loaded(function(list) {
+                    resolve(_.first(list));
+                });
+            });
+        };
     }
     LocationDetailService.$inject = ["$q", "$firebaseObject", "Ref", "$firebaseArray"];
 
@@ -765,6 +790,10 @@ angular.module('accessopolisApp')
             self.detail = result;
         });
 
+        LocationDetailService.getComments($routeParams.id).then(function(result) {
+            self.comments = result;
+        });
+
         this.backToList = function() {
             $location.path('/');
         };
@@ -776,6 +805,16 @@ angular.module('accessopolisApp')
                 self.rateFeedback = result;
             });
         };
+
+        this.addComment = function(newComment) {
+            if( newComment ) {
+                // push a message to the end of the array
+                self.comments.$add({text: newComment})
+                    // display any errors
+                    .catch(alert);
+            }
+        };
+
     }
     LocationDetailController.$inject = ["LocationDetailService", "$routeParams", "$location", "user"];
 
@@ -816,6 +855,25 @@ angular.module('accessopolisApp')
     NewLocationController.$inject = ["NavigationService", "LocationDetailService", "$location", "$rootScope"];
 
     NewLocationController.prototype.$inject = ['NavigationService', 'LocationDetailService', '$location', '$rootScope'];
+
+    function LocationVideoController($scope, LocationDetailService, $sce) {
+        var self = this;
+        $scope.$watch(function() {
+            return self.locationVideo;
+        }, function(val) {
+            if(angular.isDefined(val)) {
+                LocationDetailService.retrieveVideo(val.$id).then(function(result) {
+                    var url = angular.isDefined(result) ? result.url : undefined;
+                    if(angular.isDefined(url)) {
+                        self.url = $sce.trustAsResourceUrl(url);
+                    }
+                });
+            }
+        });
+    }
+    LocationVideoController.$inject = ["$scope", "LocationDetailService", "$sce"];
+
+    LocationVideoController.prototype.$inject = ['$scope', 'LocationDetailService', '$sce'];
 
 })();
 
