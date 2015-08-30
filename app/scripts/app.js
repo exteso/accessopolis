@@ -23,8 +23,20 @@ angular.module('accessopolisApp', [
     'accessopolis.navigation',
     'accessopolis.search',
     'accessopolis.locationDetail',
-    'accessopolis.rating'
+    'accessopolis.rating',
+    'pascalprecht.translate'
   ])
+    .config(function ($translateProvider) {
+        $translateProvider.translations('en', {
+            'accessopolis.rating.expert': 'Experts',
+            'accessopolis.rating.public': 'Public'
+        });
+        $translateProvider.translations('it', {
+            'accessopolis.rating.expert': 'Esperti',
+            'accessopolis.rating.public': 'Pubblico'
+        });
+        $translateProvider.preferredLanguage('it');
+    })
     .controller('AppCtrl', function ($scope, Auth) {
         $scope.user = Auth.$getAuth();
     });
