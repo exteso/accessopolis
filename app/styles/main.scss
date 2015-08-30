@@ -193,6 +193,7 @@ body {
             text-align: center;
             background: rgb(255,255,255);
             border: 1px solid #ccc;
+            overflow: hidden;
         }
         .accessopolis-location-data {
             float: left;
@@ -217,7 +218,7 @@ body {
 .accessopolis-rating-item { width:85px; float: left;   height: 100%;
     &:first-child { border-right: 1px solid #000;}
     .accessopolis-rating-item-val { float:left; width: 100%; vertical-align: middle; padding-top: 10px; height: 50%; text-align: center; font-size: 2em; }
-    .accessopolis-rating-item-icon {float:left; width: 100%; vertical-align: middle; padding-top: 10px; height: 50%; text-align: center; font-size: 2em; }
+    .accessopolis-rating-item-icon {float:left; width: 100%; vertical-align: middle; padding-top: 10px; height: 50%; text-align: center; font-size: 2em; margin-top: -10px; }
 }
 
 input.ng-invalid.ng-touched, select.ng-invalid.ng-touched, textarea.ng-invalid.ng-touched {
@@ -243,3 +244,82 @@ input.ng-invalid.ng-touched, select.ng-invalid.ng-touched, textarea.ng-invalid.n
 .accessopolis-search-box {
     position:relative;
 }
+
+.accessopolis-section-profile {
+    padding-top: 10px; float: right;  height: 40px;
+    .accessopolis-section-profile-auth {
+        float: left; height: 100%; width: 200px;
+        .accessopolis-profile-avatar {
+            width: 40px; height: 40px; line-height: 35px; text-align: center; border-radius: 50%; border: 2px solid #ccc; color: #ccc; font-size: 1.5em; float: left;
+        }
+        .accessopolis-profile-name {
+            width: 150px; height: 40px; line-height: 35px; float: left; margin-left: 10px; cursor: pointer;
+            a { display: block; white-space: nowrap; overflow: hidden; -ms-text-overflow: ellipsis;text-overflow: ellipsis;}
+        }
+    }
+}
+
+
+.accessopolis-location-detail {
+    border-top: 1px solid #f2f2f2; width: 100%; color: #fff;
+    .accessopolis-location-detail-back { width: 100%; height: 15px; margin-top: 5px;}
+    .accessopolis-location-detail-header { width: 100%; height: 100px;
+        .accessopolis-location-detail-header-title { float:left; width:60%; padding: 0px; }
+        .accessopolis-location-detail-header-rating { float:right; width:20%;height: 50px; margin-top: -10px; }
+
+    }
+
+}
+
+
+.accessopolis-location-detail-content {
+    width: 100%; padding: 0px;
+    .accessopolis-location-detail-content-rating-evaluation {
+        width: 30%;
+        float: left;
+        height: 400px;
+        margin-top: -1px;
+        box-shadow: -1px 1px 1px 0px rgba(0, 0, 0, 1);
+        padding: 5px;
+        .accessopolis-location-detail-content-rating-evaluation-title {
+            line-height: 20px;
+            font-size: 1.5em;
+            padding: 0px;
+        }
+    }
+    .accessopolis-location-detail-content-slide { width: calc(70% - 5px); float:right;  height: 400px;  margin-top: -1px;  box-shadow: -1px 1px 1px 0px rgba(0,0,0,1);
+        .accessopolis-location-detail-content-slide-main {
+            width: 70%;
+            float: left;
+            height: 400px;
+            overflow: auto;
+            padding: 10px;
+            .accessopolis-location-detail-content-slide-main-content {
+                width: calc(100% - 10px);
+                height: calc(100% - 10px);
+                background: #93999a;
+                line-height: 380px;
+                text-align: center;
+                margin: 5px;
+                font-size: 5em;
+            }
+        }
+        .accessopolis-location-detail-content-slide-nav {
+            width: 30%;
+            float: right;
+            height: 400px;
+            overflow: auto;
+            .accessopolis-location-detail-content-slide-nav-item {
+                float: left;
+                width: calc(100% - 10px);
+                height: 150px;
+                line-height: 150px;
+                text-align: center;
+                font-size: 3em;
+                background: #93999a;
+                margin: 5px;
+            }
+        }
+    }
+}
+
