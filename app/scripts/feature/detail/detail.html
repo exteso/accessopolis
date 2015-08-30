@@ -72,13 +72,14 @@
                         <div style="float: left; height: 50px; line-height: 50px; margin-left: 10px; ">{{comment.text}}</div>
                     </li>
                 </ul>
-
-                <form>
-                    <div class="form-group">
-                        <input type="email" class="form-control" id="exampleInputEmail1" placeholder="Insert your comment..." ng-model="ctrl.newComment">
-                    </div>
-                    <button type="submit" ng-click="ctrl.addComment(ctrl.newComment);ctrl.newComment = null;" class="btn btn-sm btn-primary">Commenta</button>
-                </form>
+                <div class="col-md-12 col-sm-12 col-xs-12">
+                    <form>
+                        <div class="form-group">
+                            <input type="email" class="form-control" id="exampleInputEmail1" placeholder="Insert your comment..." ng-model="ctrl.newComment">
+                        </div>
+                        <button type="submit" ng-click="ctrl.addComment(ctrl.newComment);ctrl.newComment = null;" class="btn btn-sm btn-primary">Commenta</button>
+                    </form>
+                </div>
             </div>
         </div>
     </div>
