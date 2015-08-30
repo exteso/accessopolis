@@ -39,6 +39,16 @@
             }
 
         }])
+        .directive('videoReview', function() {
+            return {
+                restrict: 'A',
+                scope: true,
+                controller: function() {},
+                bindToController: true,
+                controllerAs: 'videoController',
+                templateUrl: 'scripts/feature/detail/video.html'
+            }
+        })
         .directive('imageMap', function() {
             return {
                 restrict: 'A',
@@ -53,7 +63,10 @@
                 bindToController: {
                     location: '=imageMap'
                 },
-                template: '<a href="https://google.com/maps?z=12&t=m&q=loc:{{imageCtrl.location.lat}}+{{imageCtrl.location.long}}" title="google maps" data-ng-if="imageCtrl.showImage()" target="_blank"><img class="img-responsive" data-ng-src="https://maps.googleapis.com/maps/api/staticmap?center={{imageCtrl.location.lat}},{{imageCtrl.location.long}}&zoom=13&size=200x200&maptype=roadmap&markers=color:red%7Clabel:C%7C{{imageCtrl.location.lat}},{{imageCtrl.location.long}}" /></a>'
+                template: '<a href="https://google.com/maps?z=12&t=m&q=loc:{{imageCtrl.location.lat}}+{{imageCtrl.location.long}}" title="google maps" data-ng-if="imageCtrl.showImage()" target="_blank">' +
+                '<div class="accessopolis-location-map hidden-xs" style="background-image: url(\'https://maps.googleapis.com/maps/api/staticmap?center={{imageCtrl.location.lat}},{{imageCtrl.location.long}}&zoom=15&size=392x300&maptype=roadmap&markers=color:red%7Clabel:C%7C{{imageCtrl.location.lat}},{{imageCtrl.location.long}}\'); background-size: cover" ></div>' +
+                '<div class="accessopolis-location-map visible-xs" style="background-image: url(\'https://maps.googleapis.com/maps/api/staticmap?center={{imageCtrl.location.lat}},{{imageCtrl.location.long}}&zoom=15&size=786x300&maptype=roadmap&markers=color:red%7Clabel:C%7C{{imageCtrl.location.lat}},{{imageCtrl.location.long}}\'); background-size: cover"></div>' +
+                '</a>'
             }
         })
         .config(['$routeProvider', function($routeProvider) {

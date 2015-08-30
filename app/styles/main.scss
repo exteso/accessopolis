@@ -469,7 +469,12 @@ input.ng-invalid.ng-touched, select.ng-invalid.ng-touched, textarea.ng-invalid.n
                 font-size: 3em;
                 background: #93999a;
                 margin: 5px !important;
-
+                .accessopolis-location-map {
+                    width:100%;
+                    height: 100%;
+                    float:left;
+                    display:block;
+                }
             }
         }
     }
