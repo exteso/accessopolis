@@ -26,6 +26,17 @@ angular.module('accessopolisApp', [
     'accessopolis.rating',
     'pascalprecht.translate'
   ])
+    .config(["$translateProvider", function ($translateProvider) {
+        $translateProvider.translations('en', {
+            'accessopolis.rating.expert': 'Experts',
+            'accessopolis.rating.public': 'Public'
+        });
+        $translateProvider.translations('it', {
+            'accessopolis.rating.expert': 'Esperti',
+            'accessopolis.rating.public': 'Pubblico'
+        });
+        $translateProvider.preferredLanguage('it');
+    }])
     .controller('AppCtrl', ["$scope", "Auth", function ($scope, Auth) {
         $scope.user = Auth.$getAuth();
     }]);
