@@ -225,10 +225,19 @@ input.ng-invalid.ng-touched, select.ng-invalid.ng-touched, textarea.ng-invalid.n
 }
 
 .accessopolis-badge {
-    font-size: 1.2em;
+    font-size: 1.5em;
     position:absolute;
-    top:45px;
-    right:4px;
+    top:50px;
+    right:50px;
+    a, a:hover {
+        color: #fff;
+    }
+}
+
+.accessopolis-search-icon {
+    position:absolute;
+    top:48px;
+    right:10px;
 }
 
 .accessopolis-search-box {
