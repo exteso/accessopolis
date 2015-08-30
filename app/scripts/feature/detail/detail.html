@@ -36,6 +36,15 @@
                     </h1>
                 <div data-ng-if="ctrl.detail" data-ratings="ctrl.detail"></div>
 
+                <form>
+                    <input placeholder="Insert your comment..." ng-model="ctrl.newComment">
+                    <button type="submit" ng-click="ctrl.addComment(ctrl.newComment);ctrl.newComment = null;">send</button>
+                </form>
+                <ul>
+                    <li ng-repeat="comment in ctrl.comments">
+                        {{comment.text}}
+                    </li>
+                </ul>
             </div>
             <div class="accessopolis-bg-white col-md-8 col-sm-12 col-xs-12 accessopolis-location-detail-content-slide" >
 

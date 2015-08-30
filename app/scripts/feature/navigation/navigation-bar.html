@@ -11,7 +11,7 @@
                              'fa-magic': item.text == 'religion'}"></span>
         </div>
         <div class="accessopolis-navigation-bar-category-label">
-            {{item.text}}
+            {{item.text | translate}}
         </div>
 
 
@@ -23,7 +23,7 @@
                 <div  class="accessopolis-navigation-bar-sub-category-icon" >
                     <span class="fa fa-camera"></span>
                 </div>
-                <div class="accessopolis-navigation-bar-sub-category-label" >{{child}}</div>
+                <div class="accessopolis-navigation-bar-sub-category-label" >{{child | translate}}</div>
             </li>
         </ul>
 

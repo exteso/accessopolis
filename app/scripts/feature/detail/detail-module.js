@@ -80,6 +80,15 @@
             });
         };
 
+        this.getComments = function(id) {
+            return $q(function(resolve, reject) {
+                var obj = $firebaseArray(Ref.child('comments/'+id));
+                obj.$loaded(function(val) {
+                    resolve(val);
+                });
+            });
+        };
+
         this.create = function(location) {
             var mock = {lat: 45.833376, long: 9.030515};
             return $firebaseArray(Ref.child('locations')).$add(angular.extend(mock, location));
@@ -101,6 +110,10 @@
             self.detail = result;
         });
 
+        LocationDetailService.getComments($routeParams.id).then(function(result) {
+            self.comments = result;
+        });
+
         this.backToList = function() {
             $location.path('/');
         };
@@ -112,6 +125,16 @@
                 self.rateFeedback = result;
             });
         };
+
+        this.addComment = function(newComment) {
+            if( newComment ) {
+                // push a message to the end of the array
+                self.comments.$add({text: newComment})
+                    // display any errors
+                    .catch(alert);
+            }
+        };
+
     }
 
     LocationDetailController.prototype.$inject = ['LocationDetailService', '$routeParams', '$location', 'user'];
