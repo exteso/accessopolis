@@ -19,9 +19,9 @@
     function LocationDetailService($q, $firebaseObject, Ref, $firebaseArray) {
         this.find = function(id) {
             return $q(function(resolve, reject) {
-                var obj = $firebaseObject(Ref.child('locations').orderByKey().equalTo(id));
+                var obj = $firebaseObject(Ref.child('locations/'+id));
                 obj.$loaded(function(val) {
-                    resolve(val[id]);
+                    resolve(val);
                 });
             });
         };
@@ -62,6 +62,10 @@
             }, function(err) {
                 alert(err);
             });
+        };
+
+        this.backToList = function() {
+            $location.path('/');
         };
 
         NavigationService.loadNavigationElements().then(function(result) {

@@ -1,6 +1,6 @@
 (function() {
     "use strict";
-    angular.module('accessopolis.search', [])
+    angular.module('accessopolis.search', ['accessopolis.rating'])
         .service('LocationSearchService', LocationSearchService)
         .directive('locationSearch', function() {
             return {
@@ -57,28 +57,47 @@
         };
     }
 
-
-
     LocationSearchService.prototype.$inject = ['$q', 'Ref', '$firebaseArray'];
 
-    function LocationSearchController(LocationSearchService, $rootScope) {
+    function LocationSearchController(LocationSearchService, $rootScope, $scope) {
 
         var self = this;
 
         $rootScope.$on('SubcategorySelected', function(event, subcategory) {
-            LocationSearchService.search({type: subcategory}).then(function(result) {
-                self.resultList = result;
-            });
+            self.subcategorySelected = subcategory;
         });
 
         this.searchParam = undefined;
 
+        this.clearSubcategory = function($event) {
+            self.subcategorySelected = undefined;
+            $event.stopPropagation();
+        };
+
         this.performSearch = function() {
-            LocationSearchService.search({text: self.searchParam}).then(function(result) {
+            LocationSearchService.search({text: self.searchParam, type: self.subcategorySelected}).then(function(result) {
                 self.resultList = result;
             });
         };
+
+        this.showInsertButton = function() {
+            return angular.isDefined(self.resultList) && self.resultList.length === 0;
+        };
+
+        //we use scope here only to trigger the $watch mechanism. Maybe there would be a better solution?
+        $scope.$watch(function () {
+            return self.searchParam;
+        },function(){
+            self.performSearch();
+        });
+
+        $scope.$watch(function() {
+            return self.subcategorySelected;
+        }, function() {
+            self.performSearch();
+        });
+
     }
 
-    LocationSearchController.prototype.$inject = ['LocationSearchService', '$rootScope'];
+    LocationSearchController.prototype.$inject = ['LocationSearchService', '$rootScope', '$scope'];
 })();

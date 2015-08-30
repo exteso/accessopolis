@@ -118,7 +118,7 @@ body {
         }
 
         ul.accessopolis-navigation-bar-sub-category {
-            position: absolute; width: 250px; margin-left: 5px; float: left; margin-top: 105px; background: #fff; list-style: none; border: 1px solid #ccc; padding: 0px;
+            position: absolute; width: 250px; margin-left: 5px; float: left; margin-top: 105px; background: #fff; list-style: none; border: 1px solid #ccc; padding: 0px;z-index:99;
             li { float:left; line-height: 60px; height: 60px; text-align: left;  width: 100%; clear: both;  border-bottom: 1px solid #ccc;
                 .accessopolis-navigation-bar-sub-category-icon { float: left; width: 30px; height: 60px; padding-top: 8px; padding-left: 10px; line-height: 60px;
                     span { font-size: 2em;}
@@ -143,6 +143,7 @@ body {
             .accessopolis-header-logo {
                 font-size: 3em;
                 line-height: 100%;
+                font-weight: lighter;
             }
         }
 }
@@ -157,12 +158,15 @@ body {
         padding: 5px 30px 40px 30px;
         background: rgba(255, 255, 255, 0.6);
         border-radius: 3px;
+        position:relative;
         .accessopolis-search-field-header {
-            float: left;
+            float: right;
             line-height: 30px;
-            height: 30px;
+            height: 40px;
+            width:100%;
             color: #fff;
-            text-shadow: 1px 1px 2px black;}
+            text-shadow: 1px 1px 2px black;
+        }
         .accessopolis-search-field-btn {
             float: right;
             margin-top: 3px;
@@ -179,11 +183,33 @@ body {
     }
 }
 
-.accessopolis-lacation { width: 100%; height: 160px; padding: 5px; float: left; background: rgba(255, 255,255,.9);
-        .accessopolis-lacation-icon { width: 150px; float: left; height: 150px; line-height: 150px; font-size: 2.5em; text-align: center; background: rgb(255,255,255);}
-        .accessopolis-lacation-data { float: left; padding-left: 10px; width: calc(100% - 160px);  height: 150px;
-            .accessopolis-lacation-data-info { float: left;}
-            .accessopolis-lacation-data-rating { float: right; background: rgba(255, 255, 255, 0.8); width: 180px; height: calc(100% - 25px); padding: 5px;  margin-top: 10px; overflow: hidden;}
+.accessopolis-location { width: 100%; height: 160px; padding: 5px; float: left; background: rgba(255, 255,255,.9);
+        .accessopolis-location-icon {
+            width: 150px;
+            float: left;
+            height: 150px;
+            line-height: 150px;
+            font-size: 2.5em;
+            text-align: center;
+            background: rgb(255,255,255);
+            border: 1px solid #ccc;
+        }
+        .accessopolis-location-data {
+            float: left;
+            padding-left: 10px;
+            width: calc(100% - 160px);
+            height: 150px;
+            .accessopolis-location-data-info { float: left;
+                .accessopolis-location-rating-item {
+                    float: left;
+                    width: 50px; height: 50px;
+                    margin-left: 10px; margin-right: 10px;
+                    border-radius: 50%;
+                    border: 5px solid red;
+                    &:first-child { margin-left: 0px; background: green;}
+                }
+            }
+            .accessopolis-location-data-rating { float: right; background: rgba(255, 255, 255, 0.8); width: 180px; height: calc(100% - 25px); padding: 5px;  margin-top: 10px; overflow: hidden;}
         }
 }
 
@@ -196,4 +222,24 @@ body {
 
 input.ng-invalid.ng-touched, select.ng-invalid.ng-touched, textarea.ng-invalid.ng-touched {
     border:1px solid #d9534f;
+}
+
+.accessopolis-badge {
+    font-size: 1.5em;
+    position:absolute;
+    top:50px;
+    right:50px;
+    a, a:hover {
+        color: #fff;
+    }
+}
+
+.accessopolis-search-icon {
+    position:absolute;
+    top:48px;
+    right:10px;
+}
+
+.accessopolis-search-box {
+    position:relative;
 }
