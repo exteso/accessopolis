@@ -4,6 +4,41 @@
         .service('LocationDetailService', LocationDetailService)
         .controller('LocationDetailController', LocationDetailController)
         .controller('NewLocationController', NewLocationController)
+        .directive('autocompleteAddress', [function() {
+            return {
+                restrict: 'A',
+                scope: true,
+                controller: ['$rootScope', '$scope', '$log', function($rootScope, $scope, $log) {
+                    var self = this;
+                    $scope.$watch(function() {
+                        return self.autocomplete;
+                    }, function(val) {
+                        if(val) {
+                            val.addListener('place_changed', function() {
+                                var place = self.autocomplete.getPlace();
+                                if (place.geometry) {
+                                    $rootScope.$broadcast('LocationSelected', place.geometry.location);
+                                }
+                            });
+                        }
+                    })
+
+
+                }],
+                bindToController: true,
+                controllerAs: 'autocompleteCtrl',
+                link: function(scope, element, attrs) {
+                    scope.$watch(function() {
+                        return accessopolis.googleMapReady;
+                    }, function(val) {
+                        if(val) {
+                            scope.autocompleteCtrl.autocomplete = new google.maps.places.Autocomplete(element[0], {types: ['geocode']});
+                        }
+                    });
+                }
+            }
+
+        }])
         .config(['$routeProvider', function($routeProvider) {
             $routeProvider.when('/locations/:id', {
                 templateUrl: 'scripts/feature/detail/detail.html',
@@ -48,7 +83,7 @@
 
     LocationDetailController.prototype.$inject = ['LocationDetailService', '$routeParams', '$location'];
 
-    function NewLocationController(NavigationService, LocationDetailService, $location) {
+    function NewLocationController(NavigationService, LocationDetailService, $location, $rootScope) {
         var self = this;
         this.location = {};
         //this.stars = _.range(0,6);
@@ -74,8 +109,13 @@
             });
         });
 
+        $rootScope.$on('LocationSelected', function(e, data) {
+            self.location.lat = data.G;
+            self.location.long = data.K;
+        });
+
     }
 
-    NewLocationController.prototype.$inject = ['NavigationService', 'LocationDetailService', '$location'];
+    NewLocationController.prototype.$inject = ['NavigationService', 'LocationDetailService', '$location', '$rootScope'];
 
 })();
