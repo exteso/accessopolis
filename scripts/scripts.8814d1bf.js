@@ -105,7 +105,7 @@ angular.module('accessopolisApp', [
             'accessopolis.error.minlength': 'Il valore inserito non è valido',
             'accessopolis.error.maxlength': 'Il valore inserito non è valido',
             'accessopolis.error.required': 'Questo campo è obbligatorio',
-            'accessopolis.search.suggestions': 'Inserisci il nome della struttura o della località',
+            'accessopolis.search.suggestions': 'Inserisci il nome della struttura/località',
             'accessopolis.location.type': 'Tipologia della struttura',
             'accessopolis.location.address': 'Indirizzo della struttura',
             'accessopolis.cancel': 'Annulla',
