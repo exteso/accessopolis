@@ -64,9 +64,6 @@
         var self = this;
 
         $rootScope.$on('SubcategorySelected', function(event, subcategory) {
-            LocationSearchService.search({type: subcategory}).then(function(result) {
-                self.resultList = result;
-            });
             self.subcategorySelected = subcategory;
         });
 
@@ -89,6 +86,13 @@
         },function(){
             self.performSearch();
         });
+
+        $scope.$watch(function() {
+            return self.subcategorySelected;
+        }, function() {
+            self.performSearch();
+        });
+
     }
 
     LocationSearchController.prototype.$inject = ['LocationSearchService', '$rootScope', '$scope'];
