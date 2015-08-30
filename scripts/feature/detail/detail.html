@@ -1,5 +1,5 @@
 
-<div class="accessopolis-location-detail">
+<div class="accessopolis-location-detail col-xs-12">
     <div class="container">
         <div class="accessopolis-location-detail-back">
             <a data-ng-click="ctrl.backToList()" class="btn btn-primary btn-xs" >
@@ -19,27 +19,31 @@
 
 
     <div class="container accessopolis-location-detail-content" >
-        <div class="accessopolis-bg-white accessopolis-location-detail-content-rating-evaluation" >
-                <h1 class="accessopolis-location-detail-content-rating-evaluation-title" data-translate>
-                    accessopolis.accessibility-evaluation
-                </h1>
-        </div>
-        <div class="accessopolis-bg-white accessopolis-location-detail-content-slide" >
-            <div class="accessopolis-location-detail-content-slide-main" >
-                <div class="accessopolis-location-detail-content-slide-main-content" >
-                    <span class="fa fa-youtube-play"></span>
-                </div>
+        <div class="container">
+            <div class="accessopolis-bg-white col-md-4 hidden-xs hidden-sm accessopolis-location-detail-content-rating-evaluation" >
+                    <h1 class="accessopolis-location-detail-content-rating-evaluation-title" data-translate>
+                        accessopolis.accessibility-evaluation
+                    </h1>
             </div>
-            <div class="accessopolis-location-detail-content-slide-nav">
-                <div class="accessopolis-location-detail-content-slide-nav-item" >
-                    <span class="fa fa-map-marker"></span>
-                </div>
-                <div class="accessopolis-location-detail-content-slide-nav-item">
-                    <span class="fa fa-camera"></span>
-                </div>
-                <div  class="accessopolis-location-detail-content-slide-nav-item" >
-                    <span class="fa fa-youtube-play"></span>
-                </div>
+            <div class="accessopolis-bg-white col-md-8 col-sm-12 col-xs-12 accessopolis-location-detail-content-slide" >
+
+                    <div class="accessopolis-location-detail-content-slide-main col-xs-12 col-md-8 col-sm-8" >
+                        <div class="accessopolis-location-detail-content-slide-main-content" >
+                            <span class="fa fa-youtube-play"></span>
+                        </div>
+                    </div>
+
+                    <div class=" col-md-4 col-sm-4 col-xs-12 accessopolis-location-detail-content-slide-nav">
+
+                        <div class=" col-md-12 col-sm-12  col-xs-12 accessopolis-location-detail-content-slide-nav-item " data-image-map="ctrl.detail">
+                            <span class="fa fa-map-marker"></span>
+                        </div>
+                        <div class=" col-md-12 col-sm-12 col-xs-12 accessopolis-location-detail-content-slide-nav-item ">
+                            <span class="fa fa-camera"></span>
+                        </div>
+
+                    </div>
+
             </div>
         </div>
     </div>
