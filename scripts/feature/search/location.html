@@ -1,11 +1,22 @@
 
 <div class=" col-md-12 col-sm-12 col-xs-12 accessopolis-location " >
 
-    <div class="accessopolis-location-icon">
+    <div class="accessopolis-location-icon hidden-xs">
 
 
-        <div class="fa fa-thumb-tack" style="width: 100%; height: 100%;  font-size: 6em; color: #d2d2d2; overflow: hidden;"
+        <div class="fa fa-thumb-tack" style="width: 100%; height: 100%;  font-size: 4.8em; color: #d2d2d2; overflow: hidden;"
               ng-class="{'fa-coffee': ctrlLoc.location.type === 'bar',
+                         'fa-bed': ctrlLoc.location.type === 'hotels',
+                         'fa-beer': ctrlLoc.location.type === 'pub',
+                         'fa-train': ctrlLoc.location.type === 'train-stations'}">
+        </div>
+    </div>
+
+    <div class="accessopolis-location-icon-small visible-xs">
+
+
+        <div class="fa fa-thumb-tack" style="width: 100%; height: 100%;  font-size: 4.8em; color: #d2d2d2; overflow: hidden;"
+             ng-class="{'fa-coffee': ctrlLoc.location.type === 'bar',
                          'fa-bed': ctrlLoc.location.type === 'hotels',
                          'fa-beer': ctrlLoc.location.type === 'pub',
                          'fa-train': ctrlLoc.location.type === 'train-stations'}">

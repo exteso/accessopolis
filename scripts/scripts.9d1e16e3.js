@@ -87,7 +87,7 @@ angular.module('accessopolisApp', [
             'restaurant':'Ristoranti',
             'bar':'Bar',
             'pub':'Pubs',
-            'religion': 'Culto',
+            'religion': 'Luoghi di Culto',
             'mosque': 'Moschee',
             'church': 'Chiese',
             'synagogue': 'Sinagoghe',

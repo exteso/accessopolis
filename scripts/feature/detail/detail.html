@@ -1,5 +1,5 @@
 
-<div class="accessopolis-location-detail col-xs-12">
+<div class="accessopolis-location-detail col-xs-12" >
     <div class="container">
         <div class="accessopolis-location-detail-back">
             <a data-ng-click="ctrl.backToList()" class="btn btn-primary btn-xs" >
@@ -32,9 +32,7 @@
         </div>
     </div>
 </div>
-
-
-    <div class="container accessopolis-location-detail-content" >
+    <div class="container accessopolis-location-detail-content">
         <div class="container">
             <div class="accessopolis-bg-white col-md-4 hidden-xs hidden-sm accessopolis-location-detail-content-rating-evaluation" >
                     <h1 class="accessopolis-location-detail-content-rating-evaluation-title" data-translate>
@@ -42,15 +40,7 @@
                     </h1>
                 <div data-ng-if="ctrl.detail" data-ratings="ctrl.detail"></div>
 
-                <!--<form>-->
-                    <!--<input placeholder="Insert your comment..." ng-model="ctrl.newComment">-->
-                    <!--<button type="submit" ng-click="ctrl.addComment(ctrl.newComment);ctrl.newComment = null;">send</button>-->
-                <!--</form>-->
-                <!--ul>
-                    <li ng-repeat="comment in ctrl.comments">
-                        {{comment.text}}
-                    </li>
-                </ul-->
+
             </div>
             <div class="accessopolis-bg-white col-md-8 col-sm-12 col-xs-12 accessopolis-location-detail-content-slide" >
                     <div class="accessopolis-location-detail-content-slide-main col-xs-12 col-md-8 col-sm-8" >
@@ -71,5 +61,30 @@
                     </div>
 
             </div>
+
+            <div class="col-md-12 col-sm-12 col-xs-12 accessopolis-bg-white" style="min-height: 300px; padding-bottom: 50px; margin-bottom: 20px;  margin-top: 10px;">
+                <h1>Commenti:</h1>
+                <ul class="list-group" style="float: left;  width: 100%;">
+                    <li class="list-group-item" ng-repeat="comment in ctrl.comments" style="float: left; width: 100%;" >
+                        <div style="width: 50px; height: 50px; float: left; ">
+                            <div style="float: left; width: 50px; height: 50px; background: #ccc; color:#fff; text-align: center; border-radius: 50%;  line-height: 50px;">
+                                <span class="fa fa-user"></span>
+                            </div>
+                        </div>
+                        <div style="float: left; height: 50px; line-height: 50px; margin-left: 10px; ">{{comment.text}}</div>
+                    </li>
+                </ul>
+
+                <form>
+                    <div class="form-group">
+                        <input type="email" class="form-control" id="exampleInputEmail1" placeholder="Insert your comment..." ng-model="ctrl.newComment">
+                    </div>
+                    <button type="submit" ng-click="ctrl.addComment(ctrl.newComment);ctrl.newComment = null;" class="btn btn-sm btn-primary">Commenta</button>
+                </form>
+            </div>
         </div>
     </div>
+
+    </div>
+
+
