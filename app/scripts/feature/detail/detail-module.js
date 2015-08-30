@@ -39,6 +39,23 @@
             }
 
         }])
+        .directive('imageMap', function() {
+            return {
+                restrict: 'A',
+                scope: true,
+                controllerAs: 'imageCtrl',
+                controller: function() {
+                    var self = this;
+                    this.showImage = function() {
+                        return angular.isDefined(self.location) && angular.isDefined(self.location.lat) && angular.isDefined(self.location.long);
+                    }
+                },
+                bindToController: {
+                    location: '=imageMap'
+                },
+                template: '<a href="https://google.com/maps?z=12&t=m&q=loc:{{imageCtrl.location.lat}}+{{imageCtrl.location.long}}" title="google maps" data-ng-if="imageCtrl.showImage()" target="_blank"><img class="img-responsive" data-ng-src="https://maps.googleapis.com/maps/api/staticmap?center={{imageCtrl.location.lat}},{{imageCtrl.location.long}}&zoom=13&size=200x200&maptype=roadmap&markers=color:red%7Clabel:C%7C{{imageCtrl.location.lat}},{{imageCtrl.location.long}}" /></a>'
+            }
+        })
         .config(['$routeProvider', function($routeProvider) {
             $routeProvider.when('/locations/:id', {
                 templateUrl: 'scripts/feature/detail/detail.html',
