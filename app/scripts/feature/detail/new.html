@@ -27,7 +27,7 @@
 
             <div class="form-group">
                 <label data-translate for="address" data-ng-minlenght="5">accessopolis.location.address</label>
-                <input type="text" class="form-control" id="address" name="address" data-ng-model="ctrl.location.address" required="required" />
+                <input type="text" class="form-control" id="address" data-autocomplete-address name="address" data-ng-model="ctrl.location.address" required="required" />
                 <div class="text-danger" data-ng-messages="newLocationForm.address.$error" data-ng-if="newLocationForm.address.$touched">
                     <p data-ng-message="minlength" data-translate>accessopolis.error.minlength</p>
                     <p data-ng-message="maxlength">accessopolis.error.maxlength</p>
