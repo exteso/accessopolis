@@ -17,7 +17,8 @@ body {
     font-family: $body-font;
     padding: 0;
     &.accessopolis-bg {
-        background: url('../images/bg_1.jpg');
+
+        background: #ccc url('../images/bg_1.jpg');
         background-size:160%;
         background-repeat: no-repeat;
     }
@@ -190,8 +191,20 @@ body {
     float: left;
     background: rgba(255, 255, 255, .9);
     margin: 5px 0px;
+    overflow: hidden;
     .accessopolis-location-icon {
         width: 150px;
+        float: left;
+        height: 150px;
+        line-height: 150px;
+        font-size: 2.5em;
+        text-align: center;
+        background: rgb(255, 255, 255);
+        border: 1px solid #ccc;
+        overflow: hidden;
+    }
+    .accessopolis-location-icon-small {
+        width: 100px;
         float: left;
         height: 150px;
         line-height: 150px;
