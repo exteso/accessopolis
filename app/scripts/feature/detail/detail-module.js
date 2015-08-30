@@ -64,6 +64,10 @@
             });
         };
 
+        this.backToList = function() {
+            $location.path('/');
+        };
+
         NavigationService.loadNavigationElements().then(function(result) {
             result.$loaded(function(data) {
                 self.subtypes = _.chain(data).map('subcategory').flatten().uniq().value();
