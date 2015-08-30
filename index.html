@@ -8,6 +8,12 @@
     <!-- Place favicon.ico and apple-touch-icon.png in the root directory -->
 
     <link rel="stylesheet" href="styles/main.489557e7.css">
+    <script type="application/javascript">
+        window.accessopolis = window.accessopolis || {};
+        function initMap() {
+            window.accessopolis.googleMapReady = true;
+        }
+    </script>
   </head>
   <body ng-app="accessopolisApp"  class="accessopolis-bg">
     <!--[if lt IE 7]>
@@ -58,6 +64,8 @@
 
     <script src="scripts/vendor.5565dffd.js"></script>
 
-        <script src="scripts/scripts.734b12b5.js"></script>
+        <script src="scripts/scripts.6fc9e0cc.js"></script>
+
+    <script async defer src="https://maps.googleapis.com/maps/api/js?signed_in=true&libraries=places&key=AIzaSyCbm7ot6UqPk9I7sQVu3Z3PeU7hvwT0pbU&callback=initMap"></script>
 </body>
 </html>
