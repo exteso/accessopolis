@@ -193,6 +193,7 @@ body {
             text-align: center;
             background: rgb(255,255,255);
             border: 1px solid #ccc;
+            overflow: hidden;
         }
         .accessopolis-location-data {
             float: left;
@@ -217,7 +218,7 @@ body {
 .accessopolis-rating-item { width:85px; float: left;   height: 100%;
     &:first-child { border-right: 1px solid #000;}
     .accessopolis-rating-item-val { float:left; width: 100%; vertical-align: middle; padding-top: 10px; height: 50%; text-align: center; font-size: 2em; }
-    .accessopolis-rating-item-icon {float:left; width: 100%; vertical-align: middle; padding-top: 10px; height: 50%; text-align: center; font-size: 2em; }
+    .accessopolis-rating-item-icon {float:left; width: 100%; vertical-align: middle; padding-top: 10px; height: 50%; text-align: center; font-size: 2em; margin-top: -10px; }
 }
 
 input.ng-invalid.ng-touched, select.ng-invalid.ng-touched, textarea.ng-invalid.ng-touched {
