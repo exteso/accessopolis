@@ -1,5 +1,45 @@
-<div>
-    <div>Name: {{ctrl.detail.text}}</div>
-    <div>Address: {{ctrl.detail.address}}</div>
-    <a data-ng-click="ctrl.backToList()">&lt; back</a>
+
+<div class="accessopolis-location-detail">
+    <div class="container">
+        <div class="accessopolis-location-detail-back">
+            <a data-ng-click="ctrl.backToList()" class="btn btn-primary btn-xs" >
+                <span class="fa fa-chevron-left"></span> back</a>
+        </div>
+        <div class="accessopolis-location-detail-header">
+            <div class="accessopolis-location-detail-header-title">
+                <h1>{{ctrl.detail.text}}</h1>
+                <div><span class=""></span>{{ctrl.detail.address}}</div>
+            </div>
+            <div class="accessopolis-location-detail-header-rating">
+                <div data-ng-if="ctrl.detail" data-rating="ctrl.detail"></div>
+            </div>
+        </div>
+    </div>
 </div>
+
+
+    <div class="container accessopolis-location-detail-content" >
+        <div class="accessopolis-bg-white accessopolis-location-detail-content-rating-evaluation" >
+                <h1 class="accessopolis-location-detail-content-rating-evaluation-title" data-translate>
+                    accessopolis.accessibility-evaluation
+                </h1>
+        </div>
+        <div class="accessopolis-bg-white accessopolis-location-detail-content-slide" >
+            <div class="accessopolis-location-detail-content-slide-main" >
+                <div class="accessopolis-location-detail-content-slide-main-content" >
+                    <span class="fa fa-youtube-play"></span>
+                </div>
+            </div>
+            <div class="accessopolis-location-detail-content-slide-nav">
+                <div class="accessopolis-location-detail-content-slide-nav-item" >
+                    <span class="fa fa-map-marker"></span>
+                </div>
+                <div class="accessopolis-location-detail-content-slide-nav-item">
+                    <span class="fa fa-camera"></span>
+                </div>
+                <div  class="accessopolis-location-detail-content-slide-nav-item" >
+                    <span class="fa fa-youtube-play"></span>
+                </div>
+            </div>
+        </div>
+    </div>

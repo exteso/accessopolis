@@ -1,17 +1,27 @@
 
-<div class="accessopolis-lacation" >
+<div class="accessopolis-location" >
 
-    <div class="accessopolis-lacation-icon">
-        <span class="fa fa-bed"></span>
+    <div class="accessopolis-location-icon">
+        <span class="fa fa-thumb-tack"
+              ng-class="{'fa-coffee': ctrlLoc.location.type === 'bar',
+                         'fa-bed': ctrlLoc.location.type === 'hotels',
+                         'fa-beer': ctrlLoc.location.type === 'pub',
+                         'fa-train': ctrlLoc.location.type === 'train-stations'}">
+        </span>
     </div>
 
-    <div  class="accessopolis-lacation-data" >
-        <div class="accessopolis-lacation-data-info">
+    <div  class="accessopolis-location-data" >
+        <div class="accessopolis-location-data-info">
             <h1 style="font-size: 1.8em;"  data-ng-click="ctrlLoc.showDetail()">{{ctrlLoc.location.text}}</h1>
-            <span data-ng-click="ctrlLoc.showDetail()">type: {{ctrlLoc.location.type}} </span>
+            <button class="btn btn-danger btn-lg">Segnala un problema</button>
+            <!--<div class="accessopolis-location-rating-item" ></div>-->
+            <!--<div class="accessopolis-location-rating-item" ></div>-->
+            <!--<div class="accessopolis-location-rating-item" ></div>-->
+            <!--<div class="accessopolis-location-rating-item" ></div>-->
+            <!-- span data-ng-click="ctrlLoc.showDetail()">type: {{ctrlLoc.location.type}} </span-->
         </div>
 
-        <div class="accessopolis-lacation-data-rating" data-rating="ctrlLoc.location"></div>
+        <div class="accessopolis-location-data-rating" data-rating="ctrlLoc.location"></div>
 
     </div>
 </div>
