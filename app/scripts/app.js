@@ -66,7 +66,10 @@ angular.module('accessopolisApp', [
             'accessopolis.selected.categories': 'Selected Categories',
             'accessopolis.location.not-found': 'No locations found',
             'accessopolis.location.new': 'Add Location',
-            'report-a-problem': 'Report a problem'
+            'report-a-problem': 'Report a problem',
+            'accessopolis.back-to-list': 'Back to list',
+            'accessopolis.vote.now' : 'Leave your vote',
+            'accessopolis.voting': 'Vote!'
         });
         $translateProvider.translations('it', {
             'public-transport': 'Trasporti Pubblici',
@@ -110,7 +113,10 @@ angular.module('accessopolisApp', [
             'accessopolis.selected.categories': 'Categorie Selezionate',
             'accessopolis.location.not-found': 'Nessuna struttura trovata',
             'accessopolis.location.new': 'Aggiungi',
-            'report-a-problem': 'Segnala un problema'
+            'accessopolis.back-to-list': 'Torna alla lista',
+            'report-a-problem': 'Segnala un problema',
+            'accessopolis.vote.now' : 'Dai il tuo voto',
+            'accessopolis.voting': 'Vota!'
         });
         $translateProvider.preferredLanguage('it');
     })

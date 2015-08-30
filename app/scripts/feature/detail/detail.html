@@ -3,25 +3,31 @@
     <div class="container">
         <div class="accessopolis-location-detail-back">
             <a data-ng-click="ctrl.backToList()" class="btn btn-primary btn-xs" >
-                <span class="fa fa-chevron-left"></span> back</a>
+                <span class="fa fa-chevron-left"></span> <span data-translate>accessopolis.back-to-list</span></a>
         </div>
         <div class="accessopolis-location-detail-header">
             <div class="accessopolis-location-detail-header-title">
                 <h1>{{ctrl.detail.text}}</h1>
                 <div><span class=""></span>{{ctrl.detail.address}}</div>
             </div>
-            <!-- Reactivate this to enable voting -->
-            <!--
-            <div ng-show-auth="">
-            <input type="text" ng-model="ctrl.vote"><button ng-click="ctrl.rate()" value="Vote"/>
-            </div>
-            -->
+
             <div class=" hidden-xs hidden-sm accessopolis-location-detail-header-rating">
-                <div data-ng-if="ctrl.detail" data-rating="ctrl.detail"></div>
+                <div data-ng-if="ctrl.detail" data-rating="ctrl.detail" style=" float: left;"></div>
+                <div ng-show-auth="" >
+                    <button class="btn btn-primary" data-ng-show="!voting" data-ng-click="voting = !voting"  style="margin-top: 5px; margin-left: 25px;" >Dai il tuo voto</button>
+                    <div style="float: left; width: 150px; margin-top: 5px; margin-left: 20px;" data-ng-show="voting">
+                        <input type="number"  min="1" max="10" class="form-control" ng-model="ctrl.vote"  style="height: 30px; float: left; width: 80px; font-size: 1em; color: #000;" />
+                        <button data-ng-if="!ctrl.rateFeedback" ng-click="ctrl.rate()" class="btn btn-primary" style="width: 50px; height: 30px; line-height: 18px; float: left;" >Vota</button>
+                        <div ng-if="ctrl.rateFeedback" class="accessopolis-bg-white" style="width: 50px; border-radius: 50%; margin-left: 4px; text-align: center; height: 30px; line-height: 18px; float: left;">
+                            <span class="fa fa-check" style="font-size: 2em; color: green;"></span>
+                        </div>
+                    </div>
+                </div>
             </div>
 
             <div class="visible-xs visible-sm accessopolis-location-detail-header-rating-small">
                 <div data-ng-if="ctrl.detail" data-rating="ctrl.detail"></div>
+
             </div>
         </div>
     </div>
@@ -36,15 +42,15 @@
                     </h1>
                 <div data-ng-if="ctrl.detail" data-ratings="ctrl.detail"></div>
 
-                <form>
-                    <input placeholder="Insert your comment..." ng-model="ctrl.newComment">
-                    <button type="submit" ng-click="ctrl.addComment(ctrl.newComment);ctrl.newComment = null;">send</button>
-                </form>
-                <ul>
+                <!--<form>-->
+                    <!--<input placeholder="Insert your comment..." ng-model="ctrl.newComment">-->
+                    <!--<button type="submit" ng-click="ctrl.addComment(ctrl.newComment);ctrl.newComment = null;">send</button>-->
+                <!--</form>-->
+                <!--ul>
                     <li ng-repeat="comment in ctrl.comments">
                         {{comment.text}}
                     </li>
-                </ul>
+                </ul-->
             </div>
             <div class="accessopolis-bg-white col-md-8 col-sm-12 col-xs-12 accessopolis-location-detail-content-slide" >
                     <div class="accessopolis-location-detail-content-slide-main col-xs-12 col-md-8 col-sm-8" >
