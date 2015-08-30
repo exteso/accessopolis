@@ -1,0 +1,63 @@
+<div class="container accessopolis-bg-white" style="margin-top: 30px; margin-bottom: 30px">
+    <div class="">
+        <div class="page-header">
+            <h1 data-translate>accessopolis.insert-new-location</h1>
+        </div>
+        <form name="newLocationForm" data-ng-submit="ctrl.save(newLocationForm)" novalidate class="form">
+
+            <div class="form-group">
+                <label data-translate for="description">accessopolis.location.description</label>
+                <input type="text" class="form-control" name="text" data-ng-model="ctrl.location.text" id="description" required="required" />
+                <div class="text-danger" data-ng-messages="newLocationForm.text.$error" data-ng-if="newLocationForm.text.$touched">
+                    <p data-ng-message="minlength" data-translate>accessopolis.error.minlength</p>
+                    <p data-ng-message="maxlength">accessopolis.error.maxlength</p>
+                    <p data-ng-message="required">accessopolis.error.required</p>
+                </div>
+            </div>
+
+            <div class="form-group">
+                <label data-translate for="type">accessopolis.location.type</label>
+                <select name="type" class="form-control" data-ng-model="ctrl.location.type" data-ng-options="item for item in ctrl.subtypes" id="type" required="required"></select>
+                <div class="text-danger" data-ng-messages="newLocationForm.type.$error" data-ng-if="newLocationForm.type.$touched">
+                    <p data-ng-message="minlength" data-translate>accessopolis.error.minlength</p>
+                    <p data-ng-message="maxlength">accessopolis.error.maxlength</p>
+                    <p data-ng-message="required">accessopolis.error.required</p>
+                </div>
+            </div>
+
+            <div class="form-group">
+                <label data-translate for="address" data-ng-minlenght="5">accessopolis.location.address</label>
+                <input type="text" class="form-control" id="address" name="address" data-ng-model="ctrl.location.address" required="required" />
+                <div class="text-danger" data-ng-messages="newLocationForm.address.$error" data-ng-if="newLocationForm.address.$touched">
+                    <p data-ng-message="minlength" data-translate>accessopolis.error.minlength</p>
+                    <p data-ng-message="maxlength">accessopolis.error.maxlength</p>
+                    <p data-ng-message="required">accessopolis.error.required</p>
+                </div>
+            </div>
+
+            <!--<label data-translate for="rating">accessopolis.location.rating</label>-->
+            <!--<select name="rating" id="rating" data-ng-options="star in ctrl.stars" data-ng-model="ctrl.location.rating"></select>-->
+
+            <!--<label data-translate for="video">accessopolis.location.video</label>-->
+            <!--<input type="url" data-ng-model="ctrl.location.videoUrl" id="video" name="video"/>-->
+            <!--<div data-ng-messages="newLocationForm.video.$error" data-ng-if="newLocationForm.video.$touched">-->
+                <!--<p data-ng-message="url">accessopolis.error.url</p>-->
+            <!--</div>-->
+
+            <!--<label data-translate for="comment">accessopolis.location.comment</label>-->
+            <!--<textarea name="comment" id="comment" data-ng-model="ctrl.location.comment"></textarea>-->
+            <!--<div data-ng-messages="newLocationForm.comment.$error" data-ng-if="newLocationForm.comment.$touched">-->
+                <!--<p data-ng-message="minlength" data-translate>accessopolis.error.minlength</p>-->
+                <!--<p data-ng-message="maxlength">accessopolis.error.maxlength</p>-->
+                <!--<p data-ng-message="required">accessopolis.error.required</p>-->
+            <!--</div>-->
+
+            <div class="form-group">
+                <button type="button" class="btn btn-default" data-translate>accessopolis.cancel</button>
+                <button type="submit" class="btn btn-success pull-right" data-translate>accessopolis.save</button>
+                <div class="clearfix"></div>
+            </div>
+
+        </form>
+    </div>
+</div>

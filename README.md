@@ -1,2 +1,0 @@
-# accessopolis
-Accessopolis.ch

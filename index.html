@@ -1,0 +1,44 @@
+<!doctype html>
+<html class="no-js">
+  <head>
+    <meta charset="utf-8">
+    <title></title>
+    <meta name="description" content="">
+    <meta name="viewport" content="width=device-width">
+    <!-- Place favicon.ico and apple-touch-icon.png in the root directory -->
+
+    <link rel="stylesheet" href="styles/main.385dc5d4.css">
+  </head>
+  <body ng-app="accessopolisApp"  class="accessopolis-bg">
+    <!--[if lt IE 7]>
+      <p class="browsehappy">You are using an <strong>outdated</strong> browser. Please <a href="http://browsehappy.com/">upgrade your browser</a> to improve your experience.</p>
+    <![endif]-->
+
+    <!-- Add your site or application content here -->
+
+
+    <div class="header accessopolis-header" ng-cloak=""  >
+
+        <div class="container">
+            <div class="navbar-header accessopolis-header-content" ng-controller="AppCtrl">
+                <a class="navbar-brand accessopolis-header-logo" href="#/">Accessopolis</a>
+                <button ng-hide-auth="" data-ng-controller="LoginCtrl"  class="btn btn-primary btn-lg"  ng-click="oauthLogin('google')" >Accedi con Google</button>
+                <span ng-show-auth="" class="btn btn-primary btn-lg">{{user.google.email}}</span>
+            </div>
+
+        </div>
+
+    </div>
+    <div ng-view=""></div>
+
+    <div class="footer">
+      <div class="container">
+        <p><span class="glyphicon glyphicon-heart"></span> from the <a href="https://voxxeddays.com/ticino16" target="_blank">Voxxed Days Ticino</a> team and Exteso Sagl</p>
+      </div>
+    </div>
+
+    <script src="scripts/vendor.5565dffd.js"></script>
+
+        <script src="scripts/scripts.9c57b85f.js"></script>
+</body>
+</html>
