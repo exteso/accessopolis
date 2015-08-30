@@ -10,8 +10,8 @@
                 <input type="text" class="form-control" name="text" data-ng-model="ctrl.location.text" id="description" required="required" />
                 <div class="text-danger" data-ng-messages="newLocationForm.text.$error" data-ng-if="newLocationForm.text.$touched">
                     <p data-ng-message="minlength" data-translate>accessopolis.error.minlength</p>
-                    <p data-ng-message="maxlength">accessopolis.error.maxlength</p>
-                    <p data-ng-message="required">accessopolis.error.required</p>
+                    <p data-ng-message="maxlength" data-translate>accessopolis.error.maxlength</p>
+                    <p data-ng-message="required" data-translate>accessopolis.error.required</p>
                 </div>
             </div>
 
@@ -20,8 +20,8 @@
                 <select name="type" class="form-control" data-ng-model="ctrl.location.type" data-ng-options="item for item in ctrl.subtypes" id="type" required="required"></select>
                 <div class="text-danger" data-ng-messages="newLocationForm.type.$error" data-ng-if="newLocationForm.type.$touched">
                     <p data-ng-message="minlength" data-translate>accessopolis.error.minlength</p>
-                    <p data-ng-message="maxlength">accessopolis.error.maxlength</p>
-                    <p data-ng-message="required">accessopolis.error.required</p>
+                    <p data-ng-message="maxlength" data-translate>accessopolis.error.maxlength</p>
+                    <p data-ng-message="required" data-translate>accessopolis.error.required</p>
                 </div>
             </div>
 
@@ -30,8 +30,8 @@
                 <input type="text" class="form-control" id="address" data-autocomplete-address name="address" data-ng-model="ctrl.location.address" required="required" />
                 <div class="text-danger" data-ng-messages="newLocationForm.address.$error" data-ng-if="newLocationForm.address.$touched">
                     <p data-ng-message="minlength" data-translate>accessopolis.error.minlength</p>
-                    <p data-ng-message="maxlength">accessopolis.error.maxlength</p>
-                    <p data-ng-message="required">accessopolis.error.required</p>
+                    <p data-ng-message="maxlength" data-translate>accessopolis.error.maxlength</p>
+                    <p data-ng-message="required" data-translate>accessopolis.error.required</p>
                 </div>
             </div>
 
