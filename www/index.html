@@ -64,7 +64,16 @@
             </div>
           </div>
 
-        <ion-list ng-controller="LocationSearchController as ctrl">
+           <div class="list" ng-if="tab==='info'">
+
+            <label class="item item-input">
+              
+            bla  
+            </label>
+           </div>
+
+
+        <ion-list ng-controller="LocationSearchController as ctrl" ng-if="tab==='search'">
           <label class="item item-input">
               <input type="text" placeholder="Search" ng-model="ctrl.searchParam">
             </label>
@@ -75,15 +84,26 @@
             {{item.text}}
           </ion-item>
         </ion-list>
+        
+        
+        
       </ion-content>
 
       <ion-footer-bar align-title="left" ng-show="loggedInUser">
-        <label class="title">
+       <!-- <label class="title">
           <input type="text" placeholder="Message" ng-model="message.text" class="msg-input">
         </label>
         <button type="submit" class="button button-small" ng-click="addMessage(message)" id="add-message">
           Add
-        </button>
+        </button> -->
+        <ion-view hide-back-button="true">
+    <ion-tabs class="tabs-stable tabs-icon-top">
+      <ion-tab title="Search" icon="ion-search" ng-click="tab='search'">
+        </ion-tab>
+        <ion-tab title="Info" icon="ion-information" ng-click="tab='info'">
+        </ion-tab>
+    </ion-tabs>
+</ion-view>
       </ion-footer-bar>
 
     </ion-pane>

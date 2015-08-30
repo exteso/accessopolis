@@ -17,6 +17,7 @@ angular.module('ionic-firebase-seed', ['ionic', 'firebase', 'starter.controllers
 
 .controller('AppCtrl', function($scope, Auth, Messages) {
 
+  //$scope.tab="search";
   // EMAIL & PASSWORD AUTHENTICATION
 
   // Check for the user's authentication state

@@ -62,7 +62,7 @@
 
     LocationSearchService.prototype.$inject = ['$q', 'Ref', '$firebaseArray'];
 
-    function LocationSearchController(LocationSearchService, $rootScope) {
+    function LocationSearchController(LocationSearchService, $rootScope, $scope) {
 
         var self = this;
 
@@ -80,7 +80,14 @@
                 self.resultList = result;
             });
         };
+        
+        //we use scope here only to trigger the $watch mechanism. Maybe there would be a better solution?
+        $scope.$watch(function () {
+            return self.searchParam;
+        },function(){
+            self.performSearch();
+        });
     }
 
-    LocationSearchController.prototype.$inject = ['LocationSearchService', '$rootScope'];
+    LocationSearchController.prototype.$inject = ['LocationSearchService', '$rootScope','$scope'];
 })();
