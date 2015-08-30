@@ -14,12 +14,12 @@
 
     <div  class="accessopolis-location-data" >
         <div class="accessopolis-location-data-info">
-            <h1 style="font-size: 1.8em;"  data-ng-click="ctrlLoc.showDetail()">{{ctrlLoc.location.text}}</h1>
+            <h1 style="font-size: 1.8em; display: block; overflow: hidden;  white-space: nowrap; text-overflow: ellipsis;"  data-ng-click="ctrlLoc.showDetail()">{{ctrlLoc.location.text}}</h1>
 
             <div class="accessopolis-location-data-rating-small visible-xs" data-rating="ctrlLoc.location"></div>
 
-            <button class="btn btn-danger btn-lg hidden-xs">Segnala un problema</button>
-            <button class="btn btn-danger btn visible-xs">Segnala un problema</button>
+            <button class="btn btn-danger btn-lg hidden-xs" data-translate >report-a-problem</button>
+            <button class="btn btn-danger btn visible-xs"  data-translate>report-a-problem</button>
             <!--<div class="accessopolis-location-rating-item" ></div>-->
             <!--<div class="accessopolis-location-rating-item" ></div>-->
             <!--<div class="accessopolis-location-rating-item" ></div>-->

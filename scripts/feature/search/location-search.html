@@ -20,9 +20,9 @@
         <div data-ng-repeat="result in ctrl.resultList" class="accessopolis-search-result_list">
             <div data-location="result"></div>
         </div>
-        <div data-ng-if="ctrl.showInsertButton()" class="text-center alert alert-info">
+        <div ng-data-ng-if="ctrl.showInsertButton()" class="text-center alert alert-info">
             <h1 data-translate>accessopolis.location.not-found</h1>
-            <a href="#/new-location" class="btn btn-lg btn-success"><i class="fa fa-plus"></i> <span data-translate>accessopolis.location.new</span></a>
+            <a href="#/new-location" class="btn btn-lg btn-success" ng-show-auth=""><i class="fa fa-plus"></i> <span data-translate>accessopolis.location.new</span></a>
         </div>
     </div>
 </div>

@@ -50,6 +50,10 @@ angular.module('accessopolisApp', [
             'accessopolis.rating.expert': 'Experts',
             'accessopolis.rating.public': 'Public',
             'accessopolis.accessibility-evaluation': 'Accessibility Evaluation',
+            'accessopolis.accessibility-evaluation-mobility': 'Mobility',
+            'accessopolis.accessibility-evaluation-hearing': 'Hearing',
+            'accessopolis.accessibility-evaluation-vision': 'Vision',
+            'accessopolis.accessibility-evaluation-mental': 'Mental',
             'accessopolis.insert-new-location': 'Insert new location',
             'accessopolis.location.description': 'Location Description',
             'accessopolis.error.minlength': 'The value inserted is not valid',
@@ -87,6 +91,12 @@ angular.module('accessopolisApp', [
             'accessopolis.rating.expert': 'Esperti',
             'accessopolis.rating.public': 'Pubblico',
             'accessopolis.accessibility-evaluation': 'Valutazione Accessibilità',
+
+            'accessopolis.accessibility-evaluation-mobility': 'Fisiche',
+            'accessopolis.accessibility-evaluation-hearing': 'Uditive',
+            'accessopolis.accessibility-evaluation-vision': 'Visive',
+            'accessopolis.accessibility-evaluation-mental': 'Mentali',
+
             'accessopolis.insert-new-location': 'Inserire una nuova struttura',
             'accessopolis.location.description': 'Descrizione della struttura',
             'accessopolis.error.minlength': 'Il valore inserito non è valido',
@@ -447,6 +457,20 @@ angular.module('accessopolisApp')
         templateUrl: 'views/account.html',
         controller: 'AccountCtrl'
       })
+      .when('/locations/:id', {
+        templateUrl: 'scripts/feature/detail/detail.html',
+        controller: 'LocationDetailController',
+        controllerAs: 'ctrl',
+          resolve: {
+            user: ['Auth', function(Auth) {
+              return Auth.$getAuth();
+            }]
+          }
+      }).when('/new-location', {
+        templateUrl: 'scripts/feature/detail/new.html',
+        controller: 'NewLocationController',
+        controllerAs: 'ctrl'
+      })
       .otherwise({redirectTo: '/'});
   }])
 
@@ -707,18 +731,7 @@ angular.module('accessopolisApp')
                 '<div class="accessopolis-location-map visible-xs" style="background-image: url(\'https://maps.googleapis.com/maps/api/staticmap?center={{imageCtrl.location.lat}},{{imageCtrl.location.long}}&zoom=15&size=786x300&maptype=roadmap&markers=color:red%7Clabel:C%7C{{imageCtrl.location.lat}},{{imageCtrl.location.long}}\'); background-size: cover"></div>' +
                 '</a>'
             }
-        })
-        .config(['$routeProvider', function($routeProvider) {
-            $routeProvider.when('/locations/:id', {
-                templateUrl: 'scripts/feature/detail/detail.html',
-                controller: 'LocationDetailController',
-                controllerAs: 'ctrl'
-            }).when('/new-location', {
-                templateUrl: 'scripts/feature/detail/new.html',
-                controller: 'NewLocationController',
-                controllerAs: 'ctrl'
-            });
-        }]);
+        });
 
     function LocationDetailService($q, $firebaseObject, Ref, $firebaseArray) {
         this.find = function(id) {
@@ -734,14 +747,20 @@ angular.module('accessopolisApp')
             var mock = {lat: 45.833376, long: 9.030515};
             return $firebaseArray(Ref.child('locations')).$add(angular.extend(mock, location));
         }
+
+        this.rate = function(newRate){
+            return $firebaseArray(Ref.child('ratings')).$add(newRate);
+        }
     }
     LocationDetailService.$inject = ["$q", "$firebaseObject", "Ref", "$firebaseArray"];
 
     LocationDetailService.prototype.$inject = ['$q', '$firebaseObject', 'Ref', '$firebaseArray'];
 
-    function LocationDetailController(LocationDetailService, $routeParams, $location) {
+    function LocationDetailController(LocationDetailService, $routeParams, $location, user) {
 
         var self = this;
+        self.user = user;
+
         LocationDetailService.find($routeParams.id).then(function(result) {
             self.detail = result;
         });
@@ -749,10 +768,18 @@ angular.module('accessopolisApp')
         this.backToList = function() {
             $location.path('/');
         };
-    }
-    LocationDetailController.$inject = ["LocationDetailService", "$routeParams", "$location"];
 
-    LocationDetailController.prototype.$inject = ['LocationDetailService', '$routeParams', '$location'];
+        this.rate = function(){
+            var newRate = {locationId: $routeParams.id, userId: self.user.uid, rateKind: 'global', rate: self.vote, userType: 'public'};
+
+            LocationDetailService.rate(newRate).then(function(result) {
+                self.rateFeedback = result;
+            });
+        };
+    }
+    LocationDetailController.$inject = ["LocationDetailService", "$routeParams", "$location", "user"];
+
+    LocationDetailController.prototype.$inject = ['LocationDetailService', '$routeParams', '$location', 'user'];
 
     function NewLocationController(NavigationService, LocationDetailService, $location, $rootScope) {
         var self = this;
@@ -806,6 +833,18 @@ angular.module('accessopolisApp')
                     rating: '='
                 },
                 templateUrl: 'scripts/feature/rating/rating.html'
+            }
+        })
+        .directive('ratings', function() {
+            return {
+                restrict: 'A',
+                scope: true,
+                controller: RatingController,
+                controllerAs: 'ctrlRatings',
+                bindToController: {
+                    rating: '=ratings'
+                },
+                templateUrl: 'scripts/feature/rating/ratings.html'
             }
         });
 
