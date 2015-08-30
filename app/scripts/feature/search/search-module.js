@@ -80,6 +80,10 @@
             });
         };
 
+        this.showInsertButton = function() {
+            return angular.isDefined(self.resultList) && self.resultList.length === 0;
+        };
+
         //we use scope here only to trigger the $watch mechanism. Maybe there would be a better solution?
         $scope.$watch(function () {
             return self.searchParam;
