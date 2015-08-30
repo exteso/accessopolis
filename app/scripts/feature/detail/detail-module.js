@@ -68,18 +68,7 @@
                 '<div class="accessopolis-location-map visible-xs" style="background-image: url(\'https://maps.googleapis.com/maps/api/staticmap?center={{imageCtrl.location.lat}},{{imageCtrl.location.long}}&zoom=15&size=786x300&maptype=roadmap&markers=color:red%7Clabel:C%7C{{imageCtrl.location.lat}},{{imageCtrl.location.long}}\'); background-size: cover"></div>' +
                 '</a>'
             }
-        })
-        .config(['$routeProvider', function($routeProvider) {
-            $routeProvider.when('/locations/:id', {
-                templateUrl: 'scripts/feature/detail/detail.html',
-                controller: 'LocationDetailController',
-                controllerAs: 'ctrl'
-            }).when('/new-location', {
-                templateUrl: 'scripts/feature/detail/new.html',
-                controller: 'NewLocationController',
-                controllerAs: 'ctrl'
-            });
-        }]);
+        });
 
     function LocationDetailService($q, $firebaseObject, Ref, $firebaseArray) {
         this.find = function(id) {
@@ -95,13 +84,19 @@
             var mock = {lat: 45.833376, long: 9.030515};
             return $firebaseArray(Ref.child('locations')).$add(angular.extend(mock, location));
         }
+
+        this.rate = function(newRate){
+            return $firebaseArray(Ref.child('ratings')).$add(newRate);
+        }
     }
 
     LocationDetailService.prototype.$inject = ['$q', '$firebaseObject', 'Ref', '$firebaseArray'];
 
-    function LocationDetailController(LocationDetailService, $routeParams, $location) {
+    function LocationDetailController(LocationDetailService, $routeParams, $location, user) {
 
         var self = this;
+        self.user = user;
+
         LocationDetailService.find($routeParams.id).then(function(result) {
             self.detail = result;
         });
@@ -109,9 +104,17 @@
         this.backToList = function() {
             $location.path('/');
         };
+
+        this.rate = function(){
+            var newRate = {locationId: $routeParams.id, userId: self.user.uid, rateKind: 'global', rate: self.vote, userType: 'public'};
+
+            LocationDetailService.rate(newRate).then(function(result) {
+                self.rateFeedback = result;
+            });
+        };
     }
 
-    LocationDetailController.prototype.$inject = ['LocationDetailService', '$routeParams', '$location'];
+    LocationDetailController.prototype.$inject = ['LocationDetailService', '$routeParams', '$location', 'user'];
 
     function NewLocationController(NavigationService, LocationDetailService, $location, $rootScope) {
         var self = this;

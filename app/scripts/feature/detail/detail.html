@@ -10,6 +10,12 @@
                 <h1>{{ctrl.detail.text}}</h1>
                 <div><span class=""></span>{{ctrl.detail.address}}</div>
             </div>
+            <!-- Reactivate this to enable voting -->
+            <!--
+            <div ng-show-auth="">
+            <input type="text" ng-model="ctrl.vote"><button ng-click="ctrl.rate()" value="Vote"/>
+            </div>
+            -->
             <div class="accessopolis-location-detail-header-rating">
                 <div data-ng-if="ctrl.detail" data-rating="ctrl.detail"></div>
             </div>
