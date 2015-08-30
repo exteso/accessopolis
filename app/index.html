@@ -27,8 +27,27 @@
         <div class="container">
             <div class="navbar-header accessopolis-header-content" ng-controller="AppCtrl">
                 <a class="navbar-brand accessopolis-header-logo" href="#/">Accessopolis</a>
-                <button ng-hide-auth="" data-ng-controller="LoginCtrl"  class="btn btn-primary btn-lg"  ng-click="oauthLogin('google')" >Accedi con Google</button>
-                <span ng-show-auth="" class="btn btn-primary btn-lg">{{user.google.email}}</span>
+
+                <div class="accessopolis-section-profile">
+                    <button ng-hide-auth="" data-ng-controller="LoginCtrl"  class="btn btn-primary btn-lg pull-right"  ng-click="oauthLogin('google')" >Accedi con Google</button>
+
+                    <div class="accessopolis-section-profile-auth" ng-show-auth=""  >
+                        <div class="accessopolis-profile-avatar" style='background-image: url("{{user.google.cachedUserProfile.picture}}");'>
+                           <span class="fa fa-user"></span>
+                       </div>
+                       <div class="accessopolis-profile-name" >
+                           <a href="{{user.google.cachedUserProfile.link}}" target="_blank" style="margin-top: -12px;">
+                               {{user.google.displayName}}
+                           </a>
+                           <div data-ng-controller="AccountCtrl" style="margin-top: -10px;">
+                               <button role="button" ng-click="logout()" class="btn btn-danger btn-xs">Log Out</button>
+                           </div>
+                       </div>
+
+
+
+                    </div>
+                </div>
             </div>
 
         </div>
