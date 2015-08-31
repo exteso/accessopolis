@@ -49,42 +49,63 @@
 
         <a href="https://github.com/exteso/accessopolis" target="_blank" class="visible-lg"><img style="position: absolute; top: 0; right: 0; border: 0; z-index:150" src="https://camo.githubusercontent.com/52760788cde945287fbb584134c4cbc2bc36f904/68747470733a2f2f73332e616d617a6f6e6177732e636f6d2f6769746875622f726962626f6e732f666f726b6d655f72696768745f77686974655f6666666666662e706e67" alt="Fork me on GitHub" data-canonical-src="https://s3.amazonaws.com/github/ribbons/forkme_right_white_ffffff.png"></a>
 
-        <div class="container">
-            <div class="navbar-header accessopolis-header-content" ng-controller="AppCtrl">
-                <a class="navbar-brand accessopolis-header-logo" href="#/">Accessopolis</a> <sup>beta</sup>
-
-                <div class="accessopolis-section-profile hidden-xs">
-                    <button ng-hide-auth="" data-ng-controller="LoginCtrl"  class="btn btn-primary btn-lg pull-right"  ng-click="oauthLogin('google')" >Accedi con Google</button>
-
-                    <div class="accessopolis-section-profile-auth" ng-show-auth=""   >
-                        <div class="accessopolis-profile-avatar" style='background-image: url("{{user.google.cachedUserProfile.picture}}");'>
-                           <span class="fa fa-user"></span>
-                       </div>
-                       <div class="accessopolis-profile-name" >
-                           <a href="{{user.google.cachedUserProfile.link}}" target="_blank" style="margin-top: -12px;">
-                               {{user.google.displayName}}
-                           </a>
-                           <div data-ng-controller="AccountCtrl" style="margin-top: -10px;">
-                               <button role="button" ng-click="logout()" class="btn btn-danger btn-xs">Log Out</button>
-                           </div>
-                       </div>
+        <div class="container" ng-controller="AppCtrl">
 
 
 
+                <div class="col-xs-12 accessopolis-header">
+                   <div class="col-xs-8 accessopolis-header-logo" >
+                       <a class="navbar-brand  " href="#/" style="white-space: nowrap">Accessopolis </a>
+                       <sup >beta</sup>
+                   </div>
+                   <div class="col-xs-4">
+                        <span ng-hide-auth="">
+                            <button data-ng-controller="LoginCtrl"  class="btn btn-primary hidden-xs btn-lg pull-right navbar-btn"  ng-click="oauthLogin('google')" >Accedi con Google</button>
+                            <button data-ng-controller="LoginCtrl"  class="btn btn-primary visible-xs btn-sm pull-right navbar-btn"  ng-click="oauthLogin('google')" >Accedi con Google</button>
+                        </span>
+
+                       <span ng-show-auth="" data-ng-controller="AccountCtrl">
+                           <button  role="button" ng-click="logout()" class="btn btn-danger hidden-xs btn-lg navbar-btn pull-right">Log Out</button>
+                           <button  role="button" ng-click="logout()" class="btn btn-danger visible-xs btn-sm navbar-btn pull-right">Log Out</button>
+
+                       </span>
+                        <!--<span ng-show-auth="" >-->
+                            <!-- -->
+                            <!--<span class="accessopolis-section-profile hidden-xs ">-->
+                                <!--<div class="accessopolis-section-profile-auth"   >-->
+                                    <!--<div class="accessopolis-profile-avatar" style='background-image: url("{{user.google.cachedUserProfile.picture}}");'>-->
+                                        <!--<span class="fa fa-user"></span>-->
+                                    <!--</div>-->
+                                    <!--<div class="accessopolis-profile-name" >-->
+                                        <!--<a href="{{user.google.cachedUserProfile.link}}" target="_blank" style="margin-top: -12px;">-->
+                                            <!--{{user.google.displayName}}-->
+                                        <!--</a>-->
+                                        <!--<div data-ng-controller="AccountCtrl" style="margin-top: -10px;">-->
+                                            <!--<button role="button" ng-click="logout()" class="btn btn-danger btn-xs">Log Out</button>-->
+                                        <!--</div>-->
+                                    <!--</div>-->
+                                <!--</div>-->
+                            <!--</span>-->
+                        <!--</span>-->
                     </div>
                 </div>
-            </div>
-
         </div>
 
     </div>
     <div ng-view=""></div>
 
-    <div class="footer accessopolis-bg-white" >
-      <div class="container">
-        <p>With <span class="glyphicon glyphicon-heart"></span> from the <a href="https://voxxeddays.com/ticino16" target="_blank">Voxxed Days Ticino</a> team and Exteso Sagl</p>
-      </div>
-    </div>
+    <!--<div class="footer accessopolis-bg-white accessopolis-footer" >-->
+      <!--<div class="container">-->
+        <!--<p>With <span class="glyphicon glyphicon-heart"></span> from the <a href="https://voxxeddays.com/ticino16" target="_blank">Voxxed Days Ticino</a> team and Exteso Sagl</p>-->
+      <!--</div>-->
+    <!--</div>-->
+
+    <footer class="footer accessopolis-footer accessopolis-bg-white" >
+        <div class="container">
+            <p class="pull-left">With <span class="glyphicon glyphicon-heart"></span> from the <a href="https://voxxeddays.com/ticino16" target="_blank">Voxxed Days Ticino</a> team and Exteso Sagl</p>
+            <p class="pull-right">Images by <a href="https://www.flickr.com/photos/sozialhelden/">SOZIALHELDEN</a></p>
+        </div>
+    </footer>
 
     <!-- build:js(.) scripts/vendor.js -->
     <!-- bower:js -->

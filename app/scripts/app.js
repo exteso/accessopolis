@@ -71,7 +71,9 @@ angular.module('accessopolisApp', [
             'report-a-problem': 'Report a problem',
             'accessopolis.back-to-list': 'Back to list',
             'accessopolis.vote.now' : 'Leave your vote',
-            'accessopolis.voting': 'Vote!'
+            'accessopolis.voting': 'Vote!',
+            'accessopolis.welcome': 'welcome to Accessopolis.ch',
+            'accessopolis.back-to-home': 'Back to home'
         });
         $translateProvider.translations('it', {
             'public-transport': 'Trasporti Pubblici',
@@ -119,7 +121,9 @@ angular.module('accessopolisApp', [
             'accessopolis.back-to-list': 'Torna alla lista',
             'report-a-problem': 'Segnala un problema',
             'accessopolis.vote.now' : 'Dai il tuo voto',
-            'accessopolis.voting': 'Vota!'
+            'accessopolis.voting': 'Vota!',
+            'accessopolis.welcome': 'benvenuto in Accessopolis.ch',
+            'accessopolis.back-to-home': 'Torna ad Accessopolis'
         });
         $translateProvider.preferredLanguage('it');
     })
