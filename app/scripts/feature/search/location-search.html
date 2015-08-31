@@ -1,10 +1,11 @@
 <div class="accessopolis-search container">
     <div class="col-md-12 col-sm-12 col-xs-12 accessopolis-search-field" >
-            <div class="accessopolis-search-field-header"></div>
+            <!--div class="accessopolis-search-field-header"></div-->
             <div class="accessopolis-search-box" >
                 <span class="accessopolis-search-icon"><i class="fa fa-search fa-2x"></i></span>
                 <input type="text" data-ng-model="ctrl.searchParam" class="form-control input-lg" data-ng-model-options="{ updateOn: 'default blur', debounce: { 'default': 500, 'blur': 0 } }" placeholder="{{'accessopolis.search.suggestions' | translate}}">
-                <div data-ng-if="ctrl.subcategorySelected">
+
+                <div data-ng-if="ctrl.subcategorySelected" class="accessopolis-search-selected-categories">
                     <span class="sr-only" data-translate="accessopolis.selected.categories"></span>
                     <span class="badge accessopolis-badge"><a href="#" data-ng-click="ctrl.clearSubcategory($event)"><i class="fa fa-close"></i></a> {{ctrl.subcategorySelected | translate}}</span>
                 </div>
@@ -14,7 +15,7 @@
     </div>
 
     <div class="accessopolis-search-result_list" >
-        <div data-ng-repeat="result in ctrl.resultList" class="accessopolis-search-result_list">
+        <div data-ng-repeat="result in ctrl.resultList" class="accessopolis-search-result_list-item">
             <div data-location="result" ></div>
         </div>
     </div>
