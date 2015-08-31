@@ -33,5 +33,24 @@
             "mosque",
             "synagogue"
         ]
+    },
+    "-Jy3EegW-nPBjIBc_sOZ" : {
+        "text" : "sport",
+        "subcategory" : [
+            "stadium",
+            "sports-arena",
+            "indoor-pool",
+            "swimming-pool",
+            "ice-rink"
+        ]
+    },
+    "-Jy3EkqHluHlXHPIdUjt" : {
+        "text" : "culture",
+        "subcategory" : [
+            "cinema",
+            "theatre",
+            "museum",
+            "library"
+        ]
     }
 }
