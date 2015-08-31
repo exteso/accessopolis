@@ -71,7 +71,8 @@
                            <button  role="button" ng-click="logout()" class="btn btn-danger hidden-xs btn-lg navbar-btn pull-right">Log Out</button>
                            <button  role="button" ng-click="logout()" class="btn btn-danger visible-xs btn-sm navbar-btn pull-right">Log Out</button>
                        </span>
-                       <span class="accessopolis-profile-avatar hidden-sm hidden-xs" style='background-image: url("{{profile.pictureUrl}}");'>
+                       <span ng-show-auth="" class="accessopolis-profile-avatar hidden-sm hidden-xs">
+                           <!--style='background-image: url("{{profile.imageURL}}");'>-->
                            <span class="fa fa-user"></span>
                            <span class="accessopolis-profile-name">
                                 <a href="{{user.google.cachedUserProfile.link}}" target="_blank">
@@ -81,24 +82,6 @@
                             </span>
                        </span>
 
-                        <!--<span ng-show-auth="" >-->
-                            <!-- -->
-                            <!--<span class="accessopolis-section-profile hidden-xs ">-->
-                                <!--<div class="accessopolis-section-profile-auth"   >-->
-                                    <!--<div class="accessopolis-profile-avatar" style='background-image: url("{{user.google.cachedUserProfile.picture}}");'>-->
-                                        <!--<span class="fa fa-user"></span>-->
-                                    <!--</div>-->
-                                    <!--<div class="accessopolis-profile-name" >-->
-                                        <!--<a href="{{user.google.cachedUserProfile.link}}" target="_blank" style="margin-top: -12px;">-->
-                                            <!--{{user.google.displayName}}-->
-                                        <!--</a>-->
-                                        <!--<div data-ng-controller="AccountCtrl" style="margin-top: -10px;">-->
-                                            <!--<button role="button" ng-click="logout()" class="btn btn-danger btn-xs">Log Out</button>-->
-                                        <!--</div>-->
-                                    <!--</div>-->
-                                <!--</div>-->
-                            <!--</span>-->
-                        <!--</span>-->
                     </div>
 
                 </div>
@@ -106,12 +89,6 @@
 
     </div>
     <div ng-view=""></div>
-
-    <!--<div class="footer accessopolis-bg-white accessopolis-footer" >-->
-      <!--<div class="container">-->
-        <!--<p>With <span class="glyphicon glyphicon-heart"></span> from the <a href="https://voxxeddays.com/ticino16" target="_blank">Voxxed Days Ticino</a> team and Exteso Sagl</p>-->
-      <!--</div>-->
-    <!--</div>-->
 
     <footer class="footer accessopolis-footer accessopolis-bg-white" >
         <div class="container">
