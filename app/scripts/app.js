@@ -122,14 +122,17 @@ angular.module('accessopolisApp', [
             'report-a-problem': 'Segnala un problema',
             'accessopolis.vote.now' : 'Dai il tuo voto',
             'accessopolis.voting': 'Vota!',
-            'accessopolis.welcome': 'benvenuto in Accessopolis.ch',
+            'accessopolis.welcome': 'benvenuto/a in Accessopolis.ch',
             'accessopolis.back-to-home': 'Torna ad Accessopolis'
         });
         $translateProvider.preferredLanguage('it');
     })
-    .controller('AppCtrl', function ($scope, Auth, $translate) {
+    .controller('AppCtrl', function ($scope, Auth, $translate, $firebaseObject, Ref) {
         $scope.user = Auth.$getAuth();
+        $scope.profile = $firebaseObject(Ref.child('users/'+$scope.user.uid));
+        $scope.lang = "it";
         $scope.changeLanguage = function (key) {
+            $scope.lang = key;
             $translate.use(key);
         };
     });

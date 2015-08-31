@@ -63,12 +63,24 @@
                             <button data-ng-controller="LoginCtrl"  class="btn btn-primary hidden-xs btn-lg pull-right navbar-btn"  ng-click="oauthLogin('google')" >Accedi con Google</button>
                             <button data-ng-controller="LoginCtrl"  class="btn btn-primary visible-xs btn-sm pull-right navbar-btn"  ng-click="oauthLogin('google')" >Accedi con Google</button>
                         </span>
-
+                       <!--<span>-->
+                           <!--<button class="btn" ng-if="lang==='en'" ng-click="changeLanguage('it')">IT</button>-->
+                           <!--<button class="btn" ng-if="lang==='it'" ng-click="changeLanguage('en')">EN</button>-->
+                       <!--</span>-->
                        <span ng-show-auth="" data-ng-controller="AccountCtrl">
                            <button  role="button" ng-click="logout()" class="btn btn-danger hidden-xs btn-lg navbar-btn pull-right">Log Out</button>
                            <button  role="button" ng-click="logout()" class="btn btn-danger visible-xs btn-sm navbar-btn pull-right">Log Out</button>
-
                        </span>
+                       <span class="accessopolis-profile-avatar hidden-sm hidden-xs" style='background-image: url("{{profile.pictureUrl}}");'>
+                           <span class="fa fa-user"></span>
+                           <span class="accessopolis-profile-name">
+                                <a href="{{user.google.cachedUserProfile.link}}" target="_blank">
+                                    {{profile.name}}
+                                </a>
+
+                            </span>
+                       </span>
+
                         <!--<span ng-show-auth="" >-->
                             <!-- -->
                             <!--<span class="accessopolis-section-profile hidden-xs ">-->
@@ -88,6 +100,7 @@
                             <!--</span>-->
                         <!--</span>-->
                     </div>
+
                 </div>
         </div>
 
