@@ -129,7 +129,7 @@ angular.module('accessopolisApp', [
     }])
     .controller('AppCtrl', ["$scope", "Auth", "$translate", "$firebaseObject", "Ref", function ($scope, Auth, $translate, $firebaseObject, Ref) {
         $scope.user = Auth.$getAuth();
-        if (user) {
+        if ($scope.user) {
             $scope.profile = $firebaseObject(Ref.child('users/' + $scope.user.uid));
         }
         $scope.lang = "it";
