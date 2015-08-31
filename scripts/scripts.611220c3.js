@@ -47,6 +47,8 @@ angular.module('accessopolisApp', [
             'mosque': 'Mosques',
             'church': 'Churches',
             'synagogue': 'Temples',
+            'sport': 'Sport',
+            'culture': 'Culture and freetime',
             'accessopolis.rating.expert': 'Experts',
             'accessopolis.rating.public': 'Public',
             'accessopolis.accessibility-evaluation': 'Accessibility Evaluation',
@@ -69,7 +71,9 @@ angular.module('accessopolisApp', [
             'report-a-problem': 'Report a problem',
             'accessopolis.back-to-list': 'Back to list',
             'accessopolis.vote.now' : 'Leave your vote',
-            'accessopolis.voting': 'Vote!'
+            'accessopolis.voting': 'Vote!',
+            'accessopolis.welcome': 'welcome to Accessopolis.ch',
+            'accessopolis.back-to-home': 'Back to home'
         });
         $translateProvider.translations('it', {
             'public-transport': 'Trasporti Pubblici',
@@ -91,10 +95,11 @@ angular.module('accessopolisApp', [
             'mosque': 'Moschee',
             'church': 'Chiese',
             'synagogue': 'Sinagoghe',
+            'sport': 'Sport',
+            'culture': 'Cultura e tempo libero',
             'accessopolis.rating.expert': 'Esperti',
             'accessopolis.rating.public': 'Pubblico',
             'accessopolis.accessibility-evaluation': 'Valutazione Accessibilità',
-
             'accessopolis.accessibility-evaluation-mobility': 'Fisiche',
             'accessopolis.accessibility-evaluation-hearing': 'Uditive',
             'accessopolis.accessibility-evaluation-vision': 'Visive',
@@ -116,13 +121,18 @@ angular.module('accessopolisApp', [
             'accessopolis.back-to-list': 'Torna alla lista',
             'report-a-problem': 'Segnala un problema',
             'accessopolis.vote.now' : 'Dai il tuo voto',
-            'accessopolis.voting': 'Vota!'
+            'accessopolis.voting': 'Vota!',
+            'accessopolis.welcome': 'benvenuto/a in Accessopolis.ch',
+            'accessopolis.back-to-home': 'Torna ad Accessopolis'
         });
         $translateProvider.preferredLanguage('it');
     }])
-    .controller('AppCtrl', ["$scope", "Auth", "$translate", function ($scope, Auth, $translate) {
+    .controller('AppCtrl', ["$scope", "Auth", "$translate", "$firebaseObject", "Ref", function ($scope, Auth, $translate, $firebaseObject, Ref) {
         $scope.user = Auth.$getAuth();
+        $scope.profile = $firebaseObject(Ref.child('users/'+$scope.user.uid));
+        $scope.lang = "it";
         $scope.changeLanguage = function (key) {
+            $scope.lang = key;
             $translate.use(key);
         };
     }]);
@@ -252,18 +262,24 @@ angular.module('accessopolisApp')
  * Provides rudimentary account management functions.
  */
 angular.module('accessopolisApp')
-  .controller('AccountCtrl', ["$scope", "user", "Auth", "Ref", "$firebaseObject", "$timeout", function ($scope, user, Auth, Ref, $firebaseObject, $timeout) {
+  .controller('AccountCtrl', ["$scope", "user", "Auth", "Ref", "$firebaseObject", "$timeout", "$location", function ($scope, user, Auth, Ref, $firebaseObject, $timeout, $location) {
     $scope.user = user;
     $scope.details = user.google;
 
-    $scope.logout = function() { Auth.$unauth(); };
+    $scope.logout = function() {
+        Auth.$unauth();
+        $location.path('/');
+    };
 
     $scope.messages = [];
     var profile = $firebaseObject(Ref.child('users/'+user.uid));
     profile.$bindTo($scope, 'profile').then(function() {
 
-        //$scope.profile.email = user.google.email;  // will be saved to the database
-        //ref.set({ foo: "baz" });  // this would update the database and $scope.data
+        if (user.google){
+            $scope.profile.email = user.google.email;  // will be saved to the database
+            $scope.profile.name = user.google.displayName;   // will be saved to the database
+            $scope.profile.imageURL =  user.google.profileImageURL; // will be saved to the database
+        }
       });
   }]);
 
