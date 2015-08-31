@@ -7,7 +7,7 @@
     <meta name="viewport" content="width=device-width">
     <!-- Place favicon.ico and apple-touch-icon.png in the root directory -->
 
-    <link rel="stylesheet" href="styles/main.80a6ca0a.css">
+    <link rel="stylesheet" href="styles/main.32beac44.css">
     <script type="application/javascript">
         window.accessopolis = window.accessopolis || {};
         function initMap() {
@@ -46,14 +46,13 @@
 
         <div class="container" ng-controller="AppCtrl">
 
-
-
-                <div class="col-xs-12 accessopolis-header">
-                   <div class="col-xs-8 accessopolis-header-logo" >
+                <nav class="navigation-menu visible-xs "></nav>
+                <div class="col-xs-12 accessopolis-header ">
+                   <div class="col-xs-8 accessopolis-header-logo hidden-xs" >
                        <a class="navbar-brand  " href="#/" style="white-space: nowrap">Accessopolis </a>
                        <sup >beta</sup>
                    </div>
-                   <div class="col-xs-4">
+                   <div class="col-xs-4 hidden-xs ">
                         <span ng-hide-auth="">
                             <button data-ng-controller="LoginCtrl"  class="btn btn-primary hidden-xs btn-lg pull-right navbar-btn"  ng-click="oauthLogin('google')" >Accedi con Google</button>
                             <button data-ng-controller="LoginCtrl"  class="btn btn-primary visible-xs btn-sm pull-right navbar-btn"  ng-click="oauthLogin('google')" >Accedi con Google</button>
@@ -94,7 +93,7 @@
 
     <script src="scripts/vendor.6d1835a2.js"></script>
 
-        <script src="scripts/scripts.4db1a22a.js"></script>
+        <script src="scripts/scripts.4ff6218f.js"></script>
 
     <script async defer src="https://maps.googleapis.com/maps/api/js?signed_in=true&libraries=places&key=AIzaSyCbm7ot6UqPk9I7sQVu3Z3PeU7hvwT0pbU&callback=initMap"></script>
 </body>

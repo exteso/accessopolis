@@ -73,7 +73,9 @@ angular.module('accessopolisApp', [
             'accessopolis.vote.now' : 'Leave your vote',
             'accessopolis.voting': 'Vote!',
             'accessopolis.welcome': 'welcome to Accessopolis.ch',
-            'accessopolis.back-to-home': 'Back to home'
+            'accessopolis.back-to-home': 'Back to home',
+            'accessopolis.exit' : 'Logout',
+            'accessopolis.sign-in' : 'Login',
         });
         $translateProvider.translations('it', {
             'public-transport': 'Trasporti Pubblici',
@@ -110,7 +112,7 @@ angular.module('accessopolisApp', [
             'accessopolis.error.minlength': 'Il valore inserito non è valido',
             'accessopolis.error.maxlength': 'Il valore inserito non è valido',
             'accessopolis.error.required': 'Questo campo è obbligatorio',
-            'accessopolis.search.suggestions': 'Inserisci il nome della struttura/località',
+            'accessopolis.search.suggestions': 'Cerca una struttura o località',
             'accessopolis.location.type': 'Tipologia della struttura',
             'accessopolis.location.address': 'Indirizzo della struttura',
             'accessopolis.cancel': 'Annulla',
@@ -123,7 +125,9 @@ angular.module('accessopolisApp', [
             'accessopolis.vote.now' : 'Dai il tuo voto',
             'accessopolis.voting': 'Vota!',
             'accessopolis.welcome': 'benvenuto/a in Accessopolis.ch',
-            'accessopolis.back-to-home': 'Torna ad Accessopolis'
+            'accessopolis.back-to-home': 'Torna ad Accessopolis',
+            'accessopolis.exit' : 'Logout',
+            'accessopolis.sign-in' : 'Accedi'
         });
         $translateProvider.preferredLanguage('it');
     }])
@@ -544,6 +548,15 @@ angular.module('accessopolisApp')
                 templateUrl: 'scripts/feature/navigation/navigation-bar.html',
                 controllerAs: 'ctrl'
             }
+        })
+        .directive('navigationMenu', function() {
+            return {
+                restrict: 'C',
+                scope: true,
+                controller: NavigationController,
+                templateUrl: 'scripts/feature/navigation/navigation-menu.html',
+                controllerAs: 'ctrlNavMenu'
+            }
         });
 
     function NavigationService($q, Ref, $firebaseArray) {
@@ -562,7 +575,12 @@ angular.module('accessopolisApp')
         NavigationService.loadNavigationElements().then(function(data) {
             self.items = data;
         });
-        this.showLocations = function(item, $event) {
+        this.showLocations = function(item, $event, dropMenu) {
+            if(dropMenu){
+                $(".btn-navbar").click(); //bootstrap 2.x
+                $(".navbar-toggle").click() //bootstrap 3.x by Richard
+            }
+
             self.itemExpanded = undefined;
             $rootScope.$broadcast('SubcategorySelected', item);
             $event.stopPropagation();
