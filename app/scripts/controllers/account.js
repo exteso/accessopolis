@@ -11,7 +11,12 @@ angular.module('accessopolisApp')
     $scope.user = user;
     $scope.details = user.google;
 
-    $scope.logout = function() {
+    $scope.logout = function(dropMenu) {
+        if(dropMenu){
+            $(".btn-navbar").click(); //bootstrap 2.x
+            $(".navbar-toggle").click() //bootstrap 3.x by Richard
+        }
+
         Auth.$unauth();
         $location.path('/');
     };

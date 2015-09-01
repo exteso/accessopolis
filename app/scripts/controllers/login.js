@@ -8,9 +8,16 @@
  */
 angular.module('accessopolisApp')
   .controller('LoginCtrl', function ($scope, Auth, $location) {
-    $scope.oauthLogin = function(provider) {
-      $scope.err = null;
-      Auth.$authWithOAuthPopup(provider, { scope: 'email' }).then(redirect, showError);
+
+        $scope.oauthLogin = function(provider, dropMenu) {
+
+            if(dropMenu){
+                $(".btn-navbar").click(); //bootstrap 2.x
+                $(".navbar-toggle").click() //bootstrap 3.x by Richard
+            }
+
+          $scope.err = null;
+          Auth.$authWithOAuthPopup(provider, { scope: 'email' }).then(redirect, showError);
 
     };
 

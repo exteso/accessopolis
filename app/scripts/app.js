@@ -127,7 +127,7 @@ angular.module('accessopolisApp', [
             'accessopolis.welcome': 'benvenuto/a in Accessopolis.ch',
             'accessopolis.back-to-home': 'Torna ad Accessopolis',
             'accessopolis.exit' : 'Logout',
-            'accessopolis.sign-in' : 'Accedi'
+            'accessopolis.sign-in' : 'Accedi con Google'
         });
         $translateProvider.preferredLanguage('it');
     })

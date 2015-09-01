@@ -156,7 +156,15 @@
         background: rgb(255, 255, 255);
         border: 1px solid #ccc;
         overflow: hidden;
-}
+
+        .accessopolis-location-icon-item {
+            width: 100%;
+            height: 100%;
+            font-size: 4.8em;
+            color: #d2d2d2;
+            overflow: hidden;
+        }
+    }
     .accessopolis-location-icon-small {
         width: 100px;
         float: left;
@@ -167,6 +175,17 @@
         background: rgb(255, 255, 255);
         border: 1px solid #ccc;
         overflow: hidden;
+
+            .accessopolis-location-icon-item {
+                width: 100%;
+                height: 100%;
+                line-height: 150px;
+                vertical-align: middle;
+                font-size: 3em;
+                color: #000;
+                overflow: hidden;
+            }
+
 }
     .accessopolis-location-data {
         float: left;
@@ -512,7 +531,6 @@ input.ng-invalid.ng-touched, select.ng-invalid.ng-touched, textarea.ng-invalid.n
 
 .accessopolis-footer {
     min-height: 250px;
-    margin-top:100px;
     border-top:2px solid $link-color;
 }
 
@@ -531,15 +549,40 @@ input.ng-invalid.ng-touched, select.ng-invalid.ng-touched, textarea.ng-invalid.n
 }
 
 
+@media (min-width: $screen-sm-max) {
+
+    body {
+        &.accessopolis-bg {
+            background: url('../../images/bg_1.jpg');
+            background-repeat: no-repeat;
+            background-size: 200%;
+            background-position: top center;
+        }
+    }
+}
+@media (max-width: $screen-sm-max) {
+
+    body {
+        &.accessopolis-bg {
+            background: #e2e2e2 url('../../images/bg_1.jpg');
+            background-repeat: no-repeat;
+            background-size: 500%;
+            background-position: top center;
+        }
+    }
+}
+
 .container {
 
 
+
     @media (min-width: $screen-sm-max) {
+
         .accessopolis-search {
             min-height: 400px;
-
             margin: 0px;
             padding: 0px;
+
             .accessopolis-search-field {
                 background: rgba(255, 255, 255, 0.6);
                 border-radius: 3px;
@@ -564,7 +607,6 @@ input.ng-invalid.ng-touched, select.ng-invalid.ng-touched, textarea.ng-invalid.n
                 }
             }
             .accessopolis-search-result_list {
-                width: 100%;
                 margin-top: 10px;
                 .accessopolis-search-result_list-item {
                     margin-bottom: 10px;
@@ -613,13 +655,16 @@ input.ng-invalid.ng-touched, select.ng-invalid.ng-touched, textarea.ng-invalid.n
 
                 }
             }
+
             .accessopolis-search-result_list {
-                width: 100%;
-                margin-top: 10px;
+                border-top:1px solid #ccc;
+                margin: 0px !important;
                 .accessopolis-search-result_list-item {
-                    margin-bottom: 10px;
+                    margin: 0px !important;
+                    &:last-child { margin-bottom: 10px;}
                 }
             }
+
         }
 
     }

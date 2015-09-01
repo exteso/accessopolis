@@ -20,12 +20,6 @@ html,body{
 body {
     font-family: $body-font;
     padding: 0;
-    &.accessopolis-bg {
-
-        background: #ccc url('../images/bg_1.jpg');
-        background-size:160%;
-        background-repeat: no-repeat;
-    }
 }
 
 /* Everything but the jumbotron gets side spacing for mobile first views */
