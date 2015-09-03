@@ -312,10 +312,17 @@ input.ng-invalid.ng-touched, select.ng-invalid.ng-touched, textarea.ng-invalid.n
 }
 
 
+
 .accessopolis-profile {
     height: 40px;
     margin-top: 5px;
+    width: 270px;
     white-space: nowrap;
+    float: right;
+    .accessopolis-profile-logout{
+        width: 60px;
+        float: right;
+    }
 
     .accessopolis-profile-icon {
         width: 40px;
@@ -331,14 +338,21 @@ input.ng-invalid.ng-touched, select.ng-invalid.ng-touched, textarea.ng-invalid.n
     }
     .accessopolis-profile-name {
         float: left;
-        width: 150px;
+        width: 120px;
+
+        text-overflow: ellipsis;
         margin-top: 5px;
         overflow: hidden;
         font-size: 1.2em;
         height: 40px;
         line-height: 40px;
-        margin-left: 10px;
+        margin-left: 6px;
+        display: block;
+        white-space: nowrap;
+        overflow: hidden;
         a {
+            width: 100%;
+            float: left;
             display: block;
             white-space: nowrap;
             overflow: hidden;
@@ -550,28 +564,7 @@ input.ng-invalid.ng-touched, select.ng-invalid.ng-touched, textarea.ng-invalid.n
 }
 
 
-@media (min-width: $screen-sm-max) {
 
-    body {
-        &.accessopolis-bg {
-            background: url('../../images/bg_1.jpg');
-            background-repeat: no-repeat;
-            background-size: 200%;
-            background-position: top center;
-        }
-    }
-}
-@media (max-width: $screen-sm-max) {
-
-    body {
-        &.accessopolis-bg {
-            background: #e2e2e2 url('../../images/bg_1.jpg');
-            background-repeat: no-repeat;
-            background-size: 500%;
-            background-position: top center;
-        }
-    }
-}
 
 .container {
 

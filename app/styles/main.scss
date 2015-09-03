@@ -99,4 +99,26 @@ body {
 }
 
 
+@media (min-width: $screen-sm-max) {
+    body {
+        &.accessopolis-bg {
+            background: url('../images/bg_1.jpg');
+            background-repeat: no-repeat;
+            background-size: 200%;
+            background-position: top center;
+        }
+    }
+}
+@media (max-width: $screen-sm-max) {
+
+    body {
+        &.accessopolis-bg {
+            background: #e2e2e2 url('../images/bg_1.jpg');
+            background-repeat: no-repeat;
+            background-size: 500%;
+            background-position: top center;
+        }
+    }
+}
+
 @import "accessopolis/accessopolis";
