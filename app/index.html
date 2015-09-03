@@ -52,33 +52,34 @@
         <div class="container" ng-controller="AppCtrl">
 
                 <nav class="navigation-menu visible-xs "></nav>
-                <div class="col-xs-12 accessopolis-header ">
-                   <div class="col-xs-8 accessopolis-header-logo hidden-xs" >
+
+
+                <div class="col-md-12 col-sm-12 hidden-xs  accessopolis-header ">
+                   <div class="col-md-8 col-sm-7 accessopolis-header-logo " >
                        <a class="navbar-brand  " href="#/" style="white-space: nowrap">Accessopolis </a>
                        <sup >beta</sup>
                    </div>
-                   <div class="col-xs-4 hidden-xs ">
-                        <span ng-hide-auth="">
+
+                    <div class="col-md-4 col-sm-5  " ng-hide-auth="">
+                        <span >
                             <button data-ng-controller="LoginCtrl"  class="btn btn-primary btn-lg pull-right navbar-btn"  ng-click="oauthLogin('google')" >Accedi con Google</button>
                         </span>
+                   </div>
                        <!--<span>-->
                            <!--<button class="btn" ng-if="lang==='en'" ng-click="changeLanguage('it')">IT</button>-->
                            <!--<button class="btn" ng-if="lang==='it'" ng-click="changeLanguage('en')">EN</button>-->
                        <!--</span>-->
-                       <span ng-show-auth="" data-ng-controller="AccountCtrl">
-                           <button  role="button" ng-click="logout()" class="btn btn-danger btn-lg navbar-btn pull-right">Log Out</button>
-                       </span>
-                       <span ng-show-auth="" class="accessopolis-profile-avatar hidden-sm hidden-xs">
-                           <!--style='background-image: url("{{profile.imageURL}}");'>-->
-                           <span class="fa fa-user"></span>
-                           <span class="accessopolis-profile-name">
+                    <div ng-show-auth="" class="accessopolis-profile  col-md-4 col-sm-5 " >
+                           <button  role="button" ng-click="logout()" data-ng-controller="AccountCtrl" class="btn btn-danger navbar-btn pull-right">Log Out</button>
+                           <div class="accessopolis-profile-icon" style='background-image: url("{{user.google.cachedUserProfile.picture}}")'>
+                               <span data-ng-if="!user.google.cachedUserProfile.picture" class="fa fa-user"></span>
+                           </div>
+                           <div class="accessopolis-profile-name" >
                                 <a href="{{user.google.cachedUserProfile.link}}" target="_blank">
-                                    {{profile.name}}
+                                    {{user.google.cachedUserProfile.name}}
                                 </a>
-
-                            </span>
-                       </span>
-
+                            </div>
+                       </div>
                     </div>
 
                 </div>

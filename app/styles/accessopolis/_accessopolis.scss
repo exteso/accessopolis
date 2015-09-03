@@ -311,42 +311,43 @@ input.ng-invalid.ng-touched, select.ng-invalid.ng-touched, textarea.ng-invalid.n
     position:relative;
 }
 
-.accessopolis-section-profile {
-    padding-top: 10px;
-    float: right;
+
+.accessopolis-profile {
     height: 40px;
-    .accessopolis-section-profile-auth {
+    margin-top: 5px;
+    white-space: nowrap;
+
+    .accessopolis-profile-icon {
+        width: 40px;
         float: left;
-        height: 100%;
-        width: 200px;
-        .accessopolis-profile-avatar {
-            width: 40px;
-            height: 40px;
-            line-height: 35px;
-            text-align: center;
-            border-radius: 50%;
-            border: 2px solid #ccc;
-            color: #ccc;
-            font-size: 1.5em;
-            float: left;
+        margin-top: 5px;
+        overflow: hidden;
+        height: 40px;
+        line-height: 40px;
+        text-align: center;
+        border: 1px solid #ccc;
+        border-radius: 50%;
+        background-size: cover;
     }
-        .accessopolis-profile-name {
-            width: 150px;
-            height: 40px;
-            line-height: 35px;
-            float: left;
-            margin-left: 10px;
-            cursor: pointer;
-            a {
-                display: block;
-                white-space: nowrap;
-                overflow: hidden;
-                -ms-text-overflow: ellipsis;
-                text-overflow: ellipsis;
+    .accessopolis-profile-name {
+        float: left;
+        width: 150px;
+        margin-top: 5px;
+        overflow: hidden;
+        font-size: 1.2em;
+        height: 40px;
+        line-height: 40px;
+        margin-left: 10px;
+        a {
+            display: block;
+            white-space: nowrap;
+            overflow: hidden;
+            -ms-text-overflow: ellipsis;
+            text-overflow: ellipsis;
         }
     }
 }
-}
+
 
 
 .accessopolis-location-detail {
