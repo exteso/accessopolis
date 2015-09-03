@@ -76,6 +76,7 @@ angular.module('accessopolisApp', [
             'accessopolis.back-to-home': 'Back to home',
             'accessopolis.exit' : 'Logout',
             'accessopolis.sign-in' : 'Login',
+            'accessopolis.comment': 'Comment'
         });
         $translateProvider.translations('it', {
             'public-transport': 'Trasporti Pubblici',
@@ -127,7 +128,8 @@ angular.module('accessopolisApp', [
             'accessopolis.welcome': 'benvenuto/a in Accessopolis.ch',
             'accessopolis.back-to-home': 'Torna ad Accessopolis',
             'accessopolis.exit' : 'Logout',
-            'accessopolis.sign-in' : 'Accedi con Google'
+            'accessopolis.sign-in' : 'Accedi con Google',
+            'accessopolis.comment': 'Commenta'
         });
         $translateProvider.preferredLanguage('it');
     })
