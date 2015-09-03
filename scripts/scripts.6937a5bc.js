@@ -76,6 +76,7 @@ angular.module('accessopolisApp', [
             'accessopolis.back-to-home': 'Back to home',
             'accessopolis.exit' : 'Logout',
             'accessopolis.sign-in' : 'Login',
+            'accessopolis.comment': 'Comment'
         });
         $translateProvider.translations('it', {
             'public-transport': 'Trasporti Pubblici',
@@ -127,7 +128,8 @@ angular.module('accessopolisApp', [
             'accessopolis.welcome': 'benvenuto/a in Accessopolis.ch',
             'accessopolis.back-to-home': 'Torna ad Accessopolis',
             'accessopolis.exit' : 'Logout',
-            'accessopolis.sign-in' : 'Accedi'
+            'accessopolis.sign-in' : 'Accedi con Google',
+            'accessopolis.comment': 'Commenta'
         });
         $translateProvider.preferredLanguage('it');
     }])
@@ -235,9 +237,16 @@ angular.module('accessopolisApp')
  */
 angular.module('accessopolisApp')
   .controller('LoginCtrl', ["$scope", "Auth", "$location", function ($scope, Auth, $location) {
-    $scope.oauthLogin = function(provider) {
-      $scope.err = null;
-      Auth.$authWithOAuthPopup(provider, { scope: 'email' }).then(redirect, showError);
+
+        $scope.oauthLogin = function(provider, dropMenu) {
+
+            if(dropMenu){
+                $(".btn-navbar").click(); //bootstrap 2.x
+                $(".navbar-toggle").click() //bootstrap 3.x by Richard
+            }
+
+          $scope.err = null;
+          Auth.$authWithOAuthPopup(provider, { scope: 'email' }).then(redirect, showError);
 
     };
 
@@ -272,7 +281,12 @@ angular.module('accessopolisApp')
     $scope.user = user;
     $scope.details = user.google;
 
-    $scope.logout = function() {
+    $scope.logout = function(dropMenu) {
+        if(dropMenu){
+            $(".btn-navbar").click(); //bootstrap 2.x
+            $(".navbar-toggle").click() //bootstrap 3.x by Richard
+        }
+
         Auth.$unauth();
         $location.path('/');
     };
