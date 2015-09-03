@@ -13,11 +13,11 @@ Data are stored on the Firebase infrastructure and protected using Google OAuth2
 
 Clone github repository:
 
-```git clone git@github.com:exteso/accessopolis.git
-
+```
+git clone git@github.com:exteso/accessopolis.git
 cd accessopolis && npm install && bower install
-
-grunt serve```
+grunt serve
+```
 
 Open browser at (http://localhost:8080)
 
@@ -25,10 +25,10 @@ Open browser at (http://localhost:8080)
  
 
 # How to deploy a new release:
-```git pull origin
-
+```
+git pull origin
 grunt build
-
-./publish.sh```
+./publish.sh
+```
 
 to publish you need write permission on the GitHub gh-pages branch
