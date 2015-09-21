@@ -1,5 +1,5 @@
 
-<ul class="list-inline accessopolis-navigation-bar-categories hidden-xs hidden-sm" >
+<ul class="list-inline accessopolis-navigation-bar-categories hidden-xs" >
     <li data-ng-repeat="item in ctrl.items" data-ng-click="ctrl.displaySubMenu(item)"
         style=" width: calc(100% / {{ctrl.items.length}});">
 
@@ -23,7 +23,13 @@
             <li data-ng-repeat="child in item.subcategory"
                 data-ng-click="ctrl.showLocations(child, $event); ">
                 <div  class="accessopolis-navigation-bar-sub-category-icon" >
-                    <span class="fa fa-camera"></span>
+                   <span class="fa fa-camera"
+                         ng-class="{'fa-train': item.text == 'public-transport',
+                             'fa-suitcase ': item.text == 'holidays',
+                             'fa-cutlery': item.text == 'food',
+                             'fa-magic': item.text == 'religion',
+                             'fa-soccer-ball-o': item.text == 'sport',
+                             'fa-book': item.text == 'culture'}"></span>
                 </div>
                 <div class="accessopolis-navigation-bar-sub-category-label" >{{child | translate}}</div>
             </li>
@@ -31,3 +37,5 @@
 
     </li>
 </ul>
+
+

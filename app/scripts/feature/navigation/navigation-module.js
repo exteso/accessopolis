@@ -10,6 +10,15 @@
                 templateUrl: 'scripts/feature/navigation/navigation-bar.html',
                 controllerAs: 'ctrl'
             }
+        })
+        .directive('navigationMenu', function() {
+            return {
+                restrict: 'C',
+                scope: true,
+                controller: NavigationController,
+                templateUrl: 'scripts/feature/navigation/navigation-menu.html',
+                controllerAs: 'ctrlNavMenu'
+            }
         });
 
     function NavigationService($q, Ref, $firebaseArray) {
@@ -27,7 +36,12 @@
         NavigationService.loadNavigationElements().then(function(data) {
             self.items = data;
         });
-        this.showLocations = function(item, $event) {
+        this.showLocations = function(item, $event, dropMenu) {
+            if(dropMenu){
+                $(".btn-navbar").click(); //bootstrap 2.x
+                $(".navbar-toggle").click() //bootstrap 3.x by Richard
+            }
+
             self.itemExpanded = undefined;
             $rootScope.$broadcast('SubcategorySelected', item);
             $event.stopPropagation();
