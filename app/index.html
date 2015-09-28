@@ -62,7 +62,8 @@
                         <button data-ng-controller="LoginCtrl"  class="btn btn-primary visible-xs btn-sm pull-right navbar-btn"  ng-click="oauthLogin('google')" >Accedi</button>
                     </div>
                     <div ng-show-auth="" class="accessopolis-profile  " >
-                        <button  role="button" ng-click="logout()" data-ng-controller="AccountCtrl" class="btn btn-danger navbar-btn pull-right">Log Out</button>
+                        <button  role="button" ng-click="logout()" data-ng-controller="AccountCtrl" class="btn btn-danger navbar-btn pull-right hidden-xs">Log Out</button>
+                        <button  role="button" ng-click="logout()" data-ng-controller="AccountCtrl" class="btn btn-danger btn-sm navbar-btn pull-right visible-xs">Log Out</button>
                         <div class="accessopolis-profile-icon hidden-xs" style='background-image: url("{{user.google.cachedUserProfile.picture}}")'>
                             <span data-ng-if="!user.google.cachedUserProfile.picture" class="fa fa-user"></span>
                         </div>
