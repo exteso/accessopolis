@@ -119,13 +119,6 @@
             return $firebaseArray(Ref.child('ratings')).$add(newRate);
         };
 
-        this.retrieveVideo = function(locationId) {
-            return $q(function(resolve, reject) {
-                $firebaseArray(Ref.child('videos').orderByChild('locationId').equalTo(locationId)).$loaded(function(list) {
-                    resolve(_.first(list));
-                });
-            });
-        };
     }
 
     LocationDetailService.prototype.$inject = ['$q', '$firebaseObject', 'Ref', '$firebaseArray', 'imgur', 'IMGUR_API_KEY'];
@@ -141,9 +134,7 @@
 
         LocationDetailService.find($routeParams.id).then(function(result) {
             self.detail = result;
-            LocationVideoService.loadVideos(result).$loaded(function(list) {
-                self.videos = list;
-            });
+            loadVideos(result);
         });
 
         loadImages();
@@ -201,8 +192,22 @@
           });
         }
 
+        var loadVideos = function(detail) {
+            LocationVideoService.loadVideos(detail).$loaded(function(list) {
+                self.videos = list;
+            });
+        };
+        self.videoUpload = {};
         this.uploadVideo = function(file) {
-            LocationVideoService.uploadVideo(file, self.detail);
+            LocationVideoService.uploadVideo(file, self.detail).then(function(result) {
+                self.videoUpload.file = result;
+            });
+        };
+
+        self.addVideo = function() {
+            LocationVideoService.saveVideo(self.videoUpload.file, self.detail).then(function() {
+                loadVideos(self.detail);
+            });
         }
 
     }
@@ -275,13 +280,14 @@
 
     LocationVideoController.prototype.$inject = ['$scope', 'LocationDetailService', '$sce', 'LocationVideoService'];
 
-    function LocationVideoService(Auth, $log, $firebaseArray, Ref) {
+    function LocationVideoService(Auth, $log, $firebaseArray, Ref, $q) {
 
         var self = this;
 
         this.uploadVideo = function(file, detail) {
+            var deferred = $q.defer();
             if(!angular.isDefined(Auth.$getAuth())) {
-                return;
+                deferred.reject({});
             }
             var metadata = {
                 snippet: {
@@ -291,9 +297,8 @@
                     categoryId: undefined
                 }
             };
-            var fd = new FormData();
-            fd.append('file', file);
 
+            //source: https://github.com/youtube/api-samples/blob/master/javascript/cors_upload.js
             var xhr = new XMLHttpRequest();
 
             xhr.open('POST', 'https://www.googleapis.com/upload/youtube/v3/videos?uploadType=resumable&part=snippet', true);
@@ -313,17 +318,24 @@
                     xhr.setRequestHeader('X-Upload-Content-Type', file.type);
                     xhr.onload = function(e) {
                         var actualResponse = JSON.parse(e.target.response);
-                        self.loadVideos(detail).$add({videoUrl: 'https://www.youtube.com/embed/'+ actualResponse.id, thumbnail: actualResponse.snippet.thumbnails.default.url});
+                        deferred.resolve({videoUrl: 'https://www.youtube.com/embed/'+ actualResponse.id, thumbnail: actualResponse.snippet.thumbnails.default.url});
                     };
                     xhr.onerror = function(err) {
                         $log.error(err);
+                        deferred.reject({});
                     };
                     xhr.send(content);
                 } else {
                     $log.error(e);
+                    deferred.reject({});
                 }
             }.bind(this);
             xhr.send(JSON.stringify(metadata));
+            return deferred.promise;
+        };
+
+        self.saveVideo = function(file, detail) {
+            self.loadVideos(detail).$add(file);
         };
 
         this.loadVideos = function(detail) {
@@ -332,6 +344,6 @@
 
     }
 
-    LocationVideoService.prototype.$inject = ['Auth', '$log', '$firebaseArray', 'Ref'];
+    LocationVideoService.prototype.$inject = ['Auth', '$log', '$firebaseArray', 'Ref', '$q'];
 
 })();

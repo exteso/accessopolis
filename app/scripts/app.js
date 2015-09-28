@@ -91,7 +91,11 @@ angular.module('accessopolisApp', [
             'accessopolis.back-to-home': 'Back to home',
             'accessopolis.exit' : 'Logout',
             'accessopolis.sign-in' : 'Login',
-            'accessopolis.comment': 'Comment'
+            'accessopolis.comment': 'Comment',
+            'accessopolis.insert.video': 'Upload new video',
+            'accessopolis.type': 'Type',
+            'accessopolis.description': 'Description',
+            'accessopolis.upload':'Upload'
         });
         $translateProvider.translations('it', {
             'public-transport': 'Trasporti Pubblici',
@@ -155,7 +159,11 @@ angular.module('accessopolisApp', [
             'accessopolis.back-to-home': 'Torna ad Accessopolis',
             'accessopolis.exit' : 'Logout',
             'accessopolis.sign-in' : 'Accedi con Google',
-            'accessopolis.comment': 'Commenta'
+            'accessopolis.comment': 'Commenta',
+            'accessopolis.insert.video': 'Upload Video',
+            'accessopolis.type':'Tipologia',
+            'accessopolis.description': 'Descrizione',
+            'accessopolis.upload':'Upload'
         });
         $translateProvider.preferredLanguage('it');
         $translateProvider.useSanitizeValueStrategy('sanitizeParameters');
