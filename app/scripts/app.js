@@ -24,8 +24,10 @@ angular.module('accessopolisApp', [
     'accessopolis.search',
     'accessopolis.locationDetail',
     'accessopolis.rating',
-    'pascalprecht.translate'
+    'pascalprecht.translate',
+    'ngImgur'
   ])
+    .constant('IMGUR_API_KEY', 'Client-ID 7a37861e931f779')
     .config(function ($translateProvider) {
         $translateProvider.translations('en', {
             'public-transport': 'Public Transports',
