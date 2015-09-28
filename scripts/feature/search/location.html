@@ -1,9 +1,7 @@
 
 <div class=" col-md-12 col-sm-12 col-xs-12 accessopolis-location " >
 
-    <div class="accessopolis-location-icon hidden-xs">
-
-
+    <div class="col-md-3 col-sm-3 col-xs-3 accessopolis-location-icon">
         <div class="fa fa-thumb-tack accessopolis-location-icon-item"
               ng-class="{'fa-coffee': ctrlLoc.location.type === 'bar',
                          'fa-bed': ctrlLoc.location.type === 'hotels',
@@ -12,26 +10,18 @@
         </div>
     </div>
 
-    <div class="accessopolis-location-icon-small visible-xs">
 
 
-        <div class="fa fa-thumb-tack accessopolis-location-icon-item"
-             ng-class="{'fa-coffee': ctrlLoc.location.type === 'bar',
-                         'fa-bed': ctrlLoc.location.type === 'hotels',
-                         'fa-beer': ctrlLoc.location.type === 'pub',
-                         'fa-train': ctrlLoc.location.type === 'train-stations'}">
-        </div>
-    </div>
+    <div  class="col-md-9 col-sm-9 col-xs-9 accessopolis-location-data" >
 
-    <div  class="accessopolis-location-data" >
-        <div class="accessopolis-location-data-info">
-            <h1 class="visible-xs" style="font-size: 1.4em; display: block; overflow: hidden;  white-space: nowrap; text-overflow: ellipsis;"  data-ng-click="ctrlLoc.showDetail()">{{ctrlLoc.location.text}}</h1>
-            <h1 class="hidden-xs" style="font-size: 1.8em; display: block; overflow: hidden;  white-space: nowrap; text-overflow: ellipsis;"  data-ng-click="ctrlLoc.showDetail()">{{ctrlLoc.location.text}}</h1>
+        <div class="accessopolis-location-data-info col-md-8 col-sm-8 col-xs-12">
+            <h1 class="visible-xs" style="font-size: 1.2em; display: block; overflow: hidden;  white-space: nowrap; text-overflow: ellipsis;"  data-ng-click="ctrlLoc.showDetail()">{{ctrlLoc.location.text}}</h1>
+            <h1 class="hidden-xs" style="font-size: 1.4em; display: block; overflow: hidden;  white-space: nowrap; text-overflow: ellipsis;"  data-ng-click="ctrlLoc.showDetail()">{{ctrlLoc.location.text}}</h1>
 
-            <div class="accessopolis-location-data-rating-small visible-xs" data-rating="ctrlLoc.location"></div>
+            <div class=" col-xs-12 accessopolis-location-data-rating-small visible-xs" acc-rating="ctrlLoc.location"></div>
 
             <button class="btn btn-danger btn-lg hidden-xs" data-translate >report-a-problem</button>
-            <button class="btn btn-danger btn visible-xs"  data-translate>report-a-problem</button>
+            <button class="btn btn-danger btn visible-xs col-xs-12"  data-translate>report-a-problem</button>
             <!--<div class="accessopolis-location-rating-item" ></div>-->
             <!--<div class="accessopolis-location-rating-item" ></div>-->
             <!--<div class="accessopolis-location-rating-item" ></div>-->
@@ -39,8 +29,7 @@
             <!-- span data-ng-click="ctrlLoc.showDetail()">type: {{ctrlLoc.location.type}} </span-->
         </div>
 
-        <div class="accessopolis-location-data-rating hidden-xs" data-rating="ctrlLoc.location"></div>
-
+        <div class="accessopolis-location-data-rating  col-md-4 col-sm-4 hidden-xs" acc-rating="ctrlLoc.location"></div>
 
     </div>
 </div>

@@ -25,9 +25,11 @@ angular.module('accessopolisApp', [
     'accessopolis.locationDetail',
     'accessopolis.rating',
     'pascalprecht.translate',
-    'ngImgur'
+    'ngImgur',
+    'ui.bootstrap'
   ])
     .constant('IMGUR_API_KEY', 'Client-ID 7a37861e931f779')
+    .constant('GOOGLE_API_KEY', 'AIzaSyCbm7ot6UqPk9I7sQVu3Z3PeU7hvwT0pbU')
     .config(["$translateProvider", function ($translateProvider) {
         $translateProvider.translations('en', {
             'public-transport': 'Public Transports',
@@ -51,6 +53,15 @@ angular.module('accessopolisApp', [
             'synagogue': 'Temples',
             'sport': 'Sport',
             'culture': 'Culture and freetime',
+            'stadium':'Stadium',
+            'sports-arena': 'Sports Arena',
+            'indoor-pool': 'Indoor Pool',
+            'swimming-pool': 'Swimming Pool',
+            'ice-rink': 'Ice Rink',
+            'cinema': 'Cinema',
+            'theatre': 'Theatre',
+            'museum': 'Museum',
+            'library': 'Library',
             'accessopolis.rating.expert': 'Experts',
             'accessopolis.rating.public': 'Public',
             'accessopolis.accessibility-evaluation': 'Accessibility Evaluation',
@@ -61,9 +72,10 @@ angular.module('accessopolisApp', [
             'accessopolis.insert-new-location': 'Insert new location',
             'accessopolis.edit-location': 'Edit',
             'accessopolis.location.description': 'Location Description',
-            'accessopolis.error.minlength': 'The value inserted is not valid',
-            'accessopolis.error.maxlength': 'The value inserted is not valid',
+            'accessopolis.error.minlength': 'The value inserted is too short',
+            'accessopolis.error.maxlength': 'The value inserted is too long',
             'accessopolis.error.required': 'This field is required',
+            'accessopolis.error.url': 'Url is not valid. It must start with http:// or https://',
             'accessopolis.location.type': 'Location Type',
             'accessopolis.location.address': 'Location Address',
             'accessopolis.cancel': 'Cancel',
@@ -71,6 +83,7 @@ angular.module('accessopolisApp', [
             'accessopolis.selected.categories': 'Selected Categories',
             'accessopolis.location.not-found': 'No locations found',
             'accessopolis.location.new': 'Add Location',
+            'accessopolis.location.website' : 'Website address',
             'report-a-problem': 'Report a problem',
             'accessopolis.back-to-list': 'Back to list',
             'accessopolis.vote.now' : 'Leave your vote',
@@ -79,7 +92,11 @@ angular.module('accessopolisApp', [
             'accessopolis.back-to-home': 'Back to home',
             'accessopolis.exit' : 'Logout',
             'accessopolis.sign-in' : 'Login',
-            'accessopolis.comment': 'Comment'
+            'accessopolis.comment': 'Comment',
+            'accessopolis.insert.video': 'Upload new video',
+            'accessopolis.type': 'Type',
+            'accessopolis.description': 'Description',
+            'accessopolis.upload':'Upload'
         });
         $translateProvider.translations('it', {
             'public-transport': 'Trasporti Pubblici',
@@ -103,6 +120,15 @@ angular.module('accessopolisApp', [
             'synagogue': 'Sinagoghe',
             'sport': 'Sport',
             'culture': 'Cultura e tempo libero',
+            'stadium': 'Stadi',
+            'sports-arena': 'Campi Sportivi',
+            'indoor-pool': 'Piscine coperte',
+            'swimming-pool': 'Piscine scoperte',
+            'ice-rink': 'Pista di Ghiaccio',
+            'cinema': 'Cinema',
+            'theatre': 'Teatri',
+            'museum': 'Musei',
+            'library': 'Biblioteche',
             'accessopolis.rating.expert': 'Esperti',
             'accessopolis.rating.public': 'Pubblico',
             'accessopolis.accessibility-evaluation': 'Valutazione Accessibilità',
@@ -113,9 +139,10 @@ angular.module('accessopolisApp', [
             'accessopolis.insert-new-location': 'Inserire una nuova struttura',
             'accessopolis.edit-location': 'Modifica',
             'accessopolis.location.description': 'Descrizione della struttura',
-            'accessopolis.error.minlength': 'Il valore inserito non è valido',
-            'accessopolis.error.maxlength': 'Il valore inserito non è valido',
+            'accessopolis.error.minlength': 'Il valore inserito è troppo corto',
+            'accessopolis.error.maxlength': 'Il valore inserito è troppo lungo',
             'accessopolis.error.required': 'Questo campo è obbligatorio',
+            'accessopolis.error.url': 'Url non è valida. Deve iniziare con http:// o https://',
             'accessopolis.search.suggestions': 'Cerca una struttura o località',
             'accessopolis.location.type': 'Tipologia della struttura',
             'accessopolis.location.address': 'Indirizzo della struttura',
@@ -125,6 +152,7 @@ angular.module('accessopolisApp', [
             'accessopolis.location.not-found': 'Nessuna struttura trovata',
             'accessopolis.location.new': 'Aggiungi',
             'accessopolis.back-to-list': 'Torna alla lista',
+            'accessopolis.location.website' : 'Indirizzo sito web',
             'report-a-problem': 'Segnala un problema',
             'accessopolis.vote.now' : 'Dai il tuo voto',
             'accessopolis.voting': 'Vota!',
@@ -132,17 +160,29 @@ angular.module('accessopolisApp', [
             'accessopolis.back-to-home': 'Torna ad Accessopolis',
             'accessopolis.exit' : 'Logout',
             'accessopolis.sign-in' : 'Accedi con Google',
-            'accessopolis.comment': 'Commenta'
+            'accessopolis.comment': 'Commenta',
+            'accessopolis.insert.video': 'Upload Video',
+            'accessopolis.type':'Tipologia',
+            'accessopolis.description': 'Descrizione',
+            'accessopolis.upload':'Upload'
         });
         $translateProvider.preferredLanguage('it');
         $translateProvider.useSanitizeValueStrategy('sanitizeParameters');
         $translateProvider.directivePriority(222); //see https://github.com/angular-translate/angular-translate/issues/949
     }])
     .controller('AppCtrl', ["$scope", "Auth", "$translate", "$firebaseObject", "Ref", function ($scope, Auth, $translate, $firebaseObject, Ref) {
-        $scope.user = Auth.$getAuth();
-        if ($scope.user) {
+
+        Auth.$onAuth(function(authData) {
+          if(authData) {
+            $scope.user = Auth.$getAuth();
             $scope.profile = $firebaseObject(Ref.child('users/' + $scope.user.uid));
-        }
+          } else {
+            $scope.user = undefined;
+            $scope.profile = undefined;
+          }
+        });
+
+
         $scope.lang = "it";
         $scope.changeLanguage = function (key) {
             $scope.lang = key;
@@ -255,23 +295,20 @@ angular.module('accessopolisApp')
 
         $scope.oauthLogin = function(provider, dropMenu) {
 
-            if(dropMenu){
-                $(".btn-navbar").click(); //bootstrap 2.x
-                $(".navbar-toggle").click() //bootstrap 3.x by Richard
-            }
+        if(dropMenu){
+            $(".btn-navbar").click(); //bootstrap 2.x
+            $(".navbar-toggle").click() //bootstrap 3.x by Richard
+        }
 
-          $scope.err = null;
+        $scope.err = null;
 
-          Auth.$authWithOAuthPopup(provider, { scope: 'email https://www.googleapis.com/auth/youtube.upload' }).then(redirect, showError);
-
+        Auth.$authWithOAuthPopup(provider, { scope: 'email https://www.googleapis.com/auth/youtube.upload' }).then(redirect, showError);
     };
 
     $scope.anonymousLogin = function() {
       $scope.err = null;
       Auth.$authAnonymously({rememberMe: true}).then(redirect, showError);
     };
-
-
 
     function redirect() {
       $location.path('/account');
@@ -311,10 +348,14 @@ angular.module('accessopolisApp')
     var profile = $firebaseObject(Ref.child('users/'+user.uid));
     profile.$bindTo($scope, 'profile').then(function() {
 
+        //could we move this logic inside Auth.$onAuth in app.js
         if (user.google){
             $scope.profile.email = user.google.email;  // will be saved to the database
             $scope.profile.name = user.google.displayName;   // will be saved to the database
             $scope.profile.imageURL =  user.google.profileImageURL; // will be saved to the database
+            if (!$scope.profile.type){
+                $scope.profile.type = 'public'; //if a user has no type property defined, it will be set as public
+            }
         }
       });
   }]);
@@ -430,7 +471,7 @@ angular.module('accessopolisApp')
     };
   }]);
 
-angular.module('accessopolisApp').directive('itemUpload', [function() {
+angular.module('accessopolisApp').directive('itemUpload', ['$timeout', function($timeout) {
 
       'use strict';
 
@@ -439,7 +480,8 @@ angular.module('accessopolisApp').directive('itemUpload', [function() {
         scope: true,
         controllerAs: 'imageUploadCtrl',
         bindToController: {
-          doUpload : '='
+            doUpload : '=',
+            accept : '@'
         },
         link: function(scope, element) {
 
@@ -447,13 +489,15 @@ angular.module('accessopolisApp').directive('itemUpload', [function() {
           inputElem.addEventListener('change', function() {
             var image = inputElem.files[0];
             if(image) {
-              scope.imageUploadCtrl.doUpload(image);
+              $timeout(function() {
+                scope.imageUploadCtrl.doUpload(image);
+              });
             }
           }, false);
         },
         controller: function() {
         },
-        template: '<input type="file" accept="image/*" capture="camera" ng-show-auth>'
+        template: '<input type="file" accept="imageUploadCtrl.accept" capture="camera" ng-show-auth>'
       };
 }]);
 
@@ -617,6 +661,15 @@ angular.module('accessopolisApp')
                 controllerAs: 'ctrl'
             }
         })
+        .directive('navigationFilter', function() {
+            return {
+                restrict: 'C',
+                scope: true,
+                controller: NavigationController,
+                templateUrl: 'scripts/feature/navigation/navigation-filter.html',
+                controllerAs: 'navFilterCtrl'
+            }
+        })
         .directive('navigationMenu', function() {
             return {
                 restrict: 'C',
@@ -745,6 +798,9 @@ angular.module('accessopolisApp')
         this.performSearch = function() {
             LocationSearchService.search({text: self.searchParam, type: self.subcategorySelected}).then(function(result) {
                 self.resultList = result;
+                if(self.resultList.length>0){
+                    self.show_result = true;
+                }
             });
         };
 
@@ -753,17 +809,21 @@ angular.module('accessopolisApp')
         };
 
         //we use scope here only to trigger the $watch mechanism. Maybe there would be a better solution?
-        $scope.$watch(function () {
-            return self.searchParam;
-        },function(){
-            self.performSearch();
-        });
-
-        $scope.$watch(function() {
-            return self.subcategorySelected;
-        }, function() {
-            self.performSearch();
-        });
+        //$scope.$watch(function () {
+        //    return self.searchParam;
+        //},function(){
+        //    if(self.searchParam){
+        //        self.performSearch();
+        //    }
+        //});
+        //
+        //$scope.$watch(function() {
+        //    return self.subcategorySelected;
+        //}, function() {
+        //    if(self.subcategorySelected){
+        //      self.performSearch();
+        //    }
+        //});
 
     }
     LocationSearchController.$inject = ["LocationSearchService", "$rootScope", "$scope"];
@@ -775,6 +835,7 @@ angular.module('accessopolisApp')
     "use strict";
     angular.module('accessopolis.locationDetail', ['accessopolis.navigation'])
         .service('LocationDetailService', LocationDetailService)
+        .service('LocationVideoService', LocationVideoService)
         .controller('LocationDetailController', LocationDetailController)
         .controller('NewLocationController', NewLocationController)
         .directive('autocompleteAddress', [function() {
@@ -790,7 +851,7 @@ angular.module('accessopolisApp')
                             val.addListener('place_changed', function() {
                                 var place = self.autocomplete.getPlace();
                                 if (place.geometry) {
-                                    $rootScope.$broadcast('LocationSelected', place.geometry.location);
+                                    $rootScope.$broadcast('LocationSelected', place);
                                 }
                             });
                         }
@@ -871,36 +932,47 @@ angular.module('accessopolisApp')
             });
         };
 
+        this.update = function(location){
+            if (location.$id){
+                var obj = $firebaseObject(Ref.child('locations/'+location.$id));
+
+                obj.$loaded().then(function() {
+                    angular.extend(obj, location);
+                    return obj.$save();
+                });
+                return obj;
+            }
+        };
+
         this.create = function(location) {
-            var mock = {lat: 45.833376, long: 9.030515};
-            return $firebaseArray(Ref.child('locations')).$add(angular.extend(mock, location));
+            return $firebaseArray(Ref.child('locations')).$add(location);
         };
 
         this.rate = function(newRate){
             return $firebaseArray(Ref.child('ratings')).$add(newRate);
         };
 
-        this.retrieveVideo = function(locationId) {
-            return $q(function(resolve, reject) {
-                $firebaseArray(Ref.child('videos').orderByChild('locationId').equalTo(locationId)).$loaded(function(list) {
-                    resolve(_.first(list));
-                });
-            });
-        };
+        this.getUserProfile= function(user){
+            return $firebaseObject(Ref.child('users/' + user.uid));;
+        }
+
     }
     LocationDetailService.$inject = ["$q", "$firebaseObject", "Ref", "$firebaseArray"];
 
     LocationDetailService.prototype.$inject = ['$q', '$firebaseObject', 'Ref', '$firebaseArray', 'imgur', 'IMGUR_API_KEY'];
 
-    function LocationDetailController(LocationDetailService, $routeParams, $location, user, imgur, IMGUR_API_KEY) {
+    function LocationDetailController(LocationDetailService, $routeParams, $location, user, imgur, IMGUR_API_KEY, LocationVideoService, $modal) {
 
         var self = this;
-        self.user = user;
+        self.profile = LocationDetailService.getUserProfile(user);
 
         imgur.setAPIKey(IMGUR_API_KEY);
 
+        this.imagesType = ['entrance', 'bathroom', 'elevator', 'stairs', 'stairlift', 'room', 'lunchroom', 'other'];
+
         LocationDetailService.find($routeParams.id).then(function(result) {
             self.detail = result;
+            loadVideos(result.$id);
         });
 
         loadImages();
@@ -919,7 +991,7 @@ angular.module('accessopolisApp')
         };
 
         this.rate = function(){
-            var newRate = {locationId: $routeParams.id, userId: self.user.uid, rateKind: 'global', rate: self.vote, userType: 'public'};
+            var newRate = {locationId: $routeParams.id, userId: self.profile.$id, rateKind: 'global', rate: self.vote, userType: self.profile.type};
 
             LocationDetailService.rate(newRate).then(function(result) {
                 self.rateFeedback = result;
@@ -937,11 +1009,45 @@ angular.module('accessopolisApp')
 
 
         this.uploadImgur = function(file) {
-          imgur.upload(file).then(function(model) {
-              var httpsImageUrl = model.link.replace(/^http\:/, "https:");
-              self.images.$add({imageUrl: httpsImageUrl}).catch(alert);
-          });
+          self.imageUpload = self.imageUpload || {};
+          self.imageUpload.file = file;
         };
+
+
+        this.addNewImage = function(){
+            $modal.open({
+                templateUrl: 'scripts/feature/detail/addImage.html',
+                controller: ["$scope", "$modal", function($scope, $modal){
+                    $scope.ctrl = self;
+                    $scope.modal = $modal;
+                    $scope.addImage = function(){
+                        self.addImage().then(function() {
+                            $scope.$close();
+                        });
+
+                    }
+                }],
+                backdrop: 'static'
+            });
+
+        };
+
+
+        this.addImage = function() {
+          var file = self.imageUpload.file;
+          var imageType = self.imageUpload.imageType;
+          var description = self.imageUpload.description;
+          self.imageUpload = {};
+          return imgur.upload(file).then(function(model) {
+              var httpsImageUrl = model.link.replace(/^http\:/, "https:");
+              var toAdd = {imageUrl: httpsImageUrl};
+              if(imageType) {
+                  toAdd.imageType = imageType;
+                  toAdd.description = description;
+              }
+              self.images.$add(toAdd).catch(alert);
+          });
+        }
 
         function loadImages() {
           LocationDetailService.getComments($routeParams.id).then(function(result) {
@@ -949,10 +1055,34 @@ angular.module('accessopolisApp')
           });
         }
 
-    }
-    LocationDetailController.$inject = ["LocationDetailService", "$routeParams", "$location", "user", "imgur", "IMGUR_API_KEY"];
+        var loadVideos = function(id) {
+            LocationVideoService.loadVideos(id).$loaded(function(list) {
+                self.videos = list;
+                self.locationVideo = _.first(list);
+            });
+        };
+        self.videoUpload = {};
+        this.uploadVideo = function(file) {
+            LocationVideoService.uploadVideo(file, self.detail).then(function(result) {
+                self.videoUpload.file = result;
+            });
+        };
 
-    LocationDetailController.prototype.$inject = ['LocationDetailService', '$routeParams', '$location', 'user'];
+        self.addVideo = function() {
+            LocationVideoService.saveVideo(self.videoUpload.file, self.detail).then(function() {
+                loadVideos(self.detail.$id);
+            });
+        };
+
+        self.showVideo = function(video, $event) {
+            self.locationVideo = video;
+            $event.preventDefault();
+        }
+
+    }
+    LocationDetailController.$inject = ["LocationDetailService", "$routeParams", "$location", "user", "imgur", "IMGUR_API_KEY", "LocationVideoService", "$modal"];
+
+    LocationDetailController.prototype.$inject = ['LocationDetailService', '$routeParams', '$location', 'user', 'LocationVideoService', '$modal'];
 
     function NewLocationController(NavigationService, LocationDetailService, $routeParams, $location, $rootScope) {
         var self = this;
@@ -969,11 +1099,16 @@ angular.module('accessopolisApp')
             if(!frm.$valid) {
                 return;
             }
-            LocationDetailService.create(self.location).then(function(data) {
-                $location.path('/locations/'+data.name());
-            }, function(err) {
-                alert(err);
-            });
+            if (self.location.$id){
+                LocationDetailService.update(self.location)
+                $location.path('/locations/' + self.location.$id);
+            }else {
+                LocationDetailService.create(self.location).then(function (data) {
+                    $location.path('/locations/' + data.key());
+                }, function (err) {
+                    alert(err);
+                })
+            };
         };
 
         this.backToList = function() {
@@ -986,9 +1121,11 @@ angular.module('accessopolisApp')
             });
         });
 
-        $rootScope.$on('LocationSelected', function(e, data) {
-            self.location.lat = data.G;
-            self.location.long = data.K;
+        $rootScope.$on('LocationSelected', function(e, position) {
+            self.location.address = position.formatted_address;
+            var loc = position.geometry.location;
+            self.location.lat = loc.lat();
+            self.location.long = loc.lng();
         });
 
     }
@@ -996,24 +1133,87 @@ angular.module('accessopolisApp')
 
     NewLocationController.prototype.$inject = ['NavigationService', 'LocationDetailService', '$routeParams', '$location', '$rootScope'];
 
-    function LocationVideoController($scope, LocationDetailService, $sce) {
+    function LocationVideoController($scope, $sce, LocationVideoService) {
         var self = this;
         $scope.$watch(function() {
             return self.locationVideo;
         }, function(val) {
-            if(angular.isDefined(val)) {
-                LocationDetailService.retrieveVideo(val.$id).then(function(result) {
-                    var url = angular.isDefined(result) ? result.url : undefined;
-                    if(angular.isDefined(url)) {
-                        self.url = $sce.trustAsResourceUrl(url);
-                    }
-                });
+            if(angular.isDefined(val) && angular.isDefined(val.videoUrl)) {
+                self.url = $sce.trustAsResourceUrl(val.videoUrl + '?rel=0');
             }
         });
-    }
-    LocationVideoController.$inject = ["$scope", "LocationDetailService", "$sce"];
 
-    LocationVideoController.prototype.$inject = ['$scope', 'LocationDetailService', '$sce'];
+    }
+    LocationVideoController.$inject = ["$scope", "$sce", "LocationVideoService"];
+
+    LocationVideoController.prototype.$inject = ['$scope', 'LocationDetailService', '$sce', 'LocationVideoService'];
+
+    function LocationVideoService(Auth, $log, $firebaseArray, Ref, $q) {
+
+        var self = this;
+
+        this.uploadVideo = function(file, detail) {
+            var deferred = $q.defer();
+            if(!angular.isDefined(Auth.$getAuth())) {
+                deferred.reject({});
+            }
+            var metadata = {
+                snippet: {
+                    title: 'Accessopolis review: ' + detail.text,
+                    description: window.location.href,
+                    tags: ['accessopolis'],
+                    categoryId: undefined
+                }
+            };
+
+            //source: https://github.com/youtube/api-samples/blob/master/javascript/cors_upload.js
+            var xhr = new XMLHttpRequest();
+
+            xhr.open('POST', 'https://www.googleapis.com/upload/youtube/v3/videos?uploadType=resumable&part=snippet', true);
+            xhr.setRequestHeader('Authorization', 'Bearer ' + Auth.$getAuth().google.accessToken);
+            xhr.setRequestHeader('Content-Type', 'application/json');
+            xhr.setRequestHeader('X-Upload-Content-Length', file.size);
+            xhr.setRequestHeader('X-Upload-Content-Type', file.type);
+
+            xhr.onload = function(e) {
+                if (e.target.status < 400) {
+                    var url = e.target.getResponseHeader('Location');
+                    var content = file;
+
+                    var xhr = new XMLHttpRequest();
+                    xhr.open('PUT', url, true);
+                    xhr.setRequestHeader('Content-Type', file.type);
+                    xhr.setRequestHeader('X-Upload-Content-Type', file.type);
+                    xhr.onload = function(e) {
+                        var actualResponse = JSON.parse(e.target.response);
+                        deferred.resolve({videoUrl: 'https://www.youtube.com/embed/'+ actualResponse.id, thumbnail: actualResponse.snippet.thumbnails.default.url});
+                    };
+                    xhr.onerror = function(err) {
+                        $log.error(err);
+                        deferred.reject({});
+                    };
+                    xhr.send(content);
+                } else {
+                    $log.error(e);
+                    deferred.reject({});
+                }
+            }.bind(this);
+            xhr.send(JSON.stringify(metadata));
+            return deferred.promise;
+        };
+
+        self.saveVideo = function(file, detail) {
+            self.loadVideos(detail.$id).$add(file);
+        };
+
+        this.loadVideos = function(id) {
+            return $firebaseArray(Ref.child('videos/'+id));
+        };
+
+    }
+    LocationVideoService.$inject = ["Auth", "$log", "$firebaseArray", "Ref", "$q"];
+
+    LocationVideoService.prototype.$inject = ['Auth', '$log', '$firebaseArray', 'Ref', '$q'];
 
 })();
 
@@ -1021,28 +1221,16 @@ angular.module('accessopolisApp')
     "use strict";
     angular.module('accessopolis.rating', [])
         .service('RatingService', RatingService)
-        .directive('rating', function() {
+        .directive('accRating', function() {
             return {
                 restrict: 'A',
                 scope: true,
                 controller: RatingController,
                 controllerAs: 'ctrlRating',
                 bindToController: {
-                    rating: '='
+                    rating: '= accRating'
                 },
                 templateUrl: 'scripts/feature/rating/rating.html'
-            }
-        })
-        .directive('ratings', function() {
-            return {
-                restrict: 'A',
-                scope: true,
-                controller: RatingController,
-                controllerAs: 'ctrlRatings',
-                bindToController: {
-                    rating: '=ratings'
-                },
-                templateUrl: 'scripts/feature/rating/ratings.html'
             }
         });
 
@@ -1062,7 +1250,7 @@ angular.module('accessopolisApp')
                 ratingsByLocation.$loaded(function(data) {
                     var ratingByType = _.groupBy(data, 'userType');
 
-                    var totalStaff = _.sum(ratingByType['staff'], 'rate');
+                    var totalStaff = _.sum(ratingByType['expert'], 'rate');
                     var totalPublic = _.sum(ratingByType['public'], 'rate');
 
                     var ratingByKind = _.groupBy(data, 'rateKind');
@@ -1074,7 +1262,7 @@ angular.module('accessopolisApp')
 
                     resolve({
                         public: calculateRate(totalPublic, ratingByType['public']),
-                        staff : calculateRate(totalStaff, ratingByType['staff']),
+                        staff : calculateRate(totalStaff, ratingByType['expert']),
                         mobility : calculateRate(totalMobility, ratingByKind['mobility']),
                         hearing : calculateRate(totalHearing, ratingByKind['hearing']),
                         vision : calculateRate(totalVision, ratingByKind['vision']),

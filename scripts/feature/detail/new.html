@@ -7,31 +7,36 @@
 
             <div class="form-group">
                 <label data-translate for="description">accessopolis.location.description</label>
-                <input type="text" class="form-control" name="text" data-ng-model="ctrl.location.text" id="description" required="required" />
+                <input type="text" class="form-control" name="text" data-ng-model="ctrl.location.text" id="description" required="required" minlength="4"/>
                 <div class="text-danger" data-ng-messages="newLocationForm.text.$error" data-ng-if="newLocationForm.text.$touched">
-                    <p data-ng-message="minlength" data-translate>accessopolis.error.minlength</p>
-                    <p data-ng-message="maxlength" data-translate>accessopolis.error.maxlength</p>
-                    <p data-ng-message="required" data-translate>accessopolis.error.required</p>
+                    <p data-ng-message="minlength"><span translate="accessopolis.error.minlength"></span></p>
+                    <p data-ng-message="required"><span translate="accessopolis.error.required"></span></p>
                 </div>
             </div>
 
             <div class="form-group">
                 <label data-translate for="type">accessopolis.location.type</label>
-                <select name="type" class="form-control" data-ng-model="ctrl.location.type" data-ng-options="item for item in ctrl.subtypes" id="type" required="required"></select>
+                <select name="type" class="form-control" data-ng-model="ctrl.location.type" data-ng-options="item as item | translate for item in ctrl.subtypes" id="type" required="required"></select>
                 <div class="text-danger" data-ng-messages="newLocationForm.type.$error" data-ng-if="newLocationForm.type.$touched">
-                    <p data-ng-message="minlength" data-translate>accessopolis.error.minlength</p>
-                    <p data-ng-message="maxlength" data-translate>accessopolis.error.maxlength</p>
-                    <p data-ng-message="required" data-translate>accessopolis.error.required</p>
+                    <p data-ng-message="required"><span translate="accessopolis.error.required"></span></p>
                 </div>
             </div>
 
             <div class="form-group">
-                <label data-translate for="address" data-ng-minlenght="5">accessopolis.location.address</label>
-                <input type="text" class="form-control" id="address" data-autocomplete-address name="address" data-ng-model="ctrl.location.address" required="required" />
+                <label data-translate for="address">accessopolis.location.address</label>
+                <input type="text" class="form-control" id="address" data-autocomplete-address name="address" data-ng-model="ctrl.location.address" required="required" minlength="5"/>
                 <div class="text-danger" data-ng-messages="newLocationForm.address.$error" data-ng-if="newLocationForm.address.$touched">
-                    <p data-ng-message="minlength" data-translate>accessopolis.error.minlength</p>
-                    <p data-ng-message="maxlength" data-translate>accessopolis.error.maxlength</p>
-                    <p data-ng-message="required" data-translate>accessopolis.error.required</p>
+                    <p data-ng-message="minlength"><span translate="accessopolis.error.minlength"></span></p>
+                    <p data-ng-message="maxlength"><span translate="accessopolis.error.maxlength"></span></p>
+                    <p data-ng-message="required"><span translate="accessopolis.error.required"></span></p>
+                </div>
+            </div>
+
+            <div class="form-group">
+                <label data-translate for="website">accessopolis.location.website</label>
+                <input type="url" class="form-control" name="website" data-ng-model="ctrl.location.website" id="website"/>
+                <div class="text-danger" data-ng-messages="newLocationForm.website.$error" data-ng-if="newLocationForm.website.$touched">
+                    <p data-ng-message="url"><span translate="accessopolis.error.url"></span></p>
                 </div>
             </div>
 

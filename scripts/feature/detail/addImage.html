@@ -1,0 +1,21 @@
+<div style="padding: 10px;">
+    <form >
+        <div class="form-group">
+            <label data-translate >accessopolis.location.type</label>
+            <select ng-options="imageType for imageType in ctrl.imagesType" class="form-control" data-ng-model="ctrl.imageUpload.imageType"></select>
+        </div>
+
+        <div class="form-group">
+            <label data-translate for="imageDesc">accessopolis.location.description</label>
+            <textarea id="imageDesc" class="form-control"  data-ng-model="ctrl.imageUpload.description"></textarea>
+        </div>
+        <div class="form-group">
+            <item-upload do-upload="ctrl.uploadImgur" accept="image/*"></item-upload>
+        </div>
+        <div class="form-group">
+            <button ng-click="$close()" class="btn btn-secondary">Annulla</button>
+            <button data-ng-click="addImage();" class="btn btn-primary" ng-disabled="ctrl.imageUpload.file  === undefined">Upload</button>
+        </div>
+    </form>
+</div>
+

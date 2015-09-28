@@ -7,11 +7,14 @@
     <meta name="viewport" content="width=device-width">
     <!-- Place favicon.ico and apple-touch-icon.png in the root directory -->
 
-    <link rel="stylesheet" href="styles/main.ddd5caa6.css">
+    <link rel="stylesheet" href="styles/main.ba802e0e.css">
     <script type="application/javascript">
         window.accessopolis = window.accessopolis || {};
         function initMap() {
             window.accessopolis.googleMapReady = true;
+        }
+        function initVideo() {
+            window.accessopolis.videoApiLoaded = true;
         }
     </script>
       <link rel="apple-touch-icon" sizes="57x57" href="images/icons/apple-icon-57x57.561c0262.png">
@@ -32,7 +35,7 @@
       <meta name="msapplication-TileImage" content="/ms-icon-144x144.png">
       <meta name="theme-color" content="#ffffff">
   </head>
-  <body ng-app="accessopolisApp"  class="accessopolis-bg">
+  <body ng-app="accessopolisApp" ng-controller="AppCtrl as app" class="accessopolis-bg">
     <!--[if lt IE 7]>
       <p class="browsehappy">You are using an <strong>outdated</strong> browser. Please <a href="http://browsehappy.com/">upgrade your browser</a> to improve your experience.</p>
     <![endif]-->
@@ -40,28 +43,31 @@
     <!-- Add your site or application content here -->
 
 
-    <div class="header accessopolis-header" ng-cloak=""  >
+    <div class="header  accessopolis-header" ng-cloak=""  >
 
         <a href="https://github.com/exteso/accessopolis" target="_blank" class="visible-lg"><img style="position: absolute; top: 0; right: 0; border: 0; z-index:150" src="https://camo.githubusercontent.com/52760788cde945287fbb584134c4cbc2bc36f904/68747470733a2f2f73332e616d617a6f6e6177732e636f6d2f6769746875622f726962626f6e732f666f726b6d655f72696768745f77686974655f6666666666662e706e67" alt="Fork me on GitHub" data-canonical-src="https://s3.amazonaws.com/github/ribbons/forkme_right_white_ffffff.png"></a>
 
-        <div class="container" ng-controller="AppCtrl">
+        <div class="container">
 
-            <nav class="navigation-menu visible-xs "></nav>
-            <div class="col-xs-12 col-md-12 col-sm-12 accessopolis-header ">
-                <div class="col-xs-8 col-md-8 col-sm-8 accessopolis-header-logo hidden-xs" >
-                    <a class="navbar-brand  " href="#/" style="white-space: nowrap">Accessopolis </a>
+            <div class="col-xs-12 col-md-12 col-sm-12 accessopolis-header-container">
+                <div class="col-xs-8 col-md-8 col-sm-8 col-xs-8 accessopolis-header-logo" >
+                    <a class="navbar-brand" href="#/" >
+                        <img src="images/logos/accessopolis.df745af9.png"  alt="Accessopolis">
+                    </a>
                     <sup >beta</sup>
                 </div>
-                <div class="col-xs-4 col-md-4 col-sm-4 hidden-xs ">
+                <div class="col-xs-4 col-md-4 col-sm-4 col-xs-4 ">
                     <div ng-hide-auth="" class="accessopolis-profile-logout">
                         <button data-ng-controller="LoginCtrl"  class="btn btn-primary hidden-xs btn-lg pull-right navbar-btn"  ng-click="oauthLogin('google')" >Accedi con Google</button>
+                        <button data-ng-controller="LoginCtrl"  class="btn btn-primary visible-xs btn-sm pull-right navbar-btn"  ng-click="oauthLogin('google')" >Accedi</button>
                     </div>
                     <div ng-show-auth="" class="accessopolis-profile  " >
-                        <button  role="button" ng-click="logout()" data-ng-controller="AccountCtrl" class="btn btn-danger navbar-btn pull-right">Log Out</button>
-                        <div class="accessopolis-profile-icon" style='background-image: url("{{user.google.cachedUserProfile.picture}}")'>
+                        <button  role="button" ng-click="logout()" data-ng-controller="AccountCtrl" class="btn btn-danger navbar-btn pull-right hidden-xs">Log Out</button>
+                        <button  role="button" ng-click="logout()" data-ng-controller="AccountCtrl" class="btn btn-danger btn-sm navbar-btn pull-right visible-xs">Log Out</button>
+                        <div class="accessopolis-profile-icon hidden-xs" style='background-image: url("{{user.google.cachedUserProfile.picture}}")'>
                             <span data-ng-if="!user.google.cachedUserProfile.picture" class="fa fa-user"></span>
                         </div>
-                        <div class="accessopolis-profile-name" >
+                        <div class="accessopolis-profile-name hidden-xs" >
                             <a href="{{user.google.cachedUserProfile.link}}" target="_blank">
                                 {{user.google.cachedUserProfile.name}}
                             </a>
@@ -79,9 +85,9 @@
     <div ng-view=""></div>
 
 
-    <footer class="footer accessopolis-footer accessopolis-bg-white" >
+    <footer class="footer accessopolis-footer accessopolis-bg-white container-fluid" >
         <!-- Start main sponsor container -->
-        <div class="container accessopolis-bg-blue">
+        <div class=" accessopolis-bg-blue container-fluid">
             <h4 class="text-center">CON IL SOSTEGNO DI</h4>
             <div class="row">
                 <div class="col-xs-3 col-md-2 col-md-offset-1">
@@ -99,16 +105,19 @@
             </div>
         </div>
 
-        <div class="container">
-            <p class="pull-left">With <span class="glyphicon glyphicon-heart"></span> from the <a href="https://voxxeddays.com/ticino16" target="_blank">Voxxed Days Ticino</a> team and Exteso Sagl</p>
-            <p class="pull-right">Images by <a href="https://www.flickr.com/photos/sozialhelden/">SOZIALHELDEN</a></p>
+        <div class="container-fluid">
+          <div class="row accessopolis-footer-attribution">
+              <p class="pull-left">With <span class="glyphicon glyphicon-heart"></span> from the <a href="https://voxxeddays.com/ticino16" target="_blank">Voxxed Days Ticino</a> team and Exteso Sagl</p>
+              <p class="pull-right">Images by <a href="https://www.flickr.com/photos/sozialhelden/">SOZIALHELDEN</a></p>
+          </div>
         </div>
     </footer>
 
-    <script src="scripts/vendor.750e2a96.js"></script>
+    <script src="scripts/vendor.83d76ab4.js"></script>
 
-        <script src="scripts/scripts.98d78338.js"></script>
+        <script src="scripts/scripts.8e2ff757.js"></script>
 
     <script async defer src="https://maps.googleapis.com/maps/api/js?signed_in=true&libraries=places&key=AIzaSyCbm7ot6UqPk9I7sQVu3Z3PeU7hvwT0pbU&callback=initMap"></script>
+    <script src="https://apis.google.com/js/client.js?onload=initVideo"></script>
 </body>
 </html>
