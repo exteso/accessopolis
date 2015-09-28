@@ -91,6 +91,15 @@
             });
         };
 
+        this.getImages = function(id) {
+            return $q(function(resolve, reject) {
+              var obj = $firebaseArray(Ref.child('images/'+id));
+              obj.$loaded(function(val) {
+                resolve(val);
+              });
+            });
+        };
+
         this.create = function(location) {
             var mock = {lat: 45.833376, long: 9.030515};
             return $firebaseArray(Ref.child('locations')).$add(angular.extend(mock, location));
@@ -126,6 +135,10 @@
             self.comments = result;
         });
 
+        LocationDetailService.getImages($routeParams.id).then(function(result) {
+            self.images = result;
+        });
+
         this.backToList = function() {
             $location.path('/');
         };
@@ -150,7 +163,9 @@
 
         this.uploadImgur = function(file) {
           imgur.upload(file).then(function(model) {
-              console.log(model);
+              var httpsImageUrl = model.link.replace(/^http\:/, "https:");
+              self.images.$add({imageUrl: httpsImageUrl})
+                .catch(alert);
           });
         };
 
