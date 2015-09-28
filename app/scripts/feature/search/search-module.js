@@ -77,6 +77,9 @@
         this.performSearch = function() {
             LocationSearchService.search({text: self.searchParam, type: self.subcategorySelected}).then(function(result) {
                 self.resultList = result;
+                if(self.resultList.length>0){
+                    self.show_result = true;
+                }
             });
         };
 
@@ -85,17 +88,21 @@
         };
 
         //we use scope here only to trigger the $watch mechanism. Maybe there would be a better solution?
-        $scope.$watch(function () {
-            return self.searchParam;
-        },function(){
-            self.performSearch();
-        });
-
-        $scope.$watch(function() {
-            return self.subcategorySelected;
-        }, function() {
-            self.performSearch();
-        });
+        //$scope.$watch(function () {
+        //    return self.searchParam;
+        //},function(){
+        //    if(self.searchParam){
+        //        self.performSearch();
+        //    }
+        //});
+        //
+        //$scope.$watch(function() {
+        //    return self.subcategorySelected;
+        //}, function() {
+        //    if(self.subcategorySelected){
+        //      self.performSearch();
+        //    }
+        //});
 
     }
 

@@ -11,6 +11,15 @@
                 controllerAs: 'ctrl'
             }
         })
+        .directive('navigationFilter', function() {
+            return {
+                restrict: 'C',
+                scope: true,
+                controller: NavigationController,
+                templateUrl: 'scripts/feature/navigation/navigation-filter.html',
+                controllerAs: 'navFilterCtrl'
+            }
+        })
         .directive('navigationMenu', function() {
             return {
                 restrict: 'C',
