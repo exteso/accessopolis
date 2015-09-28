@@ -125,6 +125,8 @@
 
         imgur.setAPIKey(IMGUR_API_KEY);
 
+        this.imagesType = ['entrance', 'bathroom', 'elevator', 'stairs', 'stairlift', 'room', 'lunchroom', 'other'];
+
         LocationDetailService.find($routeParams.id).then(function(result) {
             self.detail = result;
         });
@@ -163,11 +165,20 @@
 
 
         this.uploadImgur = function(file) {
+          self.imageUpload = self.imageUpload || {};
+          self.imageUpload.file = file;
+        };
+
+        this.addImage = function() {
+          var file = self.imageUpload.file;
+          var imageType = self.imageUpload.imageType;
+          var description = self.imageUpload.description;
+          self.imageUpload = {};
           imgur.upload(file).then(function(model) {
               var httpsImageUrl = model.link.replace(/^http\:/, "https:");
-              self.images.$add({imageUrl: httpsImageUrl}).catch(alert);
+              self.images.$add({imageUrl: httpsImageUrl, imageType: imageType, description: description}).catch(alert);
           });
-        };
+        }
 
         function loadImages() {
           LocationDetailService.getComments($routeParams.id).then(function(result) {

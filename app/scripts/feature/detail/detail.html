@@ -57,7 +57,22 @@
             </div>
 
             <div class="col-md-12 col-sm-12 col-xs-12 accessopolis-bg-white" style="margin-top:10x;margin-bottom:10px;padding:10px;">
-              <item-upload do-upload="ctrl.uploadImgur"></item-upload>
+              <div ng-show-auth>
+                <h2>Inserisci immagine:</h2>
+                <p>
+                    Tipo di immagine: <select ng-options="imageType for imageType in ctrl.imagesType" data-ng-model="ctrl.imageUpload.imageType"></select>
+                </p>
+                <p>
+                    Descrizione:
+                    <textarea data-ng-model="ctrl.imageUpload.description"></textarea>
+                </p>
+                <p>
+                  <item-upload do-upload="ctrl.uploadImgur"></item-upload>
+                </p>
+                <div>
+                  <button data-ng-click="ctrl.addImage()" class="btn btn-primary" ng-disabled="ctrl.imageUpload.file  === undefined">Upload</button>
+                </div>
+              </div>
 
               <ul>
                 <li data-ng-repeat="image in ctrl.images">

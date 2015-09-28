@@ -1,4 +1,4 @@
-angular.module('accessopolisApp').directive('itemUpload', [function() {
+angular.module('accessopolisApp').directive('itemUpload', ['$timeout', function($timeout) {
 
       'use strict';
 
@@ -15,7 +15,9 @@ angular.module('accessopolisApp').directive('itemUpload', [function() {
           inputElem.addEventListener('change', function() {
             var image = inputElem.files[0];
             if(image) {
-              scope.imageUploadCtrl.doUpload(image);
+              $timeout(function() {
+                scope.imageUploadCtrl.doUpload(image);
+              });
             }
           }, false);
         },
