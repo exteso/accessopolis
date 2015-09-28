@@ -24,8 +24,10 @@ angular.module('accessopolisApp', [
     'accessopolis.search',
     'accessopolis.locationDetail',
     'accessopolis.rating',
-    'pascalprecht.translate'
+    'pascalprecht.translate',
+    'ngImgur'
   ])
+    .constant('IMGUR_API_KEY', 'Client-ID 7a37861e931f779')
     .config(["$translateProvider", function ($translateProvider) {
         $translateProvider.translations('en', {
             'public-transport': 'Public Transports',
@@ -57,6 +59,7 @@ angular.module('accessopolisApp', [
             'accessopolis.accessibility-evaluation-vision': 'Vision',
             'accessopolis.accessibility-evaluation-mental': 'Mental',
             'accessopolis.insert-new-location': 'Insert new location',
+            'accessopolis.edit-location': 'Edit',
             'accessopolis.location.description': 'Location Description',
             'accessopolis.error.minlength': 'The value inserted is not valid',
             'accessopolis.error.maxlength': 'The value inserted is not valid',
@@ -107,8 +110,8 @@ angular.module('accessopolisApp', [
             'accessopolis.accessibility-evaluation-hearing': 'Uditive',
             'accessopolis.accessibility-evaluation-vision': 'Visive',
             'accessopolis.accessibility-evaluation-mental': 'Mentali',
-
             'accessopolis.insert-new-location': 'Inserire una nuova struttura',
+            'accessopolis.edit-location': 'Modifica',
             'accessopolis.location.description': 'Descrizione della struttura',
             'accessopolis.error.minlength': 'Il valore inserito non è valido',
             'accessopolis.error.maxlength': 'Il valore inserito non è valido',
@@ -132,6 +135,8 @@ angular.module('accessopolisApp', [
             'accessopolis.comment': 'Commenta'
         });
         $translateProvider.preferredLanguage('it');
+        $translateProvider.useSanitizeValueStrategy('sanitizeParameters');
+        $translateProvider.directivePriority(222); //see https://github.com/angular-translate/angular-translate/issues/949
     }])
     .controller('AppCtrl', ["$scope", "Auth", "$translate", "$firebaseObject", "Ref", function ($scope, Auth, $translate, $firebaseObject, Ref) {
         $scope.user = Auth.$getAuth();
@@ -216,6 +221,16 @@ angular.module('accessopolisApp')
     return function(items) {
       return angular.isArray(items)? items.slice().reverse() : [];
     };
+  }).filter('imgurThumbnail', function() {
+    return function(imageUrl, thumbnailType) {
+      if(imageUrl) {
+        var imgSeparatorIdx = imageUrl.lastIndexOf('.');
+        if (imgSeparatorIdx !== -1) {
+          imageUrl = imageUrl.substr(0, imgSeparatorIdx) + thumbnailType + imageUrl.substr(imgSeparatorIdx);
+        }
+      }
+      return imageUrl;
+    }
   });
 
 (function() {
@@ -246,7 +261,8 @@ angular.module('accessopolisApp')
             }
 
           $scope.err = null;
-          Auth.$authWithOAuthPopup(provider, { scope: 'email' }).then(redirect, showError);
+
+          Auth.$authWithOAuthPopup(provider, { scope: 'email https://www.googleapis.com/auth/youtube.upload' }).then(redirect, showError);
 
     };
 
@@ -414,6 +430,33 @@ angular.module('accessopolisApp')
     };
   }]);
 
+angular.module('accessopolisApp').directive('itemUpload', [function() {
+
+      'use strict';
+
+      return {
+        restrict: 'E',
+        scope: true,
+        controllerAs: 'imageUploadCtrl',
+        bindToController: {
+          doUpload : '='
+        },
+        link: function(scope, element) {
+
+          var inputElem = element.find('input')[0];
+          inputElem.addEventListener('change', function() {
+            var image = inputElem.files[0];
+            if(image) {
+              scope.imageUploadCtrl.doUpload(image);
+            }
+          }, false);
+        },
+        controller: function() {
+        },
+        template: '<input type="file" accept="image/*" capture="camera" ng-show-auth>'
+      };
+}]);
+
 'use strict';
 /**
  * @ngdoc overview
@@ -508,7 +551,18 @@ angular.module('accessopolisApp')
               return Auth.$getAuth();
             }]
           }
-      }).when('/new-location', {
+      })
+      .when('/locations/:id/edit', {
+        templateUrl: 'scripts/feature/detail/new.html',
+        controller: 'NewLocationController',
+        controllerAs: 'ctrl',
+        resolve: {
+            user: ['Auth', function(Auth) {
+                return Auth.$getAuth();
+            }]
+        }
+      })
+      .when('/new-location', {
         templateUrl: 'scripts/feature/detail/new.html',
         controller: 'NewLocationController',
         controllerAs: 'ctrl'
@@ -741,8 +795,6 @@ angular.module('accessopolisApp')
                             });
                         }
                     })
-
-
                 }],
                 bindToController: true,
                 controllerAs: 'autocompleteCtrl',
@@ -810,6 +862,15 @@ angular.module('accessopolisApp')
             });
         };
 
+        this.getImages = function(id) {
+            return $q(function(resolve, reject) {
+              var obj = $firebaseArray(Ref.child('images/'+id));
+              obj.$loaded(function(val) {
+                resolve(val);
+              });
+            });
+        };
+
         this.create = function(location) {
             var mock = {lat: 45.833376, long: 9.030515};
             return $firebaseArray(Ref.child('locations')).$add(angular.extend(mock, location));
@@ -829,23 +890,32 @@ angular.module('accessopolisApp')
     }
     LocationDetailService.$inject = ["$q", "$firebaseObject", "Ref", "$firebaseArray"];
 
-    LocationDetailService.prototype.$inject = ['$q', '$firebaseObject', 'Ref', '$firebaseArray'];
+    LocationDetailService.prototype.$inject = ['$q', '$firebaseObject', 'Ref', '$firebaseArray', 'imgur', 'IMGUR_API_KEY'];
 
-    function LocationDetailController(LocationDetailService, $routeParams, $location, user) {
+    function LocationDetailController(LocationDetailService, $routeParams, $location, user, imgur, IMGUR_API_KEY) {
 
         var self = this;
         self.user = user;
+
+        imgur.setAPIKey(IMGUR_API_KEY);
 
         LocationDetailService.find($routeParams.id).then(function(result) {
             self.detail = result;
         });
 
-        LocationDetailService.getComments($routeParams.id).then(function(result) {
-            self.comments = result;
+        loadImages();
+
+        LocationDetailService.getImages($routeParams.id).then(function(result) {
+            self.images = result;
         });
 
         this.backToList = function() {
             $location.path('/');
+        };
+
+        this.edit = function() {
+            var path = $location.path();
+            $location.path(path+'/edit');
         };
 
         this.rate = function(){
@@ -865,15 +935,35 @@ angular.module('accessopolisApp')
             }
         };
 
+
+        this.uploadImgur = function(file) {
+          imgur.upload(file).then(function(model) {
+              var httpsImageUrl = model.link.replace(/^http\:/, "https:");
+              self.images.$add({imageUrl: httpsImageUrl}).catch(alert);
+          });
+        };
+
+        function loadImages() {
+          LocationDetailService.getComments($routeParams.id).then(function(result) {
+              self.comments = result;
+          });
+        }
+
     }
-    LocationDetailController.$inject = ["LocationDetailService", "$routeParams", "$location", "user"];
+    LocationDetailController.$inject = ["LocationDetailService", "$routeParams", "$location", "user", "imgur", "IMGUR_API_KEY"];
 
     LocationDetailController.prototype.$inject = ['LocationDetailService', '$routeParams', '$location', 'user'];
 
-    function NewLocationController(NavigationService, LocationDetailService, $location, $rootScope) {
+    function NewLocationController(NavigationService, LocationDetailService, $routeParams, $location, $rootScope) {
         var self = this;
-        this.location = {};
+        self.location = {};
         //this.stars = _.range(0,6);
+
+        if ($routeParams.id){
+            LocationDetailService.find($routeParams.id).then(function(result) {
+                self.location = result;
+            });
+        }
 
         this.save = function(frm) {
             if(!frm.$valid) {
@@ -902,9 +992,9 @@ angular.module('accessopolisApp')
         });
 
     }
-    NewLocationController.$inject = ["NavigationService", "LocationDetailService", "$location", "$rootScope"];
+    NewLocationController.$inject = ["NavigationService", "LocationDetailService", "$routeParams", "$location", "$rootScope"];
 
-    NewLocationController.prototype.$inject = ['NavigationService', 'LocationDetailService', '$location', '$rootScope'];
+    NewLocationController.prototype.$inject = ['NavigationService', 'LocationDetailService', '$routeParams', '$location', '$rootScope'];
 
     function LocationVideoController($scope, LocationDetailService, $sce) {
         var self = this;

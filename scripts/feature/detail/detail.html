@@ -4,6 +4,8 @@
         <div class="accessopolis-location-detail-back">
             <a data-ng-click="ctrl.backToList()" class="btn btn-primary btn-xs" >
                 <span class="fa fa-chevron-left"></span> <span data-translate>accessopolis.back-to-list</span></a>
+            <a data-ng-click="ctrl.edit()" class="btn btn-primary btn-xs" ng-show-auth>
+                <span class="fa fa-edit"></span> <span data-translate>accessopolis.edit-location</span></a>
         </div>
         <div class="accessopolis-location-detail-header">
             <div class="accessopolis-location-detail-header-title">
@@ -48,16 +50,19 @@
                     </div>
 
                     <div class=" col-md-4 col-sm-4 col-xs-12 accessopolis-location-detail-content-slide-nav">
-
                         <div class=" col-md-12 col-sm-12  col-xs-12 accessopolis-location-detail-content-slide-nav-item " data-image-map="ctrl.detail">
                             <span class="fa fa-map-marker"></span>
                         </div>
-                        <div class=" col-md-12 col-sm-12 col-xs-12 accessopolis-location-detail-content-slide-nav-item ">
-                            <span class="fa fa-camera"></span>
-                        </div>
-
                     </div>
+            </div>
 
+            <div class="col-md-12 col-sm-12 col-xs-12 accessopolis-bg-white" style="margin-top:10x;margin-bottom:10px;padding:10px;">
+              <item-upload do-upload="ctrl.uploadImgur"></item-upload>
+
+              <ul>
+                <li data-ng-repeat="image in ctrl.images">
+                  <a href="{{image.imageUrl}}"><img data-ng-src="{{image.imageUrl | imgurThumbnail: 'm'}}"></a>
+              </ul>
             </div>
 
             <div class="col-md-12 col-sm-12 col-xs-12 accessopolis-bg-white" style="min-height: 300px; padding-bottom: 50px; margin-bottom: 20px;  margin-top: 10px;">
@@ -86,5 +91,3 @@
     </div>
 
     </div>
-
-
