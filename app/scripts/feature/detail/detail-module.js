@@ -89,6 +89,15 @@
             });
         };
 
+        this.getImages = function(id) {
+            return $q(function(resolve, reject) {
+              var obj = $firebaseArray(Ref.child('images/'+id));
+              obj.$loaded(function(val) {
+                resolve(val);
+              });
+            });
+        };
+
         this.create = function(location) {
             var mock = {lat: 45.833376, long: 9.030515};
             return $firebaseArray(Ref.child('locations')).$add(angular.extend(mock, location));
@@ -107,19 +116,23 @@
         };
     }
 
-    LocationDetailService.prototype.$inject = ['$q', '$firebaseObject', 'Ref', '$firebaseArray'];
+    LocationDetailService.prototype.$inject = ['$q', '$firebaseObject', 'Ref', '$firebaseArray', 'imgur', 'IMGUR_API_KEY'];
 
-    function LocationDetailController(LocationDetailService, $routeParams, $location, user) {
+    function LocationDetailController(LocationDetailService, $routeParams, $location, user, imgur, IMGUR_API_KEY) {
 
         var self = this;
         self.user = user;
+
+        imgur.setAPIKey(IMGUR_API_KEY);
 
         LocationDetailService.find($routeParams.id).then(function(result) {
             self.detail = result;
         });
 
-        LocationDetailService.getComments($routeParams.id).then(function(result) {
-            self.comments = result;
+        loadImages();
+
+        LocationDetailService.getImages($routeParams.id).then(function(result) {
+            self.images = result;
         });
 
         this.backToList = function() {
@@ -147,6 +160,20 @@
                     .catch(alert);
             }
         };
+
+
+        this.uploadImgur = function(file) {
+          imgur.upload(file).then(function(model) {
+              var httpsImageUrl = model.link.replace(/^http\:/, "https:");
+              self.images.$add({imageUrl: httpsImageUrl}).catch(alert);
+          });
+        };
+
+        function loadImages() {
+          LocationDetailService.getComments($routeParams.id).then(function(result) {
+              self.comments = result;
+          });
+        }
 
     }
 
