@@ -10,11 +10,13 @@ angular.module('accessopolisApp').directive('itemUpload', [function() {
           doUpload : '='
         },
         link: function(scope, element) {
-          
+
           var inputElem = element.find('input')[0];
           inputElem.addEventListener('change', function() {
             var image = inputElem.files[0];
-            scope.imageUploadCtrl.doUpload(image);
+            if(image) {
+              scope.imageUploadCtrl.doUpload(image);  
+            }
           }, false);
         },
         controller: function() {

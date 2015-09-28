@@ -131,9 +131,7 @@
             self.detail = result;
         });
 
-        LocationDetailService.getComments($routeParams.id).then(function(result) {
-            self.comments = result;
-        });
+        loadImages();
 
         LocationDetailService.getImages($routeParams.id).then(function(result) {
             self.images = result;
@@ -164,10 +162,15 @@
         this.uploadImgur = function(file) {
           imgur.upload(file).then(function(model) {
               var httpsImageUrl = model.link.replace(/^http\:/, "https:");
-              self.images.$add({imageUrl: httpsImageUrl})
-                .catch(alert);
+              self.images.$add({imageUrl: httpsImageUrl}).catch(alert);
           });
         };
+
+        function loadImages() {
+          LocationDetailService.getComments($routeParams.id).then(function(result) {
+              self.comments = result;
+          });
+        }
 
     }
 
