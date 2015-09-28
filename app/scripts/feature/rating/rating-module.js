@@ -43,7 +43,7 @@
                 ratingsByLocation.$loaded(function(data) {
                     var ratingByType = _.groupBy(data, 'userType');
 
-                    var totalStaff = _.sum(ratingByType['staff'], 'rate');
+                    var totalStaff = _.sum(ratingByType['expert'], 'rate');
                     var totalPublic = _.sum(ratingByType['public'], 'rate');
 
                     var ratingByKind = _.groupBy(data, 'rateKind');
@@ -55,7 +55,7 @@
 
                     resolve({
                         public: calculateRate(totalPublic, ratingByType['public']),
-                        staff : calculateRate(totalStaff, ratingByType['staff']),
+                        staff : calculateRate(totalStaff, ratingByType['expert']),
                         mobility : calculateRate(totalMobility, ratingByKind['mobility']),
                         hearing : calculateRate(totalHearing, ratingByKind['hearing']),
                         vision : calculateRate(totalVision, ratingByKind['vision']),
