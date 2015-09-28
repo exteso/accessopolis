@@ -2,28 +2,16 @@
     "use strict";
     angular.module('accessopolis.rating', [])
         .service('RatingService', RatingService)
-        .directive('rating', function() {
+        .directive('accRating', function() {
             return {
                 restrict: 'A',
                 scope: true,
                 controller: RatingController,
                 controllerAs: 'ctrlRating',
                 bindToController: {
-                    rating: '='
+                    rating: '= accRating'
                 },
                 templateUrl: 'scripts/feature/rating/rating.html'
-            }
-        })
-        .directive('ratings', function() {
-            return {
-                restrict: 'A',
-                scope: true,
-                controller: RatingController,
-                controllerAs: 'ctrlRatings',
-                bindToController: {
-                    rating: '=ratings'
-                },
-                templateUrl: 'scripts/feature/rating/ratings.html'
             }
         });
 

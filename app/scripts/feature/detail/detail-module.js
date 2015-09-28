@@ -127,7 +127,7 @@
 
     LocationDetailService.prototype.$inject = ['$q', '$firebaseObject', 'Ref', '$firebaseArray', 'imgur', 'IMGUR_API_KEY'];
 
-    function LocationDetailController(LocationDetailService, $routeParams, $location, user, imgur, IMGUR_API_KEY, LocationVideoService) {
+    function LocationDetailController(LocationDetailService, $routeParams, $location, user, imgur, IMGUR_API_KEY, LocationVideoService, $modal) {
 
         var self = this;
         self.profile = LocationDetailService.getUserProfile(user);
@@ -179,14 +179,39 @@
           self.imageUpload.file = file;
         };
 
+
+        this.addNewImage = function(){
+            $modal.open({
+                templateUrl: 'scripts/feature/detail/addImage.html',
+                controller: function($scope, $modal){
+                    $scope.ctrl = self;
+                    $scope.modal = $modal;
+                    $scope.addImage = function(){
+                        self.addImage().then(function() {
+                            $scope.$close();
+                        });
+
+                    }
+                },
+                backdrop: 'static'
+            });
+
+        };
+
+
         this.addImage = function() {
           var file = self.imageUpload.file;
           var imageType = self.imageUpload.imageType;
           var description = self.imageUpload.description;
           self.imageUpload = {};
-          imgur.upload(file).then(function(model) {
+          return imgur.upload(file).then(function(model) {
               var httpsImageUrl = model.link.replace(/^http\:/, "https:");
-              self.images.$add({imageUrl: httpsImageUrl, imageType: imageType, description: description}).catch(alert);
+              var toAdd = {imageUrl: httpsImageUrl};
+              if(imageType) {
+                  toAdd.imageType = imageType;
+                  toAdd.description = description;
+              }
+              self.images.$add(toAdd).catch(alert);
           });
         }
 
@@ -222,7 +247,7 @@
 
     }
 
-    LocationDetailController.prototype.$inject = ['LocationDetailService', '$routeParams', '$location', 'user', 'LocationVideoService'];
+    LocationDetailController.prototype.$inject = ['LocationDetailService', '$routeParams', '$location', 'user', 'LocationVideoService', '$modal'];
 
     function NewLocationController(NavigationService, LocationDetailService, $routeParams, $location, $rootScope) {
         var self = this;

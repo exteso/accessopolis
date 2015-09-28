@@ -39,6 +39,7 @@ module.exports = function(config) {
       'bower_components/lodash/lodash.js',
       'bower_components/numeral/numeral.js',
       'bower_components/ng-imgur/dist/ng-imgur.js',
+      'bower_components/angular-bootstrap/ui-bootstrap-tpls.js',
       'bower_components/mockfirebase/browser/mockfirebase.js',
       'bower_components/angular-mocks/angular-mocks.js',
       // endbower

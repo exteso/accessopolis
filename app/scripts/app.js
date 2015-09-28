@@ -25,7 +25,8 @@ angular.module('accessopolisApp', [
     'accessopolis.locationDetail',
     'accessopolis.rating',
     'pascalprecht.translate',
-    'ngImgur'
+    'ngImgur',
+    'ui.bootstrap'
   ])
     .constant('IMGUR_API_KEY', 'Client-ID 7a37861e931f779')
     .constant('GOOGLE_API_KEY', 'AIzaSyCbm7ot6UqPk9I7sQVu3Z3PeU7hvwT0pbU')

@@ -218,6 +218,7 @@
             background: rgba(255, 255, 255, 0.8);
             height: 100%;
             padding: 0px;
+            background: red !important;
             .accessopolis-rating-item {
                 width: 50%;
                 float: left;
@@ -370,87 +371,92 @@ input.ng-invalid.ng-touched, select.ng-invalid.ng-touched, textarea.ng-invalid.n
 
 
 .accessopolis-location-detail {
+
+    background: green !important;
     border-top: 1px solid #f2f2f2;
     color: #fff;
-    min-height: 180px;
-    .accessopolis-location-detail-back {
-        width: 100%;
-        height: 15px;
-        margin-top: 5px;
-    }
-    .accessopolis-location-detail-header {
-        width: 100%;
-        height: 100px;
-        .accessopolis-location-detail-header-title {
-            float: left;
-            width: 60%;
-            padding: 0px;
+
+    .accessopolis-location-detail-header-wrap {
+        height: 180px;
+
+        .accessopolis-location-detail-back {
+            height: 15px;
+            margin-top: 5px;
         }
-        .accessopolis-location-detail-header-rating {
-            float: right;
-            width: 20%;
-            height: 50px;
-            margin-top: -10px;
-            .accessopolis-rating-item {
-                height: 100%;
-                &:first-child {
-                    border-right: 1px solid #000;
-                }
-                .accessopolis-rating-item-val {
+        .accessopolis-location-detail-header {
+            height: 100px;
+            padding: 0px;
+            .accessopolis-location-detail-header-title {
+                padding: 0px;
+            }
+
+            .accessopolis-location-detail-header-rating {
+                margin: 0px;
+                padding: 0px;
+                margin-top: -18px;
+                .accessopolis-rating-item {
+                    height: 100%;
+                    width: 50%;
                     float: left;
-                    width: 100%;
-                    vertical-align: middle;
-                    padding-top: 10px;
-                    height: 50%;
-                    text-align: center;
-                    font-size: 2em;
-                }
-                .accessopolis-rating-item-icon {
-                    float: left;
-                    width: 100%;
-                    vertical-align: middle;
-                    padding-top: 10px;
-                    height: 50%;
-                    text-align: center;
-                    font-size: 2em;
-                    margin-top: -10px;
-                    .accessopolis-rating-item-icon-tooltip {
-                        font-size: 0.5em;
-                        margin-top: -4px
+                    &:first-child {
+                        border-right: 1px solid #fff;
+                    }
+                    .accessopolis-rating-item-val {
+                        float: left;
+                        width: 100%;
+                        vertical-align: middle;
+                        padding-top: 10px;
+                        height: 50%;
+                        text-align: center;
+                        font-size: 2em;
+                    }
+                    .accessopolis-rating-item-icon {
+                        float: left;
+                        width: 100%;
+                        vertical-align: middle;
+                        padding-top: 10px;
+                        height: 50%;
+                        text-align: center;
+                        font-size: 2em;
+                        margin-top: -10px;
+                        .accessopolis-rating-item-icon-tooltip {
+                            font-size: 0.5em;
+                            margin-top: -4px
+                        }
                     }
                 }
             }
-        }
 
-        .accessopolis-location-detail-header-rating-small {
-            float: right;
-            height: 100px;
-            overflow: hidden;
-            color: #000;
-            .accessopolis-rating-item {
-                padding: 0px 10px;
-                float: left;
-                clear: both;
-                height: 50px;
-                line-height: 50px;
-                &:first-child {
-                    border-bottom: 1px solid #fff;
-                }
-                .accessopolis-rating-item-val {
+            .accessopolis-location-detail-header-rating-small {
+                float: right;
+                height: 100px;
+                overflow: hidden;
+                color: #000;
+                .accessopolis-rating-item {
+                    padding: 0px 10px;
                     float: left;
-                    vertical-align: middle;
-                    height: 100%;
-                    font-size: 1.6em;
-                }
-                .accessopolis-rating-item-icon {
-                    float: left;
-                    margin-left: 10px;
-                    vertical-align: middle;
-                    height: 100%;
-                    text-align: center;
-                    font-size: 1.6em;
-                    .accessopolis-rating-item-icon-tooltip {
-                        display: none;
+                    clear: both;
+                    height: 50px;
+                    line-height: 50px;
+                    &:first-child {
+                        border-bottom: 1px solid #fff;
+                    }
+                    .accessopolis-rating-item-val {
+                        float: left;
+                        vertical-align: middle;
+                        height: 100%;
+                        font-size: 1.6em;
+                    }
+                    .accessopolis-rating-item-icon {
+                        float: left;
+                        margin-left: 10px;
+                        vertical-align: middle;
+                        height: 100%;
+                        text-align: center;
+                        font-size: 1.6em;
+                        .accessopolis-rating-item-icon-tooltip {
+                            display: none;
+                        }
                     }
                 }
             }
@@ -461,6 +467,8 @@ input.ng-invalid.ng-touched, select.ng-invalid.ng-touched, textarea.ng-invalid.n
 
 .accessopolis-location-detail-content {
     padding: 0px;
+    margin-top: -10px;
+
     .accessopolis-location-detail-content-rating-evaluation {
         height: 400px;
         margin-top: -1px;
@@ -469,8 +477,8 @@ input.ng-invalid.ng-touched, select.ng-invalid.ng-touched, textarea.ng-invalid.n
             line-height: 20px;
             font-size: 1.5em;
             padding: 0px;
+        }
     }
-}
     .accessopolis-location-detail-content-slide {
         min-height: 400px;
         margin-top: -1px;
@@ -493,8 +501,8 @@ input.ng-invalid.ng-touched, select.ng-invalid.ng-touched, textarea.ng-invalid.n
                 margin: 5px !important;
                 box-shadow: -1px 1px 1px 0px rgba(0, 0, 0, 0.7);
 
+            }
         }
-    }
         .accessopolis-location-detail-content-slide-nav {
             height: 400px;
             overflow: auto;
@@ -502,7 +510,7 @@ input.ng-invalid.ng-touched, select.ng-invalid.ng-touched, textarea.ng-invalid.n
             padding: 0px !important;
 
             .accessopolis-location-detail-content-slide-nav-item {
-                height: 150px;
+                height: 190px;
                 line-height: 150px;
                 text-align: center;
                 font-size: 3em;
@@ -511,14 +519,32 @@ input.ng-invalid.ng-touched, select.ng-invalid.ng-touched, textarea.ng-invalid.n
                 padding: 0px !important;
                 box-shadow: -1px 1px 1px 0px rgba(0, 0, 0, 0.7);
                 .accessopolis-location-map {
-                    width:100%;
+                    width: 100%;
                     height: 100%;
-                    float:left;
-                    display:block;
+                    float: left;
+                    display: block;
+                }
+
+            }
+            .accessopolis-location-detail-content-slide-img {
+                height: 190px;
+                line-height: 150px;
+                text-align: center;
+                font-size: 3em;
+                background: #93999a;
+                margin: 5px !important;
+                padding: 0px !important;
+                box-shadow: -1px 1px 1px 0px rgba(0, 0, 0, 0.7);
+                .accessopolis-location-map {
+                    width: 100%;
+                    height: 100%;
+                    float: left;
+                    display: block;
+                }
+
             }
         }
     }
-}
 }
 
 
