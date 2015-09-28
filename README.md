@@ -19,7 +19,7 @@ cd accessopolis && npm install && bower install
 grunt serve
 ```
 
-Open browser at http://localhost:8080
+Open browser at http://localhost:9000
 
 *Note:* currently we only have 1 Firebase database, so data modified while developping are immediately changing in PROD (same DB)
  
