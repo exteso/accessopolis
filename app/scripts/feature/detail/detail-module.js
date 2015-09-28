@@ -2,6 +2,7 @@
     "use strict";
     angular.module('accessopolis.locationDetail', ['accessopolis.navigation'])
         .service('LocationDetailService', LocationDetailService)
+        .service('LocationVideoService', LocationVideoService)
         .controller('LocationDetailController', LocationDetailController)
         .controller('NewLocationController', NewLocationController)
         .directive('autocompleteAddress', [function() {
@@ -118,7 +119,7 @@
 
     LocationDetailService.prototype.$inject = ['$q', '$firebaseObject', 'Ref', '$firebaseArray', 'imgur', 'IMGUR_API_KEY'];
 
-    function LocationDetailController(LocationDetailService, $routeParams, $location, user, imgur, IMGUR_API_KEY) {
+    function LocationDetailController(LocationDetailService, $routeParams, $location, user, imgur, IMGUR_API_KEY, LocationVideoService) {
 
         var self = this;
         self.user = user;
@@ -129,6 +130,9 @@
 
         LocationDetailService.find($routeParams.id).then(function(result) {
             self.detail = result;
+            LocationVideoService.loadVideos(result).$loaded(function(list) {
+                self.videos = list;
+            });
         });
 
         loadImages();
@@ -186,9 +190,13 @@
           });
         }
 
+        this.uploadVideo = function(file) {
+            LocationVideoService.uploadVideo(file, self.detail);
+        }
+
     }
 
-    LocationDetailController.prototype.$inject = ['LocationDetailService', '$routeParams', '$location', 'user'];
+    LocationDetailController.prototype.$inject = ['LocationDetailService', '$routeParams', '$location', 'user', 'LocationVideoService'];
 
     function NewLocationController(NavigationService, LocationDetailService, $routeParams, $location, $rootScope) {
         var self = this;
@@ -233,14 +241,14 @@
 
     NewLocationController.prototype.$inject = ['NavigationService', 'LocationDetailService', '$routeParams', '$location', '$rootScope'];
 
-    function LocationVideoController($scope, LocationDetailService, $sce) {
+    function LocationVideoController($scope, $sce, LocationVideoService) {
         var self = this;
         $scope.$watch(function() {
             return self.locationVideo;
         }, function(val) {
             if(angular.isDefined(val)) {
-                LocationDetailService.retrieveVideo(val.$id).then(function(result) {
-                    var url = angular.isDefined(result) ? result.url : undefined;
+                LocationVideoService.loadVideos(val).$loaded(function(result) {
+                    var url = (angular.isDefined(result) && result.length > 0) ? _.first(result).videoUrl : undefined;
                     if(angular.isDefined(url)) {
                         self.url = $sce.trustAsResourceUrl(url);
                     }
@@ -249,6 +257,65 @@
         });
     }
 
-    LocationVideoController.prototype.$inject = ['$scope', 'LocationDetailService', '$sce'];
+    LocationVideoController.prototype.$inject = ['$scope', 'LocationDetailService', '$sce', 'LocationVideoService'];
+
+    function LocationVideoService(Auth, $log, $firebaseArray, Ref) {
+
+        var self = this;
+
+        this.uploadVideo = function(file, detail) {
+            if(!angular.isDefined(Auth.$getAuth())) {
+                return;
+            }
+            var metadata = {
+                snippet: {
+                    title: 'Accessopolis review: ' + detail.text,
+                    description: window.location.href,
+                    tags: ['accessopolis'],
+                    categoryId: undefined
+                }
+            };
+            var fd = new FormData();
+            fd.append('file', file);
+
+            var xhr = new XMLHttpRequest();
+
+            xhr.open('POST', 'https://www.googleapis.com/upload/youtube/v3/videos?uploadType=resumable&part=snippet', true);
+            xhr.setRequestHeader('Authorization', 'Bearer ' + Auth.$getAuth().google.accessToken);
+            xhr.setRequestHeader('Content-Type', 'application/json');
+            xhr.setRequestHeader('X-Upload-Content-Length', file.size);
+            xhr.setRequestHeader('X-Upload-Content-Type', file.type);
+
+            xhr.onload = function(e) {
+                if (e.target.status < 400) {
+                    var url = e.target.getResponseHeader('Location');
+                    var content = file;
+
+                    var xhr = new XMLHttpRequest();
+                    xhr.open('PUT', url, true);
+                    xhr.setRequestHeader('Content-Type', file.type);
+                    xhr.setRequestHeader('X-Upload-Content-Type', file.type);
+                    xhr.onload = function(e) {
+                        var actualResponse = JSON.parse(e.target.response);
+                        self.loadVideos(detail).$add({videoUrl: 'https://www.youtube.com/embed/'+ actualResponse.id, thumbnail: actualResponse.snippet.thumbnails.default.url});
+                    };
+                    xhr.onerror = function(err) {
+                        $log.error(err);
+                    };
+                    xhr.send(content);
+                } else {
+                    $log.error(e);
+                }
+            }.bind(this);
+            xhr.send(JSON.stringify(metadata));
+        };
+
+        this.loadVideos = function(detail) {
+            return $firebaseArray(Ref.child('videos/'+detail.$id));
+        };
+
+    }
+
+    LocationVideoService.prototype.$inject = ['Auth', '$log', '$firebaseArray', 'Ref'];
 
 })();

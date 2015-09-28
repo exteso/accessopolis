@@ -68,7 +68,7 @@
                       <textarea data-ng-model="ctrl.imageUpload.description"></textarea>
                   </p>
                   <p>
-                    <item-upload do-upload="ctrl.uploadImgur"></item-upload>
+                    <item-upload do-upload="ctrl.uploadImgur" accept="image/*"></item-upload>
                   </p>
                   <div>
                     <button ng-click="ctrl.showAddImage = false;" class="btn btn-secondary">Annulla</button>
@@ -85,6 +85,14 @@
                     <p ng-if="image.description">Descrizione: {{image.description}}</p>
                   </div>
               </ul>
+                Video: <item-upload do-upload="ctrl.uploadVideo" accept="video/*"></item-upload>
+                <ul>
+                    <li data-ng-repeat="video in ctrl.videos">
+                        <div>
+                            <a href="{{video.videoUrl}}"><img data-ng-src="{{video.thumbnail}}"></a>
+                        </div>
+                    </li>
+                </ul>
             </div>
 
             <div class="col-md-12 col-sm-12 col-xs-12 accessopolis-bg-white" style="min-height: 300px; padding-bottom: 50px; margin-bottom: 20px;  margin-top: 10px;">

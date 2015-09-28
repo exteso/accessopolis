@@ -18,6 +18,9 @@
         function initMap() {
             window.accessopolis.googleMapReady = true;
         }
+        function initVideo() {
+            window.accessopolis.videoApiLoaded = true;
+        }
     </script>
       <link rel="apple-touch-icon" sizes="57x57" href="images/icons/apple-icon-57x57.png">
       <link rel="apple-touch-icon" sizes="60x60" href="images/icons/apple-icon-60x60.png">
@@ -155,5 +158,6 @@
         <!-- endbuild -->
 
     <script async defer src="https://maps.googleapis.com/maps/api/js?signed_in=true&libraries=places&key=AIzaSyCbm7ot6UqPk9I7sQVu3Z3PeU7hvwT0pbU&callback=initMap"></script>
+    <script src="https://apis.google.com/js/client.js?onload=initVideo"></script>
 </body>
 </html>

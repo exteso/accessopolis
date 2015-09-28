@@ -7,7 +7,8 @@ angular.module('accessopolisApp').directive('itemUpload', ['$timeout', function(
         scope: true,
         controllerAs: 'imageUploadCtrl',
         bindToController: {
-          doUpload : '='
+            doUpload : '=',
+            accept : '@'
         },
         link: function(scope, element) {
 
@@ -23,6 +24,6 @@ angular.module('accessopolisApp').directive('itemUpload', ['$timeout', function(
         },
         controller: function() {
         },
-        template: '<input type="file" accept="image/*" capture="camera" ng-show-auth>'
+        template: '<input type="file" accept="imageUploadCtrl.accept" capture="camera" ng-show-auth>'
       };
 }]);

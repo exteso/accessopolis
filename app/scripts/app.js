@@ -28,6 +28,7 @@ angular.module('accessopolisApp', [
     'ngImgur'
   ])
     .constant('IMGUR_API_KEY', 'Client-ID 7a37861e931f779')
+    .constant('GOOGLE_API_KEY', 'AIzaSyCbm7ot6UqPk9I7sQVu3Z3PeU7hvwT0pbU')
     .config(function ($translateProvider) {
         $translateProvider.translations('en', {
             'public-transport': 'Public Transports',
