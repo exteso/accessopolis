@@ -60,7 +60,7 @@
               <div ng-show-auth>
                 <h2>Inserisci immagine:</h2>
                 <p>
-                    Tipo di immagine: <select ng-options="imageType for imageType in ctrl.imagesType" data-ng-model="ctrl.imageUpload.imageType"></select>
+                    Tipologia: <select ng-options="imageType for imageType in ctrl.imagesType" data-ng-model="ctrl.imageUpload.imageType"></select>
                 </p>
                 <p>
                     Descrizione:
@@ -76,7 +76,11 @@
 
               <ul>
                 <li data-ng-repeat="image in ctrl.images">
-                  <a href="{{image.imageUrl}}"><img data-ng-src="{{image.imageUrl | imgurThumbnail: 'm'}}"></a>
+                  <div>
+                    <a href="{{image.imageUrl}}"><img data-ng-src="{{image.imageUrl | imgurThumbnail: 'm'}}"></a>
+                    <p ng-if="image.imageType">Tipologia: {{image.imageType}}</p>
+                    <p ng-if="image.description">Descrizione: {{image.description}}</p>
+                  </div>
               </ul>
             </div>
 
