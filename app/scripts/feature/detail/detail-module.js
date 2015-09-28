@@ -134,7 +134,7 @@
 
         LocationDetailService.find($routeParams.id).then(function(result) {
             self.detail = result;
-            loadVideos(result);
+            loadVideos(result.$id);
         });
 
         loadImages();
@@ -192,9 +192,10 @@
           });
         }
 
-        var loadVideos = function(detail) {
-            LocationVideoService.loadVideos(detail).$loaded(function(list) {
+        var loadVideos = function(id) {
+            LocationVideoService.loadVideos(id).$loaded(function(list) {
                 self.videos = list;
+                self.locationVideo = _.first(list);
             });
         };
         self.videoUpload = {};
@@ -206,8 +207,13 @@
 
         self.addVideo = function() {
             LocationVideoService.saveVideo(self.videoUpload.file, self.detail).then(function() {
-                loadVideos(self.detail);
+                loadVideos(self.detail.$id);
             });
+        };
+
+        self.showVideo = function(video, $event) {
+            self.locationVideo = video;
+            $event.preventDefault();
         }
 
     }
@@ -267,15 +273,11 @@
         $scope.$watch(function() {
             return self.locationVideo;
         }, function(val) {
-            if(angular.isDefined(val)) {
-                LocationVideoService.loadVideos(val).$loaded(function(result) {
-                    var url = (angular.isDefined(result) && result.length > 0) ? _.first(result).videoUrl : undefined;
-                    if(angular.isDefined(url)) {
-                        self.url = $sce.trustAsResourceUrl(url + '?rel=0');
-                    }
-                });
+            if(angular.isDefined(val) && angular.isDefined(val.videoUrl)) {
+                self.url = $sce.trustAsResourceUrl(val.videoUrl + '?rel=0');
             }
         });
+
     }
 
     LocationVideoController.prototype.$inject = ['$scope', 'LocationDetailService', '$sce', 'LocationVideoService'];
@@ -335,11 +337,11 @@
         };
 
         self.saveVideo = function(file, detail) {
-            self.loadVideos(detail).$add(file);
+            self.loadVideos(detail.$id).$add(file);
         };
 
-        this.loadVideos = function(detail) {
-            return $firebaseArray(Ref.child('videos/'+detail.$id));
+        this.loadVideos = function(id) {
+            return $firebaseArray(Ref.child('videos/'+id));
         };
 
     }

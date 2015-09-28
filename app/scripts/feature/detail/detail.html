@@ -45,7 +45,7 @@
             </div>
             <div class="accessopolis-bg-white col-md-8 col-sm-12 col-xs-12 accessopolis-location-detail-content-slide" >
                     <div class="accessopolis-location-detail-content-slide-main col-xs-12 col-md-8 col-sm-8" >
-                        <div class="accessopolis-location-detail-content-slide-main-content" data-location-video="ctrl.detail">
+                        <div class="accessopolis-location-detail-content-slide-main-content" data-location-video="ctrl.locationVideo">
                             <span class="fa fa-youtube-play"></span>
                         </div>
                     </div>
@@ -113,7 +113,7 @@
                 <ul>
                     <li data-ng-repeat="video in ctrl.videos">
                         <div>
-                            <a href="{{video.videoUrl}}"><img data-ng-src="{{video.thumbnail}}"></a>
+                            <a href="#" data-ng-click="ctrl.showVideo(video, $event)"><img data-ng-src="{{video.thumbnail}}"></a>
                         </div>
                     </li>
                 </ul>
