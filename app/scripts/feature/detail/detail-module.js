@@ -99,9 +99,20 @@
             });
         };
 
+        this.update = function(location){
+            if (location.$id){
+                var obj = $firebaseObject(Ref.child('locations/'+location.$id));
+
+                obj.$loaded().then(function() {
+                    angular.extend(obj, location);
+                    return obj.$save();
+                });
+                return obj;
+            }
+        };
+
         this.create = function(location) {
-            var mock = {lat: 45.833376, long: 9.030515};
-            return $firebaseArray(Ref.child('locations')).$add(angular.extend(mock, location));
+            return $firebaseArray(Ref.child('locations')).$add(location);
         };
 
         this.rate = function(newRate){
@@ -213,11 +224,16 @@
             if(!frm.$valid) {
                 return;
             }
-            LocationDetailService.create(self.location).then(function(data) {
-                $location.path('/locations/'+data.name());
-            }, function(err) {
-                alert(err);
-            });
+            if (self.location.$id){
+                LocationDetailService.update(self.location)
+                $location.path('/locations/' + self.location.$id);
+            }else {
+                LocationDetailService.create(self.location).then(function (data) {
+                    $location.path('/locations/' + data.name());
+                }, function (err) {
+                    alert(err);
+                })
+            };
         };
 
         this.backToList = function() {

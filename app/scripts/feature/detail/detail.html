@@ -11,6 +11,7 @@
             <div class="accessopolis-location-detail-header-title">
                 <h1>{{ctrl.detail.text}}</h1>
                 <div><span class=""></span>{{ctrl.detail.address}}</div>
+                <div data-ng-if="ctrl.detail.website"><a ng-href="{{ctrl.detail.website}}">{{ctrl.detail.website}}</a></div>
             </div>
 
             <div class=" hidden-xs hidden-sm accessopolis-location-detail-header-rating">
