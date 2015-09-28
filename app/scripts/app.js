@@ -132,6 +132,7 @@ angular.module('accessopolisApp', [
             'accessopolis.comment': 'Commenta'
         });
         $translateProvider.preferredLanguage('it');
+        $translateProvider.useSanitizeValueStrategy('sanitize');
     })
     .controller('AppCtrl', function ($scope, Auth, $translate, $firebaseObject, Ref) {
         $scope.user = Auth.$getAuth();
