@@ -17,7 +17,8 @@ angular.module('accessopolisApp')
             }
 
           $scope.err = null;
-          Auth.$authWithOAuthPopup(provider, { scope: 'email' }).then(redirect, showError);
+
+          Auth.$authWithOAuthPopup(provider, { scope: 'email https://www.googleapis.com/auth/youtube.upload' }).then(redirect, showError);
 
     };
 
