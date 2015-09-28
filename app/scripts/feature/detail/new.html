@@ -23,8 +23,8 @@
             </div>
 
             <div class="form-group">
-                <label data-translate for="address" data-ng-minlenght="5">accessopolis.location.address</label>
-                <input type="text" class="form-control" id="address" data-autocomplete-address name="address" data-ng-model="ctrl.location.address" required="required" />
+                <label data-translate for="address">accessopolis.location.address</label>
+                <input type="text" class="form-control" id="address" data-autocomplete-address name="address" data-ng-model="ctrl.location.address" required="required" minlength="5"/>
                 <div class="text-danger" data-ng-messages="newLocationForm.address.$error" data-ng-if="newLocationForm.address.$touched">
                     <p data-ng-message="minlength"><span translate="accessopolis.error.minlength"></span></p>
                     <p data-ng-message="maxlength"><span translate="accessopolis.error.maxlength"></span></p>
@@ -34,7 +34,10 @@
 
             <div class="form-group">
                 <label data-translate for="website">accessopolis.location.website</label>
-                <input type="url" class="form-control" name="text" data-ng-model="ctrl.location.website" id="website" />
+                <input type="url" class="form-control" name="website" data-ng-model="ctrl.location.website" id="website"/>
+                <div class="text-danger" data-ng-messages="newLocationForm.website.$error" data-ng-if="newLocationForm.website.$touched">
+                    <p data-ng-message="url"><span translate="accessopolis.error.url"></span></p>
+                </div>
             </div>
 
             <div class="form-group">

@@ -229,7 +229,7 @@
                 $location.path('/locations/' + self.location.$id);
             }else {
                 LocationDetailService.create(self.location).then(function (data) {
-                    $location.path('/locations/' + data.name());
+                    $location.path('/locations/' + data.key());
                 }, function (err) {
                     alert(err);
                 })
