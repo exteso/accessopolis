@@ -162,10 +162,25 @@ angular.module('accessopolisApp', [
         $translateProvider.directivePriority(222); //see https://github.com/angular-translate/angular-translate/issues/949
     })
     .controller('AppCtrl', function ($scope, Auth, $translate, $firebaseObject, Ref) {
+
+        //potentially useless code
         $scope.user = Auth.$getAuth();
         if ($scope.user) {
             $scope.profile = $firebaseObject(Ref.child('users/' + $scope.user.uid));
         }
+        //end?
+
+        Auth.$onAuth(function(authData) {
+          if(authData) {
+            $scope.user = Auth.$getAuth();
+            $scope.profile = $firebaseObject(Ref.child('users/' + $scope.user.uid));
+          } else {
+            $scope.user = undefined;
+            $scope.profile = undefined;
+          }
+        });
+
+
         $scope.lang = "it";
         $scope.changeLanguage = function (key) {
             $scope.lang = key;
