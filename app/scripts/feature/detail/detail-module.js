@@ -266,7 +266,7 @@
                 LocationVideoService.loadVideos(val).$loaded(function(result) {
                     var url = (angular.isDefined(result) && result.length > 0) ? _.first(result).videoUrl : undefined;
                     if(angular.isDefined(url)) {
-                        self.url = $sce.trustAsResourceUrl(url);
+                        self.url = $sce.trustAsResourceUrl(url + '?rel=0');
                     }
                 });
             }

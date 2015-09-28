@@ -1,32 +1,30 @@
 <div class="accessopolis-search container">
 
-    <div class="col-md-8 col-md-offset-2 col-sm-12 col-xs-12 accessopolis-search-field" ng-if="!ctrl.show_result" >
-            <!--div class="accessopolis-search-field-header"></div-->
-        <div class="accessopolis-search-box row" >
-            <span class="accessopolis-search-icon"><i class="fa fa-search fa-2x"></i></span>
-            <input type="text" data-ng-model="ctrl.searchParam" class="form-control input-lg" data-ng-model-options="{ updateOn: 'default blur', debounce: { 'default': 500, 'blur': 0 } }" placeholder="{{'accessopolis.search.suggestions' | translate}}">
+    <form>
+        <div class="col-md-8 col-md-offset-2 col-sm-12 col-xs-12 accessopolis-search-field" ng-if="!ctrl.show_result" >
+                <!--div class="accessopolis-search-field-header"></div-->
+            <div class="accessopolis-search-box row" >
+                <span class="accessopolis-search-icon"><i class="fa fa-search fa-2x"></i></span>
+                <input type="text" data-ng-model="ctrl.searchParam" class="form-control input-lg" data-ng-model-options="{ updateOn: 'default blur', debounce: { 'default': 500, 'blur': 0 } }" placeholder="{{'accessopolis.search.suggestions' | translate}}">
 
-            <div data-ng-if="ctrl.subcategorySelected" class="accessopolis-search-selected-categories">
-                <span class="sr-only" data-translate="accessopolis.selected.categories"></span>
-                <span class="badge accessopolis-badge accessopolis-badge-lg"><a href="#" data-ng-click="ctrl.clearSubcategory($event)"><i class="fa fa-close"></i></a> {{ctrl.subcategorySelected | translate}}</span>
+                <div data-ng-if="ctrl.subcategorySelected" class="accessopolis-search-selected-categories">
+                    <span class="sr-only" data-translate="accessopolis.selected.categories"></span>
+                    <span class="badge accessopolis-badge accessopolis-badge-lg"><a href="#" data-ng-click="ctrl.clearSubcategory($event)"><i class="fa fa-close"></i></a> {{ctrl.subcategorySelected | translate}}</span>
+                </div>
             </div>
-        </div>
 
 
-        <nav class="navigation-bar row hidden-xs"></nav>
-        <div class="row top-buffer" style="text-align: center;">
-            <button class="btn btn-primary btn-lg col-md-12" style="width: 100%;" data-ng-click="ctrl.performSearch();">Search</button>
-            <div data-ng-if="ctrl.showInsertButton()" class="text-center alert alert-info" style=" float: left; width: 100%; margin-top: 20px;">
-                <h1 data-translate>accessopolis.location.not-found</h1>
-                <a href="#/new-location" class="btn btn-lg btn-success" ng-show-auth=""><i class="fa fa-plus"></i> <span data-translate>accessopolis.location.new</span></a>
+            <nav class="navigation-bar row hidden-xs"></nav>
+            <div class="row top-buffer" style="text-align: center;">
+                <button type="submit" class="btn btn-primary btn-lg col-md-12" style="width: 100%;" data-ng-click="ctrl.performSearch();">Search</button>
+                <div data-ng-if="ctrl.showInsertButton()" class="text-center alert alert-info" style=" float: left; width: 100%; margin-top: 20px;">
+                    <h1 data-translate>accessopolis.location.not-found</h1>
+                    <a href="#/new-location" class="btn btn-lg btn-success" ng-show-auth=""><i class="fa fa-plus"></i> <span data-translate>accessopolis.location.new</span></a>
+                </div>
             </div>
+
         </div>
-
-    </div>
-
-
-
-
+    </form>
 
 
     <div class="col-md-12 col-sm-12 col-xs-12 accessopolis-search-result_list" ng-if="ctrl.show_result" style="padding: 0px;"  >
