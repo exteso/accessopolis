@@ -109,12 +109,14 @@
         };
     }
 
-    LocationDetailService.prototype.$inject = ['$q', '$firebaseObject', 'Ref', '$firebaseArray'];
+    LocationDetailService.prototype.$inject = ['$q', '$firebaseObject', 'Ref', '$firebaseArray', 'imgur', 'IMGUR_API_KEY'];
 
-    function LocationDetailController(LocationDetailService, $routeParams, $location, user) {
+    function LocationDetailController(LocationDetailService, $routeParams, $location, user, imgur, IMGUR_API_KEY) {
 
         var self = this;
         self.user = user;
+
+        imgur.setAPIKey(IMGUR_API_KEY);
 
         LocationDetailService.find($routeParams.id).then(function(result) {
             self.detail = result;
@@ -143,6 +145,13 @@
                     // display any errors
                     .catch(alert);
             }
+        };
+
+
+        this.uploadImgur = function(file) {
+          imgur.upload(file).then(function(model) {
+              console.log(model);
+          });
         };
 
     }
