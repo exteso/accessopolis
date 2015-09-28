@@ -15,12 +15,12 @@ angular.module('accessopolisApp').directive('itemUpload', [function() {
           inputElem.addEventListener('change', function() {
             var image = inputElem.files[0];
             if(image) {
-              scope.imageUploadCtrl.doUpload(image);  
+              scope.imageUploadCtrl.doUpload(image);
             }
           }, false);
         },
         controller: function() {
         },
-        template: '<input type="file" accept="image/*" capture="camera">'
+        template: '<input type="file" accept="image/*" capture="camera" ng-show-auth>'
       };
 }]);
