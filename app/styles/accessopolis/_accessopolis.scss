@@ -1,5 +1,6 @@
 
 .accessopolis-bg-white { background: rgba(255, 255, 255, .8); }
+.accessopolis-bg-blue { background: rgba(240, 240, 240, .8); }
 
 .accessopolis-navigation-bar-categories {
     width: 100%;
@@ -21,7 +22,7 @@
             padding-top: 20px;
             line-height: 50px;
             span {
-                font-size: 2em;
+                font-size: 2em;bottom: 2px solid $link-color;
             }
         }
         .accessopolis-navigation-bar-category-icon-small {
@@ -546,7 +547,8 @@ input.ng-invalid.ng-touched, select.ng-invalid.ng-touched, textarea.ng-invalid.n
 
 .accessopolis-footer {
     min-height: 250px;
-    border-top:2px solid $link-color;
+    /* border-top:2px solid $link-color; */
+    border:none;
 }
 
 
