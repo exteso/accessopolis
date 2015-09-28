@@ -58,19 +58,22 @@
 
             <div class="col-md-12 col-sm-12 col-xs-12 accessopolis-bg-white" style="margin-top:10x;margin-bottom:10px;padding:10px;">
               <div ng-show-auth>
-                <h2>Inserisci immagine:</h2>
-                <p>
-                    Tipologia: <select ng-options="imageType for imageType in ctrl.imagesType" data-ng-model="ctrl.imageUpload.imageType"></select>
-                </p>
-                <p>
-                    Descrizione:
-                    <textarea data-ng-model="ctrl.imageUpload.description"></textarea>
-                </p>
-                <p>
-                  <item-upload do-upload="ctrl.uploadImgur"></item-upload>
-                </p>
-                <div>
-                  <button data-ng-click="ctrl.addImage()" class="btn btn-primary" ng-disabled="ctrl.imageUpload.file  === undefined">Upload</button>
+                <button ng-click="ctrl.showAddImage = true" ng-if="!ctrl.showAddImage" class="btn btn-primary">Inserisci immagine</button>
+                <div ng-if="ctrl.showAddImage">
+                  <p>
+                      Tipologia: <select ng-options="imageType for imageType in ctrl.imagesType" data-ng-model="ctrl.imageUpload.imageType"></select>
+                  </p>
+                  <p>
+                      Descrizione:
+                      <textarea data-ng-model="ctrl.imageUpload.description"></textarea>
+                  </p>
+                  <p>
+                    <item-upload do-upload="ctrl.uploadImgur"></item-upload>
+                  </p>
+                  <div>
+                    <button ng-click="ctrl.showAddImage = false;" class="btn btn-secondary">Annulla</button>
+                    <button data-ng-click="ctrl.addImage()" class="btn btn-primary" ng-disabled="ctrl.imageUpload.file  === undefined">Upload</button>
+                  </div>
                 </div>
               </div>
 
