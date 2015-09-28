@@ -17,7 +17,7 @@
                             val.addListener('place_changed', function() {
                                 var place = self.autocomplete.getPlace();
                                 if (place.geometry) {
-                                    $rootScope.$broadcast('LocationSelected', place.geometry.location);
+                                    $rootScope.$broadcast('LocationSelected', place);
                                 }
                             });
                         }
@@ -222,9 +222,11 @@
             });
         });
 
-        $rootScope.$on('LocationSelected', function(e, data) {
-            self.location.lat = data.G;
-            self.location.long = data.K;
+        $rootScope.$on('LocationSelected', function(e, position) {
+            self.location.address = position.formatted_address;
+            var loc = position.geometry.location;
+            self.location.lat = loc.lat();
+            self.location.long = loc.lng();
         });
 
     }
