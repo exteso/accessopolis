@@ -59,6 +59,7 @@ angular.module('accessopolisApp', [
             'accessopolis.accessibility-evaluation-vision': 'Vision',
             'accessopolis.accessibility-evaluation-mental': 'Mental',
             'accessopolis.insert-new-location': 'Insert new location',
+            'accessopolis.edit-location': 'Edit',
             'accessopolis.location.description': 'Location Description',
             'accessopolis.error.minlength': 'The value inserted is not valid',
             'accessopolis.error.maxlength': 'The value inserted is not valid',
@@ -109,8 +110,8 @@ angular.module('accessopolisApp', [
             'accessopolis.accessibility-evaluation-hearing': 'Uditive',
             'accessopolis.accessibility-evaluation-vision': 'Visive',
             'accessopolis.accessibility-evaluation-mental': 'Mentali',
-
             'accessopolis.insert-new-location': 'Inserire una nuova struttura',
+            'accessopolis.edit-location': 'Modifica',
             'accessopolis.location.description': 'Descrizione della struttura',
             'accessopolis.error.minlength': 'Il valore inserito non è valido',
             'accessopolis.error.maxlength': 'Il valore inserito non è valido',
@@ -134,7 +135,8 @@ angular.module('accessopolisApp', [
             'accessopolis.comment': 'Commenta'
         });
         $translateProvider.preferredLanguage('it');
-        $translateProvider.useSanitizeValueStrategy('sanitize');
+        $translateProvider.useSanitizeValueStrategy('sanitizeParameters');
+        $translateProvider.directivePriority(222); //see https://github.com/angular-translate/angular-translate/issues/949
     })
     .controller('AppCtrl', function ($scope, Auth, $translate, $firebaseObject, Ref) {
         $scope.user = Auth.$getAuth();

@@ -92,7 +92,18 @@ angular.module('accessopolisApp')
               return Auth.$getAuth();
             }]
           }
-      }).when('/new-location', {
+      })
+      .when('/locations/:id/edit', {
+        templateUrl: 'scripts/feature/detail/new.html',
+        controller: 'NewLocationController',
+        controllerAs: 'ctrl',
+        resolve: {
+            user: ['Auth', function(Auth) {
+                return Auth.$getAuth();
+            }]
+        }
+      })
+      .when('/new-location', {
         templateUrl: 'scripts/feature/detail/new.html',
         controller: 'NewLocationController',
         controllerAs: 'ctrl'

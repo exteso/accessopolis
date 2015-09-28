@@ -22,8 +22,6 @@
                             });
                         }
                     })
-
-
                 }],
                 bindToController: true,
                 controllerAs: 'autocompleteCtrl',
@@ -128,6 +126,11 @@
             $location.path('/');
         };
 
+        this.edit = function() {
+            var path = $location.path();
+            $location.path(path+'/edit');
+        };
+
         this.rate = function(){
             var newRate = {locationId: $routeParams.id, userId: self.user.uid, rateKind: 'global', rate: self.vote, userType: 'public'};
 
@@ -149,10 +152,16 @@
 
     LocationDetailController.prototype.$inject = ['LocationDetailService', '$routeParams', '$location', 'user'];
 
-    function NewLocationController(NavigationService, LocationDetailService, $location, $rootScope) {
+    function NewLocationController(NavigationService, LocationDetailService, $routeParams, $location, $rootScope) {
         var self = this;
-        this.location = {};
+        self.location = {};
         //this.stars = _.range(0,6);
+
+        if ($routeParams.id){
+            LocationDetailService.find($routeParams.id).then(function(result) {
+                self.location = result;
+            });
+        }
 
         this.save = function(frm) {
             if(!frm.$valid) {
@@ -182,7 +191,7 @@
 
     }
 
-    NewLocationController.prototype.$inject = ['NavigationService', 'LocationDetailService', '$location', '$rootScope'];
+    NewLocationController.prototype.$inject = ['NavigationService', 'LocationDetailService', '$routeParams', '$location', '$rootScope'];
 
     function LocationVideoController($scope, LocationDetailService, $sce) {
         var self = this;
