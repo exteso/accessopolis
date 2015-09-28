@@ -119,6 +119,10 @@
             return $firebaseArray(Ref.child('ratings')).$add(newRate);
         };
 
+        this.getUserProfile= function(user){
+            return $firebaseObject(Ref.child('users/' + user.uid));;
+        }
+
     }
 
     LocationDetailService.prototype.$inject = ['$q', '$firebaseObject', 'Ref', '$firebaseArray', 'imgur', 'IMGUR_API_KEY'];
@@ -126,7 +130,7 @@
     function LocationDetailController(LocationDetailService, $routeParams, $location, user, imgur, IMGUR_API_KEY, LocationVideoService) {
 
         var self = this;
-        self.user = user;
+        self.profile = LocationDetailService.getUserProfile(user);
 
         imgur.setAPIKey(IMGUR_API_KEY);
 
@@ -153,7 +157,7 @@
         };
 
         this.rate = function(){
-            var newRate = {locationId: $routeParams.id, userId: self.user.uid, rateKind: 'global', rate: self.vote, userType: 'public'};
+            var newRate = {locationId: $routeParams.id, userId: self.profile.$id, rateKind: 'global', rate: self.vote, userType: self.profile.type};
 
             LocationDetailService.rate(newRate).then(function(result) {
                 self.rateFeedback = result;

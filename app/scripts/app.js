@@ -171,13 +171,6 @@ angular.module('accessopolisApp', [
     })
     .controller('AppCtrl', function ($scope, Auth, $translate, $firebaseObject, Ref) {
 
-        //potentially useless code
-        $scope.user = Auth.$getAuth();
-        if ($scope.user) {
-            $scope.profile = $firebaseObject(Ref.child('users/' + $scope.user.uid));
-        }
-        //end?
-
         Auth.$onAuth(function(authData) {
           if(authData) {
             $scope.user = Auth.$getAuth();

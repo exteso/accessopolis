@@ -25,10 +25,14 @@ angular.module('accessopolisApp')
     var profile = $firebaseObject(Ref.child('users/'+user.uid));
     profile.$bindTo($scope, 'profile').then(function() {
 
+        //could we move this logic inside Auth.$onAuth in app.js
         if (user.google){
             $scope.profile.email = user.google.email;  // will be saved to the database
             $scope.profile.name = user.google.displayName;   // will be saved to the database
             $scope.profile.imageURL =  user.google.profileImageURL; // will be saved to the database
+            if (!$scope.profile.type){
+                $scope.profile.type = 'public'; //if a user has no type property defined, it will be set as public
+            }
         }
       });
   });

@@ -11,23 +11,20 @@ angular.module('accessopolisApp')
 
         $scope.oauthLogin = function(provider, dropMenu) {
 
-            if(dropMenu){
-                $(".btn-navbar").click(); //bootstrap 2.x
-                $(".navbar-toggle").click() //bootstrap 3.x by Richard
-            }
+        if(dropMenu){
+            $(".btn-navbar").click(); //bootstrap 2.x
+            $(".navbar-toggle").click() //bootstrap 3.x by Richard
+        }
 
-          $scope.err = null;
+        $scope.err = null;
 
-          Auth.$authWithOAuthPopup(provider, { scope: 'email https://www.googleapis.com/auth/youtube.upload' }).then(redirect, showError);
-
+        Auth.$authWithOAuthPopup(provider, { scope: 'email https://www.googleapis.com/auth/youtube.upload' }).then(redirect, showError);
     };
 
     $scope.anonymousLogin = function() {
       $scope.err = null;
       Auth.$authAnonymously({rememberMe: true}).then(redirect, showError);
     };
-
-
 
     function redirect() {
       $location.path('/account');
