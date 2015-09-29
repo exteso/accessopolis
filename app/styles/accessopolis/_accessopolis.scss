@@ -11,9 +11,7 @@
     li {
         float: left;
         text-align: center;
-
         height: 100px;
-        overflow: hidden;
         border-left: 1px solid #ccc;
         &.accessopolis-navigation-bar-categories-item-evidence {
             background: $link-color !important;
@@ -23,9 +21,9 @@
         .accessopolis-navigation-bar-category-icon {
             float: left;
             width: 100%;
+            padding-top: 15px;
             height: 50px;
-            padding-top: 20px;
-            line-height: 50px;
+            line-height: 40px;
             span {
                 font-size: 2em;
                 bottom: 2px solid $link-color;
@@ -44,7 +42,7 @@
             float: left;
             width: 100%;
             height: 50px;
-            line-height: 50px;
+            line-height: 20px;
         }
 
         ul.accessopolis-navigation-bar-sub-category {
