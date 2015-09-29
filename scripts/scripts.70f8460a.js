@@ -953,7 +953,9 @@ angular.module('accessopolisApp')
         };
 
         this.getUserProfile= function(user){
-            return $firebaseObject(Ref.child('users/' + user.uid));;
+            if(user){
+                return $firebaseObject(Ref.child('users/' + user.uid));;
+            }
         }
 
     }
