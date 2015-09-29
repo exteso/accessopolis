@@ -1,7 +1,8 @@
 <h4>Filter by:</h4>
-<ul class="list-inline accessopolis-navigation-bar-categories" >
+<ul class="list-inline accessopolis-navigation-bar-categories col-md-12 col-sm-12 col-xs-12" >
+
     <li data-ng-repeat="item in ctrl.items" data-ng-click="ctrl.displaySubMenu(item); "
-        style=" width: calc(100% / {{ctrl.items.length}});"
+        class="col-md-2 col-sm-3 col-xs-4"
         ng-class="{'accessopolis-navigation-bar-categories-item-evidence': ctrl.itemExpanded == item.$id }">
         <div class="accessopolis-navigation-bar-category-icon" >
             <span class="fa fa-camera"
