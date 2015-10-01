@@ -197,8 +197,36 @@
                 },
                 backdrop: 'static'
             });
-
         };
+
+        this.addNewVideo = function(){
+            $modal.open({
+                templateUrl: 'scripts/feature/detail/addVideo.html',
+                controller: function($scope, $modal){
+                    $scope.ctrl = self;
+                    $scope.modal = $modal;
+                    $scope.addImage = function(){
+                        self.uploadVideo().then(function() {
+                            $scope.$close();
+                        });
+
+                    }
+                },
+                backdrop: 'static'
+            });
+        };
+
+        this.openCarousel = function(){
+            $modal.open({
+                templateUrl: 'scripts/feature/detail/carousel_photos.html',
+                controller: function($scope, $modal){
+                    $scope.ctrl = self;
+                    $scope.modal = $modal;
+                },
+                backdrop: 'static'
+            });
+        };
+
 
 
         this.addImage = function() {
@@ -246,6 +274,13 @@
             self.locationVideo = video;
             $event.preventDefault();
         }
+
+
+        // IMG
+        self.myInterval = 5000;
+        self.noWrapSlides = false;
+
+
 
     }
 

@@ -39,12 +39,25 @@
 </div>
 
 <div class="col-xs-12"   >
-    <div class="container accessopolis-location-detail-content">
+    <div class="container accessopolis-location-detail-content" >
 
-            <div class="accessopolis-bg-white col-md-12 col-sm-12 col-xs-12 accessopolis-location-detail-content-slide" >
+            <div class="accessopolis-bg-white col-md-12 col-sm-12 col-xs-12 accessopolis-location-detail-content-slide"  >
                     <div class="accessopolis-location-detail-content-slide-main col-xs-12 col-md-8 col-sm-8" >
                         <div class="accessopolis-location-detail-content-slide-main-content" data-location-video="ctrl.locationVideo">
-                            <span class="fa fa-youtube-play"></span>
+
+                        </div>
+                        <div class="col-md-12 col-sm-12 col-xs-12" style="height: 120px; background: rgba(0,0,0,.5); margin-top: -120px; position: absolute; overflow: scroll; white-space: nowrap;">
+                            <ul class="list-inline" >
+                                <li ng-show-auth >
+                                    <button ng-click="ctrl.addNewVideo()" ng-if="!ctrl.showAddVideo" class="btn btn-primary" data-translate>accessopolis.insert.video</button>
+                                </li>
+                                <li data-ng-repeat="video in ctrl.videos" style="padding: 10px;">
+                                    <div style="border: 2px solid #fff;">
+                                        <a href="#" data-ng-click="ctrl.showVideo(video, $event)"><img data-ng-src="{{video.thumbnail}}"></a>
+                                    </div>
+                                </li>
+
+                            </ul>
                         </div>
                     </div>
 
@@ -55,84 +68,23 @@
                                 <span class="fa fa-map-marker"></span>
                             </div>
                             <div style="width: 100%; height: 40px; text-align: left; font-size: 0.5em; padding-left: 3px; line-height: 40px; color: #fff; background: rgba(0, 0, 0, 0.7); position: absolute; margin-top: -40px;" >
-                                Show map
+                                Map
                             </div>
                         </div>
 
                         <div  class=" col-md-12 col-sm-12  col-xs-12 accessopolis-location-detail-content-slide-img " >
                             <div style="width: 100%; height: 100%; overflow: hidden;">
                                 <span data-ng-if="ctrl.images.length ==0" class="fa fa-camera"></span>
-
-                                <a href="{{ctrl.images[0].imageUrl}}" ><img data-ng-src="{{ctrl.images[0].imageUrl | imgurThumbnail: 'm'}}"></a>
+                                <a data-ng-click="ctrl.openCarousel()" href="" ><img data-ng-src="{{ctrl.images[0].imageUrl | imgurThumbnail: 'm'}}"></a>
                             </div>
 
                             <div style="width: 100%; height: 40px; text-align: left; font-size: 0.5em; padding-left: 3px; line-height: 40px; color: #fff; background: rgba(0, 0, 0, 0.7); position: absolute; margin-top: -40px;" >
-                                <span data-ng-if="ctrl.images.length >0">{{ctrl.images.length}} photos</span>
-                                <button class="btn btn-primary btn-xs pull-right" style="margin-top: 7px; margin-right: 15px;"  data-ng-click="ctrl.addNewImage()" >Add new photos</button>
+                                <span data-ng-if="ctrl.images.length >0">Photos ({{ctrl.images.length}})</span>
+                                <button  ng-show-auth  class="btn btn-primary btn-xs pull-right" style="margin-top: 7px; margin-right: 15px;"  data-ng-click="ctrl.addNewImage()" >Add new photos</button>
                             </div>
                         </div>
                     </div>
-            </div>
 
-            <div class="col-md-12 col-sm-12 col-xs-12 accessopolis-bg-white" style="margin-top:10px;margin-bottom:10px;padding:10px;">
-              <!--<div ng-show-auth>-->
-                <!--<button ng-click="ctrl.showAddImage = true" ng-if="!ctrl.showAddImage" class="btn btn-primary">Inserisci immagine</button>-->
-                <!--<div ng-if="ctrl.showAddImage">-->
-                  <!--<p>-->
-                      <!--Tipologia: <select ng-options="imageType for imageType in ctrl.imagesType" data-ng-model="ctrl.imageUpload.imageType"></select>-->
-                  <!--</p>-->
-                  <!--<p>-->
-                      <!--Descrizione:-->
-                      <!--<textarea data-ng-model="ctrl.imageUpload.description"></textarea>-->
-                  <!--</p>-->
-                  <!--<p>-->
-                    <!--<item-upload do-upload="ctrl.uploadImgur" accept="image/*"></item-upload>-->
-                  <!--</p>-->
-                  <!--<div>-->
-                    <!--<button ng-click="ctrl.showAddImage = false;" class="btn btn-secondary">Annulla</button>-->
-                    <!--<button data-ng-click="ctrl.addImage()" class="btn btn-primary" ng-disabled="ctrl.imageUpload.file  === undefined">Upload</button>-->
-                  <!--</div>-->
-                <!--</div>-->
-              <!--</div>-->
-              <!--<ul>-->
-                <!--<li data-ng-repeat="image in ctrl.images">-->
-                  <!--<div>-->
-                    <!--<a href="{{image.imageUrl}}"><img data-ng-src="{{image.imageUrl | imgurThumbnail: 'm'}}"></a>-->
-                    <!--<p ng-if="image.imageType">Tipologia: {{image.imageType}}</p>-->
-                    <!--<p ng-if="image.description">Descrizione: {{image.description}}</p>-->
-                  <!--</div>-->
-              <!--</ul>-->
-
-                <div class="col-md-12 col-sm-12 col-xs-12 accessopolis-bg-white" style="margin-top:10px;margin-bottom:10px;padding:10px;">
-                    <div ng-show-auth>
-                        <button ng-click="ctrl.showAddVideo = true" ng-if="!ctrl.showAddVideo" class="btn btn-primary" data-translate>accessopolis.insert.video</button>
-                        <div ng-if="ctrl.showAddVideo">
-                            <p>
-                                <span data-translate>accessopolis.type</span>: <select ng-options="imageType for imageType in ctrl.imagesType" data-ng-model="ctrl.videoUpload.videoType"></select>
-                            </p>
-                            <p>
-                                <span data-translate>accessopolis.description</span>:
-                                <textarea data-ng-model="ctrl.videoUpload.description"></textarea>
-                            </p>
-                            <p>
-                                <item-upload do-upload="ctrl.uploadVideo" accept="video/*" data-ng-if="!ctrl.videoUpload.file"></item-upload>
-                                <img data-ng-src="{{ctrl.videoUpload.file.thumbnail}}" data-ng-if="ctrl.videoUpload.file">
-                            </p>
-                            <div>
-                                <button ng-click="ctrl.showAddVideo = false;" class="btn btn-secondary" data-translate>accessopolis.cancel</button>
-                                <button data-ng-click="ctrl.addVideo()" class="btn btn-primary" ng-disabled="ctrl.videoUpload.file  === undefined" data-translate>accessopolis.upload</button>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-
-                <ul>
-                    <li data-ng-repeat="video in ctrl.videos">
-                        <div>
-                            <a href="#" data-ng-click="ctrl.showVideo(video, $event)"><img data-ng-src="{{video.thumbnail}}"></a>
-                        </div>
-                    </li>
-                </ul>
             </div>
 
             <div class="col-md-12 col-sm-12 col-xs-12 accessopolis-bg-white" style="min-height: 300px; padding-bottom: 50px; margin-bottom: 20px;  margin-top: 10px;">
@@ -160,3 +112,5 @@
 
     </div>
 </div>
+
+

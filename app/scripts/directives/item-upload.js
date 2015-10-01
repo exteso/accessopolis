@@ -24,6 +24,6 @@ angular.module('accessopolisApp').directive('itemUpload', ['$timeout', function(
         },
         controller: function() {
         },
-        template: '<input type="file" accept="imageUploadCtrl.accept" capture="camera" ng-show-auth>'
+        template: '<span class="btn btn-primary btn-file">Browse <input type="file"  accept="imageUploadCtrl.accept" capture="camera" ng-show-auth></span>'
       };
 }]);
