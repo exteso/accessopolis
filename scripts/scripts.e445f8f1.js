@@ -497,7 +497,7 @@ angular.module('accessopolisApp').directive('itemUpload', ['$timeout', function(
         },
         controller: function() {
         },
-        template: '<input type="file" accept="imageUploadCtrl.accept" capture="camera" ng-show-auth>'
+        template: '<span class="btn btn-primary btn-file">Browse <input type="file"  accept="imageUploadCtrl.accept" capture="camera" ng-show-auth></span>'
       };
 }]);
 
@@ -1031,8 +1031,36 @@ angular.module('accessopolisApp')
                 }],
                 backdrop: 'static'
             });
-
         };
+
+        this.addNewVideo = function(){
+            $modal.open({
+                templateUrl: 'scripts/feature/detail/addVideo.html',
+                controller: ["$scope", "$modal", function($scope, $modal){
+                    $scope.ctrl = self;
+                    $scope.modal = $modal;
+                    $scope.addImage = function(){
+                        self.uploadVideo().then(function() {
+                            $scope.$close();
+                        });
+
+                    }
+                }],
+                backdrop: 'static'
+            });
+        };
+
+        this.openCarousel = function(){
+            $modal.open({
+                templateUrl: 'scripts/feature/detail/carousel_photos.html',
+                controller: ["$scope", "$modal", function($scope, $modal){
+                    $scope.ctrl = self;
+                    $scope.modal = $modal;
+                }],
+                backdrop: 'static'
+            });
+        };
+
 
 
         this.addImage = function() {
@@ -1080,6 +1108,13 @@ angular.module('accessopolisApp')
             self.locationVideo = video;
             $event.preventDefault();
         }
+
+
+        // IMG
+        self.myInterval = 5000;
+        self.noWrapSlides = false;
+
+
 
     }
     LocationDetailController.$inject = ["LocationDetailService", "$routeParams", "$location", "user", "imgur", "IMGUR_API_KEY", "LocationVideoService", "$modal"];
