@@ -119,20 +119,14 @@
             return $firebaseArray(Ref.child('ratings')).$add(newRate);
         };
 
-        this.getUserProfile= function(user){
-            if(user){
-                return $firebaseObject(Ref.child('users/' + user.uid));;
-            }
-        }
-
     }
 
-    LocationDetailService.prototype.$inject = ['$q', '$firebaseObject', 'Ref', '$firebaseArray', 'imgur', 'IMGUR_API_KEY'];
+    LocationDetailService.prototype.$inject = ['$q', '$firebaseObject', 'Ref', '$firebaseArray'];
 
-    function LocationDetailController(LocationDetailService, $routeParams, $location, user, imgur, IMGUR_API_KEY, LocationVideoService, $modal) {
+    function LocationDetailController(LocationDetailService, $routeParams, $location, user, imgur, IMGUR_API_KEY, LocationVideoService, UserService, $modal) {
 
         var self = this;
-        self.profile = LocationDetailService.getUserProfile(user);
+        self.profile = UserService.getCurrentUserProfile();
 
         imgur.setAPIKey(IMGUR_API_KEY);
 
@@ -284,7 +278,7 @@
 
     }
 
-    LocationDetailController.prototype.$inject = ['LocationDetailService', '$routeParams', '$location', 'user', 'LocationVideoService', '$modal'];
+    LocationDetailController.prototype.$inject = ['LocationDetailService', '$routeParams', '$location', 'user', 'imgur', 'IMGUR_API_KEY', 'LocationVideoService', 'UserService', '$modal'];
 
     function NewLocationController(NavigationService, LocationDetailService, $routeParams, $location, $rootScope) {
         var self = this;

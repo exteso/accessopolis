@@ -4,7 +4,7 @@
         <div class="accessopolis-location-detail-back col-md-12 col-sm-12 col-xs-12" >
             <a data-ng-click="ctrl.backToList()" class="btn btn-primary btn-xs" >
                 <span class="fa fa-chevron-left"></span> <span data-translate>accessopolis.back-to-list</span></a>
-            <a data-ng-click="ctrl.edit()" class="btn btn-primary btn-xs" ng-show-auth>
+            <a data-ng-click="ctrl.edit()" data-ng-if="ctrl.profile.isAdmin == 'true'" class="btn btn-primary btn-xs" ng-show-auth>
                 <span class="fa fa-edit"></span> <span data-translate>accessopolis.edit-location</span></a>
         </div>
 
@@ -54,6 +54,7 @@
                                 <li data-ng-repeat="video in ctrl.videos" style="padding: 10px;">
                                     <div style="border: 2px solid #fff;">
                                         <a href="#" data-ng-click="ctrl.showVideo(video, $event)"><img data-ng-src="{{video.thumbnail}}"></a>
+                                        <i data-ng-if="ctrl.profile.isAdmin()" class="fa fa-trash-o"></i>
                                     </div>
                                 </li>
 

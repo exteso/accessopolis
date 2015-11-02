@@ -7,6 +7,7 @@
  * Provides rudimentary account management functions.
  */
 angular.module('accessopolisApp')
+  .service('UserService', UserService)
   .controller('AccountCtrl', function ($scope, user, Auth, Ref, $firebaseObject, $timeout, $location) {
     $scope.user = user;
     $scope.details = user.google;
@@ -33,6 +34,23 @@ angular.module('accessopolisApp')
             if (!$scope.profile.type){
                 $scope.profile.type = 'public'; //if a user has no type property defined, it will be set as public
             }
+            if (!$scope.profile.isAdmin){
+                $scope.profile.isAdmin = 'false'; //if a user is not yet defined as Admin, we force it to have a property isAdmin == false
+            }
         }
       });
   });
+
+
+function UserService($q, $firebaseObject, Ref, user) {
+
+    this.getCurrentUserProfile= function(){
+        if(user){
+            return $firebaseObject(Ref.child('users/' + user.uid));
+        }
+    }
+
+}
+
+UserService.prototype.$inject = ['$q', '$firebaseObject', 'Ref', 'user'];
+

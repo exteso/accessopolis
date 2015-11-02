@@ -4,6 +4,7 @@
 
             <div class="jumbotron" style="margin-top: 30px;">
                 <h1> {{profile.name}} <span data-translate>accessopolis.welcome</span></h1>
+                <p data-ng-if="profile.isAdmin == 'true'" style="color:red">You have the ADMIN role, please, be careful!</p>
                 <p class="clearfix"></p>
                 <p><a role="button" href="#/" class="btn btn-primary btn-lg" data-translate>accessopolis.back-to-home</a></p>
             </div>
