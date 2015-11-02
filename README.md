@@ -21,7 +21,9 @@ grunt serve
 
 Open browser at http://localhost:9000
 
-*Note:* currently we only have 1 Firebase database, so data modified while developping are immediately changing in PROD (same DB)
+*Note:* currently we have 2 Firebase databases:
+   - accessopolis-dev.firebaseio.com to be used while DEVELOPING, you can log in with google account only from localhost:9000 or localhost:8080
+   - accessopolis.firebaseio.com for PRODUCTION use. Can login with Google account only from https://www.accessopolis.chß
  
 
 # How to deploy a new release:
