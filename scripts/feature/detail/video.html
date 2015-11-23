@@ -1,0 +1,4 @@
+<iframe data-ng-if="videoCtrl.locationVideo && videoCtrl.url" width="400" height="400" data-ng-src="{{videoCtrl.url}}" frameborder="0" allowfullscreen></iframe>
+<div data-ng-if="videoCtrl.enableVideoUpload && !videoCtrl.locationVideo || !videoCtrl.url">
+    <a href="#" data-ng-click="videoCtrl.uploadVideo()"><i class="fa fa-video-camera"></i></a>
+</div>

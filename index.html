@@ -1,0 +1,123 @@
+<!doctype html>
+<html class="no-js">
+  <head>
+    <meta charset="utf-8">
+    <title></title>
+    <meta name="description" content="">
+    <meta name="viewport" content="width=device-width">
+    <!-- Place favicon.ico and apple-touch-icon.png in the root directory -->
+
+    <link rel="stylesheet" href="styles/main.e65db7bb.css">
+    <script type="application/javascript">
+        window.accessopolis = window.accessopolis || {};
+        function initMap() {
+            window.accessopolis.googleMapReady = true;
+        }
+        function initVideo() {
+            window.accessopolis.videoApiLoaded = true;
+        }
+    </script>
+      <link rel="apple-touch-icon" sizes="57x57" href="images/icons/apple-icon-57x57.561c0262.png">
+      <link rel="apple-touch-icon" sizes="60x60" href="images/icons/apple-icon-60x60.864c4e68.png">
+      <link rel="apple-touch-icon" sizes="72x72" href="images/icons/apple-icon-72x72.e4789cde.png">
+      <link rel="apple-touch-icon" sizes="76x76" href="images/icons/apple-icon-76x76.b80907e2.png">
+      <link rel="apple-touch-icon" sizes="114x114" href="images/icons/apple-icon-114x114.0b4e4d4a.png">
+      <link rel="apple-touch-icon" sizes="120x120" href="images/icons/apple-icon-120x120.b8b72df3.png">
+      <link rel="apple-touch-icon" sizes="144x144" href="images/icons/apple-icon-144x144.68a7e919.png">
+      <link rel="apple-touch-icon" sizes="152x152" href="images/icons/apple-icon-152x152.7f7fd42e.png">
+      <link rel="apple-touch-icon" sizes="180x180" href="images/icons/apple-icon-180x180.e75b8bf4.png">
+      <link rel="icon" type="image/png" sizes="192x192"  href="images/icons/android-icon-192x192.5f305112.png">
+      <link rel="icon" type="image/png" sizes="32x32" href="images/icons/favicon-32x32.a8995498.png">
+      <link rel="icon" type="image/png" sizes="96x96" href="images/icons/favicon-96x96.3e98dac0.png">
+      <link rel="icon" type="image/png" sizes="16x16" href="images/icons/favicon-16x16.ff20b145.png">
+      <link rel="manifest" href="/manifest.json">
+      <meta name="msapplication-TileColor" content="#ffffff">
+      <meta name="msapplication-TileImage" content="/ms-icon-144x144.png">
+      <meta name="theme-color" content="#ffffff">
+  </head>
+  <body ng-app="accessopolisApp" ng-controller="AppCtrl as app" class="accessopolis-bg">
+    <!--[if lt IE 7]>
+      <p class="browsehappy">You are using an <strong>outdated</strong> browser. Please <a href="http://browsehappy.com/">upgrade your browser</a> to improve your experience.</p>
+    <![endif]-->
+
+    <!-- Add your site or application content here -->
+
+
+    <div class="header  accessopolis-header" ng-cloak=""  >
+
+        <a href="https://github.com/exteso/accessopolis" target="_blank" class="visible-lg"><img style="position: absolute; top: 0; right: 0; border: 0; z-index:150" src="https://camo.githubusercontent.com/52760788cde945287fbb584134c4cbc2bc36f904/68747470733a2f2f73332e616d617a6f6e6177732e636f6d2f6769746875622f726962626f6e732f666f726b6d655f72696768745f77686974655f6666666666662e706e67" alt="Fork me on GitHub" data-canonical-src="https://s3.amazonaws.com/github/ribbons/forkme_right_white_ffffff.png"></a>
+
+        <div class="container">
+
+            <div class="col-xs-12 col-md-12 col-sm-12 accessopolis-header-container">
+                <div class="col-xs-8 col-md-8 col-sm-8 col-xs-8 accessopolis-header-logo" >
+                    <a class="navbar-brand" href="#/" >
+                        <img src="images/logos/accessopolis.df745af9.png"  alt="Accessopolis">
+                    </a>
+                    <sup >beta</sup>
+                </div>
+                <div class="col-xs-4 col-md-4 col-sm-4 col-xs-4 ">
+                    <div ng-hide-auth="" class="accessopolis-profile-logout">
+                        <button data-ng-controller="LoginCtrl"  class="btn btn-primary hidden-xs btn-lg pull-right navbar-btn"  ng-click="oauthLogin('google')" >Accedi con Google</button>
+                        <button data-ng-controller="LoginCtrl"  class="btn btn-primary visible-xs btn-sm pull-right navbar-btn"  ng-click="oauthLogin('google')" >Accedi</button>
+                    </div>
+                    <div ng-show-auth="" class="accessopolis-profile  " >
+                        <button  role="button" ng-click="logout()" data-ng-controller="AccountCtrl" class="btn btn-danger navbar-btn pull-right hidden-xs">Log Out</button>
+                        <button  role="button" ng-click="logout()" data-ng-controller="AccountCtrl" class="btn btn-danger btn-sm navbar-btn pull-right visible-xs">Log Out</button>
+                        <div class="accessopolis-profile-icon hidden-xs" style='background-image: url("{{user.google.cachedUserProfile.picture}}")'>
+                            <span data-ng-if="!user.google.cachedUserProfile.picture" class="fa fa-user"></span>
+                        </div>
+                        <div class="accessopolis-profile-name hidden-xs" >
+                            <a href="{{user.google.cachedUserProfile.link}}" target="_blank">
+                                {{user.google.cachedUserProfile.name}}
+                            </a>
+                        </div>
+                    </div>
+
+                </div>
+
+                </div>
+
+            </div>
+        </div>
+
+    </div>
+    <div ng-view=""></div>
+
+
+    <footer class="footer accessopolis-footer accessopolis-bg-white container-fluid" >
+        <!-- Start main sponsor container -->
+        <div class=" accessopolis-bg-blue container-fluid">
+            <h4 class="text-center">CON IL SOSTEGNO DI</h4>
+            <div class="row">
+                <div class="col-xs-3 col-md-2 col-md-offset-1">
+                    <a target="_blank" href="http://www.romulus.ch" class="thumbnail"><img src="images/fr.1d53f3e7.png" alt="Fondazione Romulus"></a><h5>Fondazione Romulus</h5>
+                </div>
+                <div class="col-xs-3 col-md-2 col-md-offset-1">
+                    <a target="_blank" href="http://www.ersl.ch"  class="thumbnail"><img src="images/ersl.0206962c.png" alt="Ente Regionale per lo Sviluppo del Luganese"></a><h5>Ente Regionale per lo Sviluppo del Luganese</h5>
+                </div>
+                <div class="col-xs-3 col-md-2 col-md-offset-1">
+                    <a target="_blank" href="http://www.lugano.ch"><img src="images/lvga.62dd400f.png" alt="Città di Lugano"></a><h5>Città di Lugano</h5>
+                </div>
+                <div class="col-xs-3 col-md-2 col-md-offset-1">
+                    <a target="_blank" href="http://www.chiasso.ch" href="images/chiasso.e2733441.png" alt="Città di Chiasso" class="thumbnail"><img src="images/chiasso.e2733441.png" alt="Fondazione Romulus"></a><h5>Città di Chiasso</h5>
+                </div>
+            </div>
+        </div>
+
+        <div class="container-fluid">
+          <div class="row accessopolis-footer-attribution">
+              <p class="pull-left">With <span class="glyphicon glyphicon-heart"></span> from the <a href="https://voxxeddays.com/ticino16" target="_blank">Voxxed Days Ticino</a> team and Exteso Sagl</p>
+              <p class="pull-right">Images by <a href="https://www.flickr.com/photos/sozialhelden/">SOZIALHELDEN</a></p>
+          </div>
+        </div>
+    </footer>
+
+    <script src="scripts/vendor.2a2dd4ec.js"></script>
+
+        <script src="scripts/scripts.6f9d9a63.js"></script>
+
+    <script async defer src="https://maps.googleapis.com/maps/api/js?signed_in=true&libraries=places&key=AIzaSyCbm7ot6UqPk9I7sQVu3Z3PeU7hvwT0pbU&callback=initMap"></script>
+    <script src="https://apis.google.com/js/client.js?onload=initVideo"></script>
+</body>
+</html>

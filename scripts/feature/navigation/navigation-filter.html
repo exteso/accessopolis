@@ -1,0 +1,34 @@
+
+<h6>Filter by:</h6>
+<ul class="list-group" >
+    <li class="list-group-item" data-ng-repeat="item in navFilterCtrl.items" data-ng-click="navFilterCtrl.displaySubMenu(item)"
+        ng-class="{'accessopolis-navigation-bar-categories-item-evidence': navFilterCtrl.itemExpanded == item.$id }">
+            <span class="fa fa-camera"
+                  ng-class="{'fa-train': item.text == 'public-transport',
+                             'fa-suitcase ': item.text == 'holidays',
+                             'fa-cutlery': item.text == 'food',
+                             'fa-magic': item.text == 'religion',
+                             'fa-soccer-ball-o': item.text == 'sport',
+                             'fa-book': item.text == 'culture' }"></span>
+            <span>{{item.text | translate}}</span>
+
+
+        <ul class="accessopolis-navigation-bar-sub-category"
+            data-ng-if="navFilterCtrl.itemExpanded === item.$id" class="list-inline">
+            <li data-ng-repeat="child in item.subcategory"
+                data-ng-click="navFilterCtrl.showLocations(child, $event); ">
+
+                   <span class="fa fa-camera"
+                         ng-class="{'fa-train': item.text == 'public-transport',
+                             'fa-suitcase ': item.text == 'holidays',
+                             'fa-cutlery': item.text == 'food',
+                             'fa-magic': item.text == 'religion',
+                             'fa-soccer-ball-o': item.text == 'sport',
+                             'fa-book': item.text == 'culture'}"></span>
+
+                <span class="accessopolis-navigation-bar-sub-category-label" >{{child | translate}}</span>
+            </li>
+        </ul>
+
+    </li>
+</ul>
