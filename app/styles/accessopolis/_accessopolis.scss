@@ -375,7 +375,7 @@ input.ng-invalid.ng-touched, select.ng-invalid.ng-touched, textarea.ng-invalid.n
         height: 180px;
 
         .accessopolis-location-detail-back {
-            height: 15px;
+            min-height: 15px;
             margin-top: 5px;
         }
         .accessopolis-location-detail-header {
