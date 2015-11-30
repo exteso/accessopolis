@@ -5,34 +5,32 @@
 
 
   function LocationService($q, $firebaseObject, Ref, $firebaseArray) {
-    this.find = function(id) {
+  
+    function find(id) {
         return $q(function(resolve, reject) {
-            var obj = $firebaseObject(Ref.child('locations/'+id));
-            obj.$loaded(function(val) {
+            $firebaseObject(Ref.child('locations/'+id)).$loaded(function(val) {
                 resolve(val);
             });
         });
     };
 
-    this.getComments = function(id) {
+    function getComments(id) {
         return $q(function(resolve, reject) {
-            var obj = $firebaseArray(Ref.child('comments/'+id));
-            obj.$loaded(function(val) {
+            $firebaseArray(Ref.child('comments/'+id)).$loaded(function(val) {
                 resolve(val);
             });
         });
     };
 
-    this.getImages = function(id) {
+    function getImages(id) {
         return $q(function(resolve, reject) {
-          var obj = $firebaseArray(Ref.child('images/'+id));
-          obj.$loaded(function(val) {
+          $firebaseArray(Ref.child('images/'+id)).$loaded(function(val) {
             resolve(val);
           });
         });
     };
 
-    this.update = function(location){
+    function update(location){
         if (location.$id){
             var obj = $firebaseObject(Ref.child('locations/'+location.$id));
 
@@ -44,13 +42,21 @@
         }
     };
 
-    this.create = function(location) {
+    function create(location) {
         return $firebaseArray(Ref.child('locations')).$add(location);
     };
 
-    this.rate = function(newRate){
+    function rate(newRate){
         return $firebaseArray(Ref.child('ratings')).$add(newRate);
     };
+    
+    //
+    this.find = find;
+    this.getComments = getComments;
+    this.getImages = getImages;
+    this.update = update;
+    this.create = create;
+    this.rate = rate;
   }
 
     
