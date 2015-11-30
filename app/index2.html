@@ -1,0 +1,104 @@
+<!doctype html>
+<html>
+  <head>
+    <meta charset="utf-8">
+    <!-- build:css(.) styles/vendor.css -->
+    <!-- bower:css -->
+    <!-- endbower -->
+    <!-- endbuild -->
+    <!-- build:css(.tmp) styles/main.css -->
+    <link rel="stylesheet" href="styles/main.css">
+    <!-- endbuild -->
+    
+    <link rel="apple-touch-icon" sizes="57x57" href="images/icons/apple-icon-57x57.png">
+    <link rel="apple-touch-icon" sizes="60x60" href="images/icons/apple-icon-60x60.png">
+    <link rel="apple-touch-icon" sizes="72x72" href="images/icons/apple-icon-72x72.png">
+    <link rel="apple-touch-icon" sizes="76x76" href="images/icons/apple-icon-76x76.png">
+    <link rel="apple-touch-icon" sizes="114x114" href="images/icons/apple-icon-114x114.png">
+    <link rel="apple-touch-icon" sizes="120x120" href="images/icons/apple-icon-120x120.png">
+    <link rel="apple-touch-icon" sizes="144x144" href="images/icons/apple-icon-144x144.png">
+    <link rel="apple-touch-icon" sizes="152x152" href="images/icons/apple-icon-152x152.png">
+    <link rel="apple-touch-icon" sizes="180x180" href="images/icons/apple-icon-180x180.png">
+    <link rel="icon" type="image/png" sizes="192x192"  href="images/icons/android-icon-192x192.png">
+    <link rel="icon" type="image/png" sizes="32x32" href="images/icons/favicon-32x32.png">
+    <link rel="icon" type="image/png" sizes="96x96" href="images/icons/favicon-96x96.png">
+    <link rel="icon" type="image/png" sizes="16x16" href="images/icons/favicon-16x16.png">
+    <link rel="manifest" href="/manifest.json">
+    <meta name="msapplication-TileColor" content="#ffffff">
+    <meta name="msapplication-TileImage" content="/ms-icon-144x144.png">
+    <meta name="theme-color" content="#ffffff">
+  </head>
+  <body class="accessopolis-bg" ng-app="accessopolisApp">
+  
+  <div class="header  accessopolis-header">
+    <a href="https://github.com/exteso/accessopolis" target="_blank" class="visible-lg"><img style="position: absolute; top: 0; right: 0; border: 0; z-index:150" src="https://camo.githubusercontent.com/52760788cde945287fbb584134c4cbc2bc36f904/68747470733a2f2f73332e616d617a6f6e6177732e636f6d2f6769746875622f726962626f6e732f666f726b6d655f72696768745f77686974655f6666666666662e706e67" alt="Fork me on GitHub" data-canonical-src="https://s3.amazonaws.com/github/ribbons/forkme_right_white_ffffff.png"></a>
+    
+    
+    <div class="container">
+      <div class="col-xs-12 col-md-12 col-sm-12 accessopolis-header-container">
+        <div class="col-xs-8 col-md-8 col-sm-8 col-xs-8 accessopolis-header-logo" >
+          <a class="navbar-brand" href="#/" ><img src="images/logos/accessopolis.png"  alt="Accessopolis"></a>
+          <sup >beta</sup>
+        </div>
+        <div class="col-xs-4 col-md-4 col-sm-4 col-xs-4">
+          <ap-login-status></ap-login-status>
+        </div>
+      </div>
+    </div>
+  </div>
+  
+  
+  
+  
+  <footer class="footer accessopolis-footer accessopolis-bg-white container-fluid" >
+        <!-- Start main sponsor container -->
+        <div class=" accessopolis-bg-blue container-fluid">
+            <h4 class="text-center">CON IL SOSTEGNO DI</h4>
+            <div class="row">
+                <div class="col-xs-3 col-md-2 col-md-offset-1">
+                    <a target="_blank" href="http://www.romulus.ch" class="thumbnail"><img src="images/fr.png" alt="Fondazione Romulus"></a><h5>Fondazione Romulus</h5>
+                </div>
+                <div class="col-xs-3 col-md-2 col-md-offset-1">
+                    <a target="_blank" href="http://www.ersl.ch"  class="thumbnail"><img src="images/ersl.png" alt="Ente Regionale per lo Sviluppo del Luganese"></a><h5>Ente Regionale per lo Sviluppo del Luganese</h5>
+                </div>
+                <div class="col-xs-3 col-md-2 col-md-offset-1">
+                    <a target="_blank" href="http://www.lugano.ch"><img src="images/lvga.png" alt="Città di Lugano"></a><h5>Città di Lugano</h5>
+                </div>
+                <div class="col-xs-3 col-md-2 col-md-offset-1">
+                    <a target="_blank" href="http://www.chiasso.ch" href="images/chiasso.png" alt="Città di Chiasso" class="thumbnail"><img src="images/chiasso.png" alt="Fondazione Romulus"></a><h5>Città di Chiasso</h5>
+                </div>
+            </div>
+        </div>
+
+        <div class="container-fluid">
+          <div class="row accessopolis-footer-attribution">
+              <p class="pull-left">With <span class="glyphicon glyphicon-heart"></span> from the <a href="https://voxxeddays.com/ticino16" target="_blank">Voxxed Days Ticino</a> team and Exteso Sagl</p>
+              <p class="pull-right">Images by <a href="https://www.flickr.com/photos/sozialhelden/">SOZIALHELDEN</a></p>
+          </div>
+        </div>
+    </footer>
+    
+    <script type="application/javascript">
+        window.accessopolis = window.accessopolis || {};
+        function initMap() {
+            window.accessopolis.googleMapReady = true;
+        }
+        function initVideo() {
+            window.accessopolis.videoApiLoaded = true;
+        }
+    </script>
+    <script src="https://ajax.googleapis.com/ajax/libs/angularjs/1.5.0-beta.2/angular.min.js"></script>
+    <script src="https://ajax.googleapis.com/ajax/libs/angularjs/1.5.0-beta.2/angular-route.min.js"></script>
+    <script async defer src="https://maps.googleapis.com/maps/api/js?signed_in=true&libraries=places&key=AIzaSyCbm7ot6UqPk9I7sQVu3Z3PeU7hvwT0pbU&callback=initMap"></script>
+    <script src="https://apis.google.com/js/client.js?onload=initVideo"></script>
+    
+    
+    <script src="bower_components/firebase/firebase.js"></script>
+    <script src="bower_components/angularfire/dist/angularfire.js"></script>
+    
+    <!-- build:js({.tmp,app}) scripts2/scripts.js -->
+    <script src="scripts2/app.js"></script>
+    <script src="scripts2/components/login-status/login-status.js"></script>
+    <!-- endbuild -->
+  </body>
+</html>
