@@ -2,7 +2,9 @@ ap-search-result > div {
   background-color: rgba(255, 255, 255, 0.901961);
   margin-top:14px;
   margin-bottom:14px;
-  height: 150px;
+  min-height: 150px;
+  display:table;
+  width:100%;
 }
 
 ap-search-result > div > div {
@@ -32,6 +34,13 @@ ap-search-result .ap-search-result-icon-container .fa {
 
 ap-search-result .ap-search-result-description {
   display:table-cell;
+  padding-left:16px;
+  cursor:pointer;
+}
+
+ap-search-result .ap-search-result-description a {
+  color:black;
+  text-decoration:none;
 }
 
 

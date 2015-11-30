@@ -13,6 +13,9 @@ angular.module('accessopolisApp', ['ngRoute', 'firebase'])
     $routeProvider
       .when('/', {
         template: '<ap-search-box></ap-search-box>'
+      }).
+      when('/location/:identifier', {
+        template: '<ap-location></ap-location>'
       });
   
   }])
