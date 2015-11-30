@@ -8,9 +8,13 @@ angular.module('accessopolisApp', ['ngRoute', 'firebase'])
   //firebase related conf
   .constant('FBURL', 'https://accessopolis-dev.firebaseio.com')
   .constant('SIMPLE_LOGIN_PROVIDERS', ['google'])
-  .constant('loginRedirectPath', '/login')
   
   .config(['$routeProvider', function($routeProvider) {
+    $routeProvider
+      .when('/', {
+        template: '<ap-search-box></ap-search-box>'
+      });
+  
   }])
   
   

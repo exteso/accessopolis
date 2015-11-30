@@ -1,0 +1,10 @@
+ap-search-result-list div.row > ul {
+  margin:0;
+  padding:0;
+}
+
+ap-search-result-list div.row  > ul > li {
+  margin:0;
+  padding:0;
+  list-style-type:none;
+}
