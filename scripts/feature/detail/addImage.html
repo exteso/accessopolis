@@ -1,0 +1,27 @@
+<form >
+<div class="modal-header">
+    <h3 class="modal-title">New Image</h3>
+</div>
+<div class="modal-body" ng-init="ctrl.files={}">
+
+        <div class="form-group">
+            <label data-translate >accessopolis.location.type</label>
+            <select ng-options="imageType for imageType in ctrl.imagesType" class="form-control" data-ng-model="ctrl.imageUpload.imageType"></select>
+        </div>
+
+        <div class="form-group">
+            <label data-translate for="imageDesc">accessopolis.location.description</label>
+            <textarea id="imageDesc" class="form-control"  data-ng-model="ctrl.imageUpload.description"></textarea>
+        </div>
+
+        <div class="form-group" ng-show="ctrl.imageUpload">
+             <item-upload save-in-db="ctrl.addImage" accept="image/*" files="ctrl.files"></item-upload>
+        </div>
+</div>
+<div class="modal-footer">
+    <button ng-click="$close()" class="btn btn-secondary" data-translate>accessopolis.cancel</button>
+    <button ng-click="$close()" class="btn btn-primary" ng-disabled="ctrl.files.filesToUpload  === undefined">Done</button>
+
+</div>
+
+</form>
