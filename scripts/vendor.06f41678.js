@@ -9210,7 +9210,7 @@ return jQuery;
 }));
 
 /**
- * @license AngularJS v1.4.6
+ * @license AngularJS v1.4.8
  * (c) 2010-2015 Google, Inc. http://angularjs.org
  * License: MIT
  */
@@ -9268,7 +9268,7 @@ function minErr(module, ErrorConstructor) {
       return match;
     });
 
-    message += '\nhttp://errors.angularjs.org/1.4.6/' +
+    message += '\nhttp://errors.angularjs.org/1.4.8/' +
       (module ? module + '/' : '') + code;
 
     for (i = SKIP_INDEXES, paramPrefix = '?'; i < templateArgs.length; i++, paramPrefix = '&') {
@@ -9478,20 +9478,24 @@ msie = document.documentMode;
  *                   String ...)
  */
 function isArrayLike(obj) {
-  if (obj == null || isWindow(obj)) {
-    return false;
-  }
+
+  // `null`, `undefined` and `window` are not array-like
+  if (obj == null || isWindow(obj)) return false;
+
+  // arrays, strings and jQuery/jqLite objects are array like
+  // * jqLite is either the jQuery or jqLite constructor function
+  // * we have to check the existance of jqLite first as this method is called
+  //   via the forEach method when constructing the jqLite object in the first place
+  if (isArray(obj) || isString(obj) || (jqLite && obj instanceof jqLite)) return true;
 
   // Support: iOS 8.2 (not reproducible in simulator)
   // "length" in obj used to prevent JIT error (gh-11508)
   var length = "length" in Object(obj) && obj.length;
 
-  if (obj.nodeType === NODE_TYPE_ELEMENT && length) {
-    return true;
-  }
-
-  return isString(obj) || isArray(obj) || length === 0 ||
-         typeof length === 'number' && length > 0 && (length - 1) in obj;
+  // NodeList objects (with `item` method) and
+  // other objects with suitable length characteristics are array-like
+  return isNumber(length) &&
+    (length >= 0 && (length - 1) in obj || typeof obj.item == 'function');
 }
 
 /**
@@ -9636,6 +9640,10 @@ function baseExtend(dst, objs, deep) {
           dst[key] = new Date(src.valueOf());
         } else if (isRegExp(src)) {
           dst[key] = new RegExp(src);
+        } else if (src.nodeName) {
+          dst[key] = src.cloneNode(true);
+        } else if (isElement(src)) {
+          dst[key] = src.clone();
         } else {
           if (!isObject(dst[key])) dst[key] = isArray(src) ? [] : {};
           baseExtend(dst[key], [src], true);
@@ -9751,7 +9759,7 @@ identity.$inject = [];
 function valueFn(value) {return function() {return value;};}
 
 function hasCustomToString(obj) {
-  return isFunction(obj.toString) && obj.toString !== Object.prototype.toString;
+  return isFunction(obj.toString) && obj.toString !== toString;
 }
 
 
@@ -9950,9 +9958,9 @@ function isPromiseLike(obj) {
 }
 
 
-var TYPED_ARRAY_REGEXP = /^\[object (Uint8(Clamped)?)|(Uint16)|(Uint32)|(Int8)|(Int16)|(Int32)|(Float(32)|(64))Array\]$/;
+var TYPED_ARRAY_REGEXP = /^\[object (?:Uint8|Uint8Clamped|Uint16|Uint32|Int8|Int16|Int32|Float32|Float64)Array\]$/;
 function isTypedArray(value) {
-  return TYPED_ARRAY_REGEXP.test(toString.call(value));
+  return value && isNumber(value.length) && TYPED_ARRAY_REGEXP.test(toString.call(value));
 }
 
 
@@ -10074,100 +10082,111 @@ function arrayRemove(array, value) {
  </file>
  </example>
  */
-function copy(source, destination, stackSource, stackDest) {
-  if (isWindow(source) || isScope(source)) {
-    throw ngMinErr('cpws',
-      "Can't copy! Making copies of Window or Scope instances is not supported.");
-  }
-  if (isTypedArray(destination)) {
-    throw ngMinErr('cpta',
-      "Can't copy! TypedArray destination cannot be mutated.");
-  }
+function copy(source, destination) {
+  var stackSource = [];
+  var stackDest = [];
 
-  if (!destination) {
-    destination = source;
-    if (isObject(source)) {
-      var index;
-      if (stackSource && (index = stackSource.indexOf(source)) !== -1) {
-        return stackDest[index];
-      }
-
-      // TypedArray, Date and RegExp have specific copy functionality and must be
-      // pushed onto the stack before returning.
-      // Array and other objects create the base object and recurse to copy child
-      // objects. The array/object will be pushed onto the stack when recursed.
-      if (isArray(source)) {
-        return copy(source, [], stackSource, stackDest);
-      } else if (isTypedArray(source)) {
-        destination = new source.constructor(source);
-      } else if (isDate(source)) {
-        destination = new Date(source.getTime());
-      } else if (isRegExp(source)) {
-        destination = new RegExp(source.source, source.toString().match(/[^\/]*$/)[0]);
-        destination.lastIndex = source.lastIndex;
-      } else if (isFunction(source.cloneNode)) {
-          destination = source.cloneNode(true);
-      } else {
-        var emptyObject = Object.create(getPrototypeOf(source));
-        return copy(source, emptyObject, stackSource, stackDest);
-      }
-
-      if (stackDest) {
-        stackSource.push(source);
-        stackDest.push(destination);
-      }
+  if (destination) {
+    if (isTypedArray(destination)) {
+      throw ngMinErr('cpta', "Can't copy! TypedArray destination cannot be mutated.");
     }
-  } else {
-    if (source === destination) throw ngMinErr('cpi',
-      "Can't copy! Source and destination are identical.");
-
-    stackSource = stackSource || [];
-    stackDest = stackDest || [];
-
-    if (isObject(source)) {
-      stackSource.push(source);
-      stackDest.push(destination);
+    if (source === destination) {
+      throw ngMinErr('cpi', "Can't copy! Source and destination are identical.");
     }
 
+    // Empty the destination object
+    if (isArray(destination)) {
+      destination.length = 0;
+    } else {
+      forEach(destination, function(value, key) {
+        if (key !== '$$hashKey') {
+          delete destination[key];
+        }
+      });
+    }
+
+    stackSource.push(source);
+    stackDest.push(destination);
+    return copyRecurse(source, destination);
+  }
+
+  return copyElement(source);
+
+  function copyRecurse(source, destination) {
+    var h = destination.$$hashKey;
     var result, key;
     if (isArray(source)) {
-      destination.length = 0;
-      for (var i = 0; i < source.length; i++) {
-        destination.push(copy(source[i], null, stackSource, stackDest));
+      for (var i = 0, ii = source.length; i < ii; i++) {
+        destination.push(copyElement(source[i]));
+      }
+    } else if (isBlankObject(source)) {
+      // createMap() fast path --- Safe to avoid hasOwnProperty check because prototype chain is empty
+      for (key in source) {
+        destination[key] = copyElement(source[key]);
+      }
+    } else if (source && typeof source.hasOwnProperty === 'function') {
+      // Slow path, which must rely on hasOwnProperty
+      for (key in source) {
+        if (source.hasOwnProperty(key)) {
+          destination[key] = copyElement(source[key]);
+        }
       }
     } else {
-      var h = destination.$$hashKey;
-      if (isArray(destination)) {
-        destination.length = 0;
-      } else {
-        forEach(destination, function(value, key) {
-          delete destination[key];
-        });
-      }
-      if (isBlankObject(source)) {
-        // createMap() fast path --- Safe to avoid hasOwnProperty check because prototype chain is empty
-        for (key in source) {
-          destination[key] = copy(source[key], null, stackSource, stackDest);
-        }
-      } else if (source && typeof source.hasOwnProperty === 'function') {
-        // Slow path, which must rely on hasOwnProperty
-        for (key in source) {
-          if (source.hasOwnProperty(key)) {
-            destination[key] = copy(source[key], null, stackSource, stackDest);
-          }
-        }
-      } else {
-        // Slowest path --- hasOwnProperty can't be called as a method
-        for (key in source) {
-          if (hasOwnProperty.call(source, key)) {
-            destination[key] = copy(source[key], null, stackSource, stackDest);
-          }
+      // Slowest path --- hasOwnProperty can't be called as a method
+      for (key in source) {
+        if (hasOwnProperty.call(source, key)) {
+          destination[key] = copyElement(source[key]);
         }
       }
-      setHashKey(destination,h);
     }
+    setHashKey(destination, h);
+    return destination;
   }
-  return destination;
+
+  function copyElement(source) {
+    // Simple values
+    if (!isObject(source)) {
+      return source;
+    }
+
+    // Already copied values
+    var index = stackSource.indexOf(source);
+    if (index !== -1) {
+      return stackDest[index];
+    }
+
+    if (isWindow(source) || isScope(source)) {
+      throw ngMinErr('cpws',
+        "Can't copy! Making copies of Window or Scope instances is not supported.");
+    }
+
+    var needsRecurse = false;
+    var destination;
+
+    if (isArray(source)) {
+      destination = [];
+      needsRecurse = true;
+    } else if (isTypedArray(source)) {
+      destination = new source.constructor(source);
+    } else if (isDate(source)) {
+      destination = new Date(source.getTime());
+    } else if (isRegExp(source)) {
+      destination = new RegExp(source.source, source.toString().match(/[^\/]*$/)[0]);
+      destination.lastIndex = source.lastIndex;
+    } else if (isFunction(source.cloneNode)) {
+        destination = source.cloneNode(true);
+    } else {
+      destination = Object.create(getPrototypeOf(source));
+      needsRecurse = true;
+    }
+
+    stackSource.push(source);
+    stackDest.push(destination);
+
+    return needsRecurse
+      ? copyRecurse(source, destination)
+      : destination;
+  }
 }
 
 /**
@@ -11291,7 +11310,7 @@ function setupModuleLoader(window) {
            * @param {string} name constant name
            * @param {*} object Constant value.
            * @description
-           * Because the constant are fixed, they get applied before other provide methods.
+           * Because the constants are fixed, they get applied before other provide methods.
            * See {@link auto.$provide#constant $provide.constant()}.
            */
           constant: invokeLater('$provide', 'constant', 'unshift'),
@@ -11552,6 +11571,7 @@ function toDebugString(obj) {
   $HttpParamSerializerProvider,
   $HttpParamSerializerJQLikeProvider,
   $HttpBackendProvider,
+  $xhrFactoryProvider,
   $LocationProvider,
   $LogProvider,
   $ParseProvider,
@@ -11589,11 +11609,11 @@ function toDebugString(obj) {
  * - `codeName` – `{string}` – Code name of the release, such as "jiggling-armfat".
  */
 var version = {
-  full: '1.4.6',    // all of these placeholder strings will be replaced by grunt's
+  full: '1.4.8',    // all of these placeholder strings will be replaced by grunt's
   major: 1,    // package task
   minor: 4,
-  dot: 6,
-  codeName: 'multiplicative-elevation'
+  dot: 8,
+  codeName: 'ice-manipulation'
 };
 
 
@@ -11710,6 +11730,7 @@ function publishExternalAPI(angular) {
         $httpParamSerializer: $HttpParamSerializerProvider,
         $httpParamSerializerJQLike: $HttpParamSerializerJQLikeProvider,
         $httpBackend: $HttpBackendProvider,
+        $xhrFactory: $xhrFactoryProvider,
         $location: $LocationProvider,
         $log: $LogProvider,
         $parse: $ParseProvider,
@@ -11884,10 +11905,10 @@ function camelCase(name) {
     replace(MOZ_HACK_REGEXP, 'Moz$1');
 }
 
-var SINGLE_TAG_REGEXP = /^<(\w+)\s*\/?>(?:<\/\1>|)$/;
+var SINGLE_TAG_REGEXP = /^<([\w-]+)\s*\/?>(?:<\/\1>|)$/;
 var HTML_REGEXP = /<|&#?\w+;/;
-var TAG_NAME_REGEXP = /<([\w:]+)/;
-var XHTML_TAG_REGEXP = /<(?!area|br|col|embed|hr|img|input|link|meta|param)(([\w:]+)[^>]*)\/>/gi;
+var TAG_NAME_REGEXP = /<([\w:-]+)/;
+var XHTML_TAG_REGEXP = /<(?!area|br|col|embed|hr|img|input|link|meta|param)(([\w:-]+)[^>]*)\/>/gi;
 
 var wrapMap = {
   'option': [1, '<select multiple="multiple">', '</select>'],
@@ -11974,6 +11995,14 @@ function jqLiteParseHTML(html, context) {
   return [];
 }
 
+
+// IE9-11 has no method "contains" in SVG element and in Node.prototype. Bug #10259.
+var jqLiteContains = Node.prototype.contains || function(arg) {
+  // jshint bitwise: false
+  return !!(this.compareDocumentPosition(arg) & 16);
+  // jshint bitwise: true
+};
+
 /////////////////////////////////////////////
 function JQLite(element) {
   if (element instanceof JQLite) {
@@ -12032,17 +12061,23 @@ function jqLiteOff(element, type, fn, unsupported) {
       delete events[type];
     }
   } else {
-    forEach(type.split(' '), function(type) {
-      if (isDefined(fn)) {
-        var listenerFns = events[type];
-        arrayRemove(listenerFns || [], fn);
-        if (listenerFns && listenerFns.length > 0) {
-          return;
-        }
-      }
 
-      removeEventListenerFn(element, type, handle);
-      delete events[type];
+    var removeHandler = function(type) {
+      var listenerFns = events[type];
+      if (isDefined(fn)) {
+        arrayRemove(listenerFns || [], fn);
+      }
+      if (!(isDefined(fn) && listenerFns && listenerFns.length > 0)) {
+        removeEventListenerFn(element, type, handle);
+        delete events[type];
+      }
+    };
+
+    forEach(type.split(' '), function(type) {
+      removeHandler(type);
+      if (MOUSE_EVENT_MAP[type]) {
+        removeHandler(MOUSE_EVENT_MAP[type]);
+      }
     });
   }
 }
@@ -12497,6 +12532,9 @@ function createEventHandler(element, events) {
       return event.immediatePropagationStopped === true;
     };
 
+    // Some events have special handlers that wrap the real handler
+    var handlerWrapper = eventFns.specialHandlerWrapper || defaultHandlerWrapper;
+
     // Copy event handlers in case event handlers array is modified during execution.
     if ((eventFnsLength > 1)) {
       eventFns = shallowCopy(eventFns);
@@ -12504,7 +12542,7 @@ function createEventHandler(element, events) {
 
     for (var i = 0; i < eventFnsLength; i++) {
       if (!event.isImmediatePropagationStopped()) {
-        eventFns[i].call(element, event);
+        handlerWrapper(element, event, eventFns[i]);
       }
     }
   };
@@ -12513,6 +12551,22 @@ function createEventHandler(element, events) {
   //       events on `element`
   eventHandler.elem = element;
   return eventHandler;
+}
+
+function defaultHandlerWrapper(element, event, handler) {
+  handler.call(element, event);
+}
+
+function specialMouseHandlerWrapper(target, event, handler) {
+  // Refer to jQuery's implementation of mouseenter & mouseleave
+  // Read about mouseenter and mouseleave:
+  // http://www.quirksmode.org/js/events_mouse.html#link8
+  var related = event.relatedTarget;
+  // For mousenter/leave call the handler if related is outside the target.
+  // NB: No relatedTarget if the mouse left/entered the browser window
+  if (!related || (related !== target && !jqLiteContains.call(target, related))) {
+    handler.call(target, event);
+  }
 }
 
 //////////////////////////////////////////
@@ -12543,35 +12597,28 @@ forEach({
     var types = type.indexOf(' ') >= 0 ? type.split(' ') : [type];
     var i = types.length;
 
-    while (i--) {
-      type = types[i];
+    var addHandler = function(type, specialHandlerWrapper, noEventListener) {
       var eventFns = events[type];
 
       if (!eventFns) {
-        events[type] = [];
-
-        if (type === 'mouseenter' || type === 'mouseleave') {
-          // Refer to jQuery's implementation of mouseenter & mouseleave
-          // Read about mouseenter and mouseleave:
-          // http://www.quirksmode.org/js/events_mouse.html#link8
-
-          jqLiteOn(element, MOUSE_EVENT_MAP[type], function(event) {
-            var target = this, related = event.relatedTarget;
-            // For mousenter/leave call the handler if related is outside the target.
-            // NB: No relatedTarget if the mouse left/entered the browser window
-            if (!related || (related !== target && !target.contains(related))) {
-              handle(event, type);
-            }
-          });
-
-        } else {
-          if (type !== '$destroy') {
-            addEventListenerFn(element, type, handle);
-          }
+        eventFns = events[type] = [];
+        eventFns.specialHandlerWrapper = specialHandlerWrapper;
+        if (type !== '$destroy' && !noEventListener) {
+          addEventListenerFn(element, type, handle);
         }
-        eventFns = events[type];
       }
+
       eventFns.push(fn);
+    };
+
+    while (i--) {
+      type = types[i];
+      if (MOUSE_EVENT_MAP[type]) {
+        addHandler(MOUSE_EVENT_MAP[type], specialMouseHandlerWrapper);
+        addHandler(type, undefined, true);
+      } else {
+        addHandler(type);
+      }
     }
   },
 
@@ -13752,7 +13799,7 @@ function $AnchorScrollProvider() {
    * When called, it scrolls to the element related to the specified `hash` or (if omitted) to the
    * current value of {@link ng.$location#hash $location.hash()}, according to the rules specified
    * in the
-   * [HTML5 spec](http://dev.w3.org/html5/spec/Overview.html#the-indicated-part-of-the-document).
+   * [HTML5 spec](http://www.w3.org/html/wg/drafts/html/master/browsers.html#the-indicated-part-of-the-document).
    *
    * It also watches the {@link ng.$location#hash $location.hash()} and automatically scrolls to
    * match any anchor whenever it changes. This can be disabled by calling
@@ -14267,7 +14314,7 @@ var $AnimateProvider = ['$provide', function($provide) {
      * when an animation is detected (and animations are enabled), $animate will do the heavy lifting
      * to ensure that animation runs with the triggered DOM operation.
      *
-     * By default $animate doesn't trigger an animations. This is because the `ngAnimate` module isn't
+     * By default $animate doesn't trigger any animations. This is because the `ngAnimate` module isn't
      * included and only when it is active then the animation hooks that `$animate` triggers will be
      * functional. Once active then all structural `ng-` directives will trigger animations as they perform
      * their DOM-related operations (enter, leave and move). Other directives such as `ngClass`,
@@ -14619,6 +14666,13 @@ var $CoreAnimateCssProvider = function() {
     };
 
     return function(element, options) {
+      // there is no point in applying the styles since
+      // there is no animation that goes on at all in
+      // this version of $animateCss.
+      if (options.cleanupStyles) {
+        options.from = options.to = null;
+      }
+
       if (options.from) {
         element.css(options.from);
         options.from = null;
@@ -15086,10 +15140,10 @@ function $BrowserProvider() {
            $scope.keys = [];
            $scope.cache = $cacheFactory('cacheId');
            $scope.put = function(key, value) {
-             if (isUndefined($scope.cache.get(key))) {
+             if (angular.isUndefined($scope.cache.get(key))) {
                $scope.keys.push(key);
              }
-             $scope.cache.put(key, isUndefined(value) ? null : value);
+             $scope.cache.put(key, angular.isUndefined(value) ? null : value);
            };
          }]);
      </file>
@@ -15112,9 +15166,9 @@ function $CacheFactoryProvider() {
 
       var size = 0,
           stats = extend({}, options, {id: cacheId}),
-          data = {},
+          data = createMap(),
           capacity = (options && options.capacity) || Number.MAX_VALUE,
-          lruHash = {},
+          lruHash = createMap(),
           freshEnd = null,
           staleEnd = null;
 
@@ -15242,6 +15296,8 @@ function $CacheFactoryProvider() {
             delete lruHash[key];
           }
 
+          if (!(key in data)) return;
+
           delete data[key];
           size--;
         },
@@ -15256,9 +15312,9 @@ function $CacheFactoryProvider() {
          * Clears the cache object of any entries.
          */
         removeAll: function() {
-          data = {};
+          data = createMap();
           size = 0;
-          lruHash = {};
+          lruHash = createMap();
           freshEnd = staleEnd = null;
         },
 
@@ -16659,6 +16715,7 @@ function $CompileProvider($provide, $$sanitizeUriProvider) {
               return template.replace(/\{\{/g, startSymbol).replace(/}}/g, endSymbol);
         },
         NG_ATTR_BINDING = /^ngAttr[A-Z]/;
+    var MULTI_ELEMENT_DIR_RE = /^(.+)Start$/;
 
     compile.$$addBindingInfo = debugInfoEnabled ? function $$addBindingInfo($element, binding) {
       var bindings = $element.data('$binding') || [];
@@ -16710,6 +16767,14 @@ function $CompileProvider($provide, $$sanitizeUriProvider) {
       var namespace = null;
       return function publicLinkFn(scope, cloneConnectFn, options) {
         assertArg(scope, 'scope');
+
+        if (previousCompileContext && previousCompileContext.needsNewScope) {
+          // A parent directive did a replace and a directive on this element asked
+          // for transclusion, which caused us to lose a layer of element on which
+          // we could hold the new transclusion scope, so we will create it manually
+          // here.
+          scope = scope.$parent.$new();
+        }
 
         options = options || {};
         var parentBoundTranscludeFn = options.parentBoundTranscludeFn,
@@ -16856,11 +16921,6 @@ function $CompileProvider($provide, $$sanitizeUriProvider) {
             if (nodeLinkFn.scope) {
               childScope = scope.$new();
               compile.$$addScopeInfo(jqLite(node), childScope);
-              var destroyBindings = nodeLinkFn.$$destroyBindings;
-              if (destroyBindings) {
-                nodeLinkFn.$$destroyBindings = null;
-                childScope.$on('$destroyed', destroyBindings);
-              }
             } else {
               childScope = scope;
             }
@@ -16879,8 +16939,7 @@ function $CompileProvider($provide, $$sanitizeUriProvider) {
               childBoundTranscludeFn = null;
             }
 
-            nodeLinkFn(childLinkFn, childScope, node, $rootElement, childBoundTranscludeFn,
-                       nodeLinkFn);
+            nodeLinkFn(childLinkFn, childScope, node, $rootElement, childBoundTranscludeFn);
 
           } else if (childLinkFn) {
             childLinkFn(scope, node.childNodes, undefined, parentBoundTranscludeFn);
@@ -16949,13 +17008,11 @@ function $CompileProvider($provide, $$sanitizeUriProvider) {
                 });
             }
 
-            var directiveNName = ngAttrName.replace(/(Start|End)$/, '');
-            if (directiveIsMultiElement(directiveNName)) {
-              if (ngAttrName === directiveNName + 'Start') {
-                attrStartName = name;
-                attrEndName = name.substr(0, name.length - 5) + 'end';
-                name = name.substr(0, name.length - 6);
-              }
+            var multiElementMatch = ngAttrName.match(MULTI_ELEMENT_DIR_RE);
+            if (multiElementMatch && directiveIsMultiElement(multiElementMatch[1])) {
+              attrStartName = name;
+              attrEndName = name.substr(0, name.length - 5) + 'end';
+              name = name.substr(0, name.length - 6);
             }
 
             nName = directiveNormalize(name.toLowerCase());
@@ -17194,7 +17251,8 @@ function $CompileProvider($provide, $$sanitizeUriProvider) {
           } else {
             $template = jqLite(jqLiteClone(compileNode)).contents();
             $compileNode.empty(); // clear contents
-            childTranscludeFn = compile($template, transcludeFn);
+            childTranscludeFn = compile($template, transcludeFn, undefined,
+                undefined, { needsNewScope: directive.$$isolateScope || directive.$$newScope});
           }
         }
 
@@ -17236,8 +17294,11 @@ function $CompileProvider($provide, $$sanitizeUriProvider) {
             var templateDirectives = collectDirectives(compileNode, [], newTemplateAttrs);
             var unprocessedDirectives = directives.splice(i + 1, directives.length - (i + 1));
 
-            if (newIsolateScopeDirective) {
-              markDirectivesAsIsolate(templateDirectives);
+            if (newIsolateScopeDirective || newScopeDirective) {
+              // The original directive caused the current element to be replaced but this element
+              // also needs to have a new scope, so we need to tell the template directives
+              // that they would need to get their scope from further up, if they require transclusion
+              markDirectiveScope(templateDirectives, newIsolateScopeDirective, newScopeDirective);
             }
             directives = directives.concat(templateDirectives).concat(unprocessedDirectives);
             mergeTemplateAttributes(templateAttrs, newTemplateAttrs);
@@ -17390,10 +17451,9 @@ function $CompileProvider($provide, $$sanitizeUriProvider) {
         return elementControllers;
       }
 
-      function nodeLinkFn(childLinkFn, scope, linkNode, $rootElement, boundTranscludeFn,
-                          thisLinkFn) {
-        var i, ii, linkFn, controller, isolateScope, elementControllers, transcludeFn, $element,
-            attrs;
+      function nodeLinkFn(childLinkFn, scope, linkNode, $rootElement, boundTranscludeFn) {
+        var linkFn, isolateScope, controllerScope, elementControllers, transcludeFn, $element,
+            attrs, removeScopeBindingWatches, removeControllerBindingWatches;
 
         if (compileNode === linkNode) {
           attrs = templateAttrs;
@@ -17403,8 +17463,11 @@ function $CompileProvider($provide, $$sanitizeUriProvider) {
           attrs = new Attributes($element, templateAttrs);
         }
 
+        controllerScope = scope;
         if (newIsolateScopeDirective) {
           isolateScope = scope.$new(true);
+        } else if (newScopeDirective) {
+          controllerScope = scope.$parent;
         }
 
         if (boundTranscludeFn) {
@@ -17425,42 +17488,34 @@ function $CompileProvider($provide, $$sanitizeUriProvider) {
           compile.$$addScopeClass($element, true);
           isolateScope.$$isolateBindings =
               newIsolateScopeDirective.$$isolateBindings;
-          initializeDirectiveBindings(scope, attrs, isolateScope,
-                                      isolateScope.$$isolateBindings,
-                                      newIsolateScopeDirective, isolateScope);
-        }
-        if (elementControllers) {
-          // Initialize bindToController bindings for new/isolate scopes
-          var scopeDirective = newIsolateScopeDirective || newScopeDirective;
-          var bindings;
-          var controllerForBindings;
-          if (scopeDirective && elementControllers[scopeDirective.name]) {
-            bindings = scopeDirective.$$bindings.bindToController;
-            controller = elementControllers[scopeDirective.name];
-
-            if (controller && controller.identifier && bindings) {
-              controllerForBindings = controller;
-              thisLinkFn.$$destroyBindings =
-                  initializeDirectiveBindings(scope, attrs, controller.instance,
-                                              bindings, scopeDirective);
-            }
+          removeScopeBindingWatches = initializeDirectiveBindings(scope, attrs, isolateScope,
+                                        isolateScope.$$isolateBindings,
+                                        newIsolateScopeDirective);
+          if (removeScopeBindingWatches) {
+            isolateScope.$on('$destroy', removeScopeBindingWatches);
           }
-          for (i in elementControllers) {
-            controller = elementControllers[i];
-            var controllerResult = controller();
+        }
 
-            if (controllerResult !== controller.instance) {
-              // If the controller constructor has a return value, overwrite the instance
-              // from setupControllers and update the element data
-              controller.instance = controllerResult;
-              $element.data('$' + i + 'Controller', controllerResult);
-              if (controller === controllerForBindings) {
-                // Remove and re-install bindToController bindings
-                thisLinkFn.$$destroyBindings();
-                thisLinkFn.$$destroyBindings =
-                  initializeDirectiveBindings(scope, attrs, controllerResult, bindings, scopeDirective);
-              }
-            }
+        // Initialize bindToController bindings
+        for (var name in elementControllers) {
+          var controllerDirective = controllerDirectives[name];
+          var controller = elementControllers[name];
+          var bindings = controllerDirective.$$bindings.bindToController;
+
+          if (controller.identifier && bindings) {
+            removeControllerBindingWatches =
+              initializeDirectiveBindings(controllerScope, attrs, controller.instance, bindings, controllerDirective);
+          }
+
+          var controllerResult = controller();
+          if (controllerResult !== controller.instance) {
+            // If the controller constructor has a return value, overwrite the instance
+            // from setupControllers
+            controller.instance = controllerResult;
+            $element.data('$' + controllerDirective.name + 'Controller', controllerResult);
+            removeControllerBindingWatches && removeControllerBindingWatches();
+            removeControllerBindingWatches =
+              initializeDirectiveBindings(controllerScope, attrs, controller.instance, bindings, controllerDirective);
           }
         }
 
@@ -17520,10 +17575,15 @@ function $CompileProvider($provide, $$sanitizeUriProvider) {
       }
     }
 
-    function markDirectivesAsIsolate(directives) {
-      // mark all directives as needing isolate scope.
+    // Depending upon the context in which a directive finds itself it might need to have a new isolated
+    // or child scope created. For instance:
+    // * if the directive has been pulled into a template because another directive with a higher priority
+    // asked for element transclusion
+    // * if the directive itself asks for transclusion but it is at the root of a template and the original
+    // element was replaced. See https://github.com/angular/angular.js/issues/12936
+    function markDirectiveScope(directives, isolateScope, newScope) {
       for (var j = 0, jj = directives.length; j < jj; j++) {
-        directives[j] = inherit(directives[j], {$$isolateScope: true});
+        directives[j] = inherit(directives[j], {$$isolateScope: isolateScope, $$newScope: newScope});
       }
     }
 
@@ -17670,7 +17730,9 @@ function $CompileProvider($provide, $$sanitizeUriProvider) {
             var templateDirectives = collectDirectives(compileNode, [], tempTemplateAttrs);
 
             if (isObject(origAsyncDirective.scope)) {
-              markDirectivesAsIsolate(templateDirectives);
+              // the original directive that caused the template to be loaded async required
+              // an isolate scope
+              markDirectiveScope(templateDirectives, true);
             }
             directives = templateDirectives.concat(directives);
             mergeTemplateAttributes(tAttrs, tempTemplateAttrs);
@@ -17719,7 +17781,7 @@ function $CompileProvider($provide, $$sanitizeUriProvider) {
               childBoundTranscludeFn = boundTranscludeFn;
             }
             afterTemplateNodeLinkFn(afterTemplateChildLinkFn, scope, linkNode, $rootElement,
-              childBoundTranscludeFn, afterTemplateNodeLinkFn);
+              childBoundTranscludeFn);
           }
           linkQueue = null;
         });
@@ -17736,8 +17798,7 @@ function $CompileProvider($provide, $$sanitizeUriProvider) {
           if (afterTemplateNodeLinkFn.transcludeOnThisElement) {
             childBoundTranscludeFn = createBoundTranscludeFn(scope, afterTemplateNodeLinkFn.transclude, boundTranscludeFn);
           }
-          afterTemplateNodeLinkFn(afterTemplateChildLinkFn, scope, node, rootElement, childBoundTranscludeFn,
-                                  afterTemplateNodeLinkFn);
+          afterTemplateNodeLinkFn(afterTemplateChildLinkFn, scope, node, rootElement, childBoundTranscludeFn);
         }
       };
     }
@@ -17846,7 +17907,7 @@ function $CompileProvider($provide, $$sanitizeUriProvider) {
         compile: function() {
             return {
               pre: function attrInterpolatePreLinkFn(scope, element, attr) {
-                var $$observers = (attr.$$observers || (attr.$$observers = {}));
+                var $$observers = (attr.$$observers || (attr.$$observers = createMap()));
 
                 if (EVENT_HANDLER_ATTR_REGEXP.test(name)) {
                   throw $compileMinErr('nodomevents',
@@ -17949,7 +18010,7 @@ function $CompileProvider($provide, $$sanitizeUriProvider) {
         // Copy over user data (that includes Angular's $scope etc.). Don't copy private
         // data here because there's no public interface in jQuery to do that and copying over
         // event listeners (which is the main use of private data) wouldn't work anyway.
-        jqLite(newNode).data(jqLite(firstElementToRemove).data());
+        jqLite.data(newNode, jqLite.data(firstElementToRemove));
 
         // Remove data of the replaced element. We cannot just call .remove()
         // on the element it since that would deallocate scope that is needed
@@ -17997,9 +18058,8 @@ function $CompileProvider($provide, $$sanitizeUriProvider) {
 
     // Set up $watches for isolate scope and controller bindings. This process
     // only occurs for isolate scopes and new scopes with controllerAs.
-    function initializeDirectiveBindings(scope, attrs, destination, bindings,
-                                         directive, newScope) {
-      var onNewScopeDestroyed;
+    function initializeDirectiveBindings(scope, attrs, destination, bindings, directive) {
+      var removeWatchCollection = [];
       forEach(bindings, function(definition, scopeName) {
         var attrName = definition.attrName,
         optional = definition.optional,
@@ -18061,14 +18121,13 @@ function $CompileProvider($provide, $$sanitizeUriProvider) {
               return lastValue = parentValue;
             };
             parentValueWatch.$stateful = true;
-            var unwatch;
+            var removeWatch;
             if (definition.collection) {
-              unwatch = scope.$watchCollection(attrs[attrName], parentValueWatch);
+              removeWatch = scope.$watchCollection(attrs[attrName], parentValueWatch);
             } else {
-              unwatch = scope.$watch($parse(attrs[attrName], parentValueWatch), null, parentGet.literal);
+              removeWatch = scope.$watch($parse(attrs[attrName], parentValueWatch), null, parentGet.literal);
             }
-            onNewScopeDestroyed = (onNewScopeDestroyed || []);
-            onNewScopeDestroyed.push(unwatch);
+            removeWatchCollection.push(removeWatch);
             break;
 
           case '&':
@@ -18084,16 +18143,12 @@ function $CompileProvider($provide, $$sanitizeUriProvider) {
             break;
         }
       });
-      var destroyBindings = onNewScopeDestroyed ? function destroyBindings() {
-        for (var i = 0, ii = onNewScopeDestroyed.length; i < ii; ++i) {
-          onNewScopeDestroyed[i]();
+
+      return removeWatchCollection.length && function removeWatches() {
+        for (var i = 0, ii = removeWatchCollection.length; i < ii; ++i) {
+          removeWatchCollection[i]();
         }
-      } : noop;
-      if (newScope && destroyBindings !== noop) {
-        newScope.$on('$destroy', destroyBindings);
-        return noop;
-      }
-      return destroyBindings;
+      };
     }
   }];
 }
@@ -18818,9 +18873,9 @@ function $HttpProvider() {
    * Configure `$http` service to return promises without the shorthand methods `success` and `error`.
    * This should be used to make sure that applications work without these methods.
    *
-   * Defaults to false. If no value is specified, returns the current configured value.
+   * Defaults to true. If no value is specified, returns the current configured value.
    *
-   * @param {boolean=} value If true, `$http` will return a normal promise without the `success` and `error` methods.
+   * @param {boolean=} value If true, `$http` will return a promise with the deprecated legacy `success` and `error` methods.
    *
    * @returns {boolean|Object} If a value is specified, returns the $httpProvider for chaining.
    *    otherwise, returns the current configured value.
@@ -18898,28 +18953,18 @@ function $HttpProvider() {
      *
      *
      * ## General usage
-     * The `$http` service is a function which takes a single argument — a configuration object —
+     * The `$http` service is a function which takes a single argument — a {@link $http#usage configuration object} —
      * that is used to generate an HTTP request and returns  a {@link ng.$q promise}.
      *
      * ```js
-     *   // Simple GET request example :
-     *   $http.get('/someUrl').
-     *     then(function(response) {
+     *   // Simple GET request example:
+     *   $http({
+     *     method: 'GET',
+     *     url: '/someUrl'
+     *   }).then(function successCallback(response) {
      *       // this callback will be called asynchronously
      *       // when the response is available
-     *     }, function(response) {
-     *       // called asynchronously if an error occurs
-     *       // or server returns response with an error status.
-     *     });
-     * ```
-     *
-     * ```js
-     *   // Simple POST request example (passing data) :
-     *   $http.post('/someUrl', {msg:'hello word!'}).
-     *     then(function(response) {
-     *       // this callback will be called asynchronously
-     *       // when the response is available
-     *     }, function(response) {
+     *     }, function errorCallback(response) {
      *       // called asynchronously if an error occurs
      *       // or server returns response with an error status.
      *     });
@@ -18939,25 +18984,16 @@ function $HttpProvider() {
      * XMLHttpRequest will transparently follow it, meaning that the error callback will not be
      * called for such responses.
      *
-     * ## Writing Unit Tests that use $http
-     * When unit testing (using {@link ngMock ngMock}), it is necessary to call
-     * {@link ngMock.$httpBackend#flush $httpBackend.flush()} to flush each pending
-     * request using trained responses.
-     *
-     * ```
-     * $httpBackend.expectGET(...);
-     * $http.get(...);
-     * $httpBackend.flush();
-     * ```
      *
      * ## Shortcut methods
      *
      * Shortcut methods are also available. All shortcut methods require passing in the URL, and
-     * request data must be passed in for POST/PUT requests.
+     * request data must be passed in for POST/PUT requests. An optional config can be passed as the
+     * last argument.
      *
      * ```js
-     *   $http.get('/someUrl').then(successCallback);
-     *   $http.post('/someUrl', data).then(successCallback);
+     *   $http.get('/someUrl', config).then(successCallback, errorCallback);
+     *   $http.post('/someUrl', data, config).then(successCallback, errorCallback);
      * ```
      *
      * Complete list of shortcut methods:
@@ -18970,6 +19006,17 @@ function $HttpProvider() {
      * - {@link ng.$http#jsonp $http.jsonp}
      * - {@link ng.$http#patch $http.patch}
      *
+     *
+     * ## Writing Unit Tests that use $http
+     * When unit testing (using {@link ngMock ngMock}), it is necessary to call
+     * {@link ngMock.$httpBackend#flush $httpBackend.flush()} to flush each pending
+     * request using trained responses.
+     *
+     * ```
+     * $httpBackend.expectGET(...);
+     * $http.get(...);
+     * $httpBackend.flush();
+     * ```
      *
      * ## Deprecation Notice
      * <div class="alert alert-danger">
@@ -19128,7 +19175,7 @@ function $HttpProvider() {
      *
      * There are two kinds of interceptors (and two kinds of rejection interceptors):
      *
-     *   * `request`: interceptors get called with a http `config` object. The function is free to
+     *   * `request`: interceptors get called with a http {@link $http#usage config} object. The function is free to
      *     modify the `config` object or create a new one. The function needs to return the `config`
      *     object directly, or a promise containing the `config` or a new `config` object.
      *   * `requestError`: interceptor gets called when a previous interceptor threw an error or
@@ -19480,11 +19527,8 @@ function $HttpProvider() {
       function transformResponse(response) {
         // make a copy since the response must be cacheable
         var resp = extend({}, response);
-        if (!response.data) {
-          resp.data = response.data;
-        } else {
-          resp.data = transformData(response.data, response.headers, response.status, config.transformResponse);
-        }
+        resp.data = transformData(response.data, response.headers, response.status,
+                                  config.transformResponse);
         return (isSuccess(response.status))
           ? resp
           : $q.reject(resp);
@@ -19794,8 +19838,33 @@ function $HttpProvider() {
   }];
 }
 
-function createXhr() {
-    return new window.XMLHttpRequest();
+/**
+ * @ngdoc service
+ * @name $xhrFactory
+ *
+ * @description
+ * Factory function used to create XMLHttpRequest objects.
+ *
+ * Replace or decorate this service to create your own custom XMLHttpRequest objects.
+ *
+ * ```
+ * angular.module('myApp', [])
+ * .factory('$xhrFactory', function() {
+ *   return function createXhr(method, url) {
+ *     return new window.XMLHttpRequest({mozSystem: true});
+ *   };
+ * });
+ * ```
+ *
+ * @param {string} method HTTP method of the request (GET, POST, PUT, ..)
+ * @param {string} url URL of the request.
+ */
+function $xhrFactoryProvider() {
+  this.$get = function() {
+    return function createXhr() {
+      return new window.XMLHttpRequest();
+    };
+  };
 }
 
 /**
@@ -19803,6 +19872,7 @@ function createXhr() {
  * @name $httpBackend
  * @requires $window
  * @requires $document
+ * @requires $xhrFactory
  *
  * @description
  * HTTP backend used by the {@link ng.$http service} that delegates to
@@ -19815,8 +19885,8 @@ function createXhr() {
  * $httpBackend} which can be trained with responses.
  */
 function $HttpBackendProvider() {
-  this.$get = ['$browser', '$window', '$document', function($browser, $window, $document) {
-    return createHttpBackend($browser, createXhr, $browser.defer, $window.angular.callbacks, $document[0]);
+  this.$get = ['$browser', '$window', '$document', '$xhrFactory', function($browser, $window, $document, $xhrFactory) {
+    return createHttpBackend($browser, $xhrFactory, $browser.defer, $window.angular.callbacks, $document[0]);
   }];
 }
 
@@ -19840,7 +19910,7 @@ function createHttpBackend($browser, createXhr, $browserDefer, callbacks, rawDoc
       });
     } else {
 
-      var xhr = createXhr();
+      var xhr = createXhr(method, url);
 
       xhr.open(method, url, true);
       forEach(headers, function(value, key) {
@@ -21092,9 +21162,9 @@ var locationPrototype = {
    * @description
    * This method is getter / setter.
    *
-   * Return hash fragment when called without any parameter.
+   * Returns the hash fragment when called without any parameters.
    *
-   * Change hash fragment when called with parameter and return `$location`.
+   * Changes the hash fragment when called with a parameter and returns `$location`.
    *
    *
    * ```js
@@ -21115,8 +21185,8 @@ var locationPrototype = {
    * @name $location#replace
    *
    * @description
-   * If called, all changes to $location during current `$digest` will be replacing current history
-   * record, instead of adding new one.
+   * If called, all changes to $location during the current `$digest` will replace the current history
+   * record, instead of adding a new one.
    */
   replace: function() {
     this.$$replace = true;
@@ -21436,7 +21506,7 @@ function $LocationProvider() {
         var oldUrl = $location.absUrl();
         var oldState = $location.$$state;
         var defaultPrevented;
-
+        newUrl = trimEmptyHash(newUrl);
         $location.$$parse(newUrl);
         $location.$$state = newState;
 
@@ -21709,20 +21779,30 @@ var $parseMinErr = minErr('$parse');
 
 
 function ensureSafeMemberName(name, fullExpression) {
+  if (name === "__defineGetter__" || name === "__defineSetter__"
+      || name === "__lookupGetter__" || name === "__lookupSetter__"
+      || name === "__proto__") {
+    throw $parseMinErr('isecfld',
+        'Attempting to access a disallowed field in Angular expressions! '
+        + 'Expression: {0}', fullExpression);
+  }
+  return name;
+}
+
+function getStringValue(name, fullExpression) {
   // From the JavaScript docs:
   // Property names must be strings. This means that non-string objects cannot be used
   // as keys in an object. Any non-string object, including a number, is typecasted
   // into a string via the toString method.
   //
   // So, to ensure that we are checking the same `name` that JavaScript would use,
-  // we cast it to a string, if possible
-  name =  (isObject(name) && name.toString) ? name.toString() : name;
-
-  if (name === "__defineGetter__" || name === "__defineSetter__"
-      || name === "__lookupGetter__" || name === "__lookupSetter__"
-      || name === "__proto__") {
-    throw $parseMinErr('isecfld',
-        'Attempting to access a disallowed field in Angular expressions! '
+  // we cast it to a string, if possible.
+  // Doing `name + ''` can cause a repl error if the result to `toString` is not a string,
+  // this is, this will handle objects that misbehave.
+  name = name + '';
+  if (!isString(name)) {
+    throw $parseMinErr('iseccst',
+        'Cannot convert object to primitive value! '
         + 'Expression: {0}', fullExpression);
   }
   return name;
@@ -21769,6 +21849,16 @@ function ensureSafeFunction(obj, fullExpression) {
       throw $parseMinErr('isecff',
         'Referencing call, apply or bind in Angular expressions is disallowed! Expression: {0}',
         fullExpression);
+    }
+  }
+}
+
+function ensureSafeAssignContext(obj, fullExpression) {
+  if (obj) {
+    if (obj === (0).constructor || obj === (false).constructor || obj === ''.constructor ||
+        obj === {}.constructor || obj === [].constructor || obj === Function.constructor) {
+      throw $parseMinErr('isecaf',
+        'Assigning to a constructor is disallowed! Expression: {0}', fullExpression);
     }
   }
 }
@@ -22487,6 +22577,8 @@ ASTCompiler.prototype = {
         'ensureSafeMemberName',
         'ensureSafeObject',
         'ensureSafeFunction',
+        'getStringValue',
+        'ensureSafeAssignContext',
         'ifDefined',
         'plus',
         'text',
@@ -22495,6 +22587,8 @@ ASTCompiler.prototype = {
           ensureSafeMemberName,
           ensureSafeObject,
           ensureSafeFunction,
+          getStringValue,
+          ensureSafeAssignContext,
           ifDefined,
           plusFn,
           expression);
@@ -22638,6 +22732,7 @@ ASTCompiler.prototype = {
           if (ast.computed) {
             right = self.nextId();
             self.recurse(ast.property, right);
+            self.getStringValue(right);
             self.addEnsureSafeMemberName(right);
             if (create && create !== 1) {
               self.if_(self.not(self.computedMember(left, right)), self.lazyAssign(self.computedMember(left, right), '{}'));
@@ -22721,6 +22816,7 @@ ASTCompiler.prototype = {
         self.if_(self.notNull(left.context), function() {
           self.recurse(ast.right, right);
           self.addEnsureSafeObject(self.member(left.context, left.name, left.computed));
+          self.addEnsureSafeAssignContext(left.context);
           expression = self.member(left.context, left.name, left.computed) + ast.operator + right;
           self.assign(intoId, expression);
           recursionFn(intoId || expression);
@@ -22846,6 +22942,10 @@ ASTCompiler.prototype = {
     this.current().body.push(this.ensureSafeFunction(item), ';');
   },
 
+  addEnsureSafeAssignContext: function(item) {
+    this.current().body.push(this.ensureSafeAssignContext(item), ';');
+  },
+
   ensureSafeObject: function(item) {
     return 'ensureSafeObject(' + item + ',text)';
   },
@@ -22856,6 +22956,14 @@ ASTCompiler.prototype = {
 
   ensureSafeFunction: function(item) {
     return 'ensureSafeFunction(' + item + ',text)';
+  },
+
+  getStringValue: function(item) {
+    this.assign(item, 'getStringValue(' + item + ',text)');
+  },
+
+  ensureSafeAssignContext: function(item) {
+    return 'ensureSafeAssignContext(' + item + ',text)';
   },
 
   lazyRecurse: function(ast, intoId, nameId, recursionFn, create, skipWatchIdCheck) {
@@ -23035,6 +23143,7 @@ ASTInterpreter.prototype = {
         var lhs = left(scope, locals, assign, inputs);
         var rhs = right(scope, locals, assign, inputs);
         ensureSafeObject(lhs.value, self.expression);
+        ensureSafeAssignContext(lhs.context);
         lhs.context[lhs.name] = rhs;
         return context ? {value: rhs} : rhs;
       };
@@ -23232,6 +23341,7 @@ ASTInterpreter.prototype = {
       var value;
       if (lhs != null) {
         rhs = right(scope, locals, assign, inputs);
+        rhs = getStringValue(rhs);
         ensureSafeMemberName(rhs, expression);
         if (create && create !== 1 && lhs && !(lhs[rhs])) {
           lhs[rhs] = {};
@@ -23537,13 +23647,14 @@ function $ParseProvider() {
     function addInterceptor(parsedExpression, interceptorFn) {
       if (!interceptorFn) return parsedExpression;
       var watchDelegate = parsedExpression.$$watchDelegate;
+      var useInputs = false;
 
       var regularWatch =
           watchDelegate !== oneTimeLiteralWatchDelegate &&
           watchDelegate !== oneTimeWatchDelegate;
 
       var fn = regularWatch ? function regularInterceptedExpression(scope, locals, assign, inputs) {
-        var value = parsedExpression(scope, locals, assign, inputs);
+        var value = useInputs && inputs ? inputs[0] : parsedExpression(scope, locals, assign, inputs);
         return interceptorFn(value, scope, locals);
       } : function oneTimeInterceptedExpression(scope, locals, assign, inputs) {
         var value = parsedExpression(scope, locals, assign, inputs);
@@ -23561,6 +23672,7 @@ function $ParseProvider() {
         // If there is an interceptor, but no watchDelegate then treat the interceptor like
         // we treat filters - it is assumed to be a pure function unless flagged with $stateful
         fn.$$watchDelegate = inputsWatchDelegate;
+        useInputs = !parsedExpression.inputs;
         fn.inputs = parsedExpression.inputs ? parsedExpression.inputs : [parsedExpression];
       }
 
@@ -23621,6 +23733,8 @@ function $ParseProvider() {
  * ```
  *
  * Note: progress/notify callbacks are not currently supported via the ES6-style interface.
+ *
+ * Note: unlike ES6 behaviour, an exception thrown in the constructor function will NOT implicitly reject the promise.
  *
  * However, the more traditional CommonJS-style usage is still available, and documented below.
  *
@@ -24206,15 +24320,15 @@ function $$RAFProvider() { //rAF
  *     exposed as $$____ properties
  *
  * Loop operations are optimized by using while(count--) { ... }
- *   - this means that in order to keep the same order of execution as addition we have to add
+ *   - This means that in order to keep the same order of execution as addition we have to add
  *     items to the array at the beginning (unshift) instead of at the end (push)
  *
  * Child scopes are created and removed often
- *   - Using an array would be slow since inserts in middle are expensive so we use linked list
+ *   - Using an array would be slow since inserts in the middle are expensive; so we use linked lists
  *
- * There are few watches then a lot of observers. This is why you don't want the observer to be
- * implemented in the same way as watch. Watch requires return of initialization function which
- * are expensive to construct.
+ * There are fewer watches than observers. This is why you don't want the observer to be implemented
+ * in the same way as watch. Watch requires return of the initialization function which is expensive
+ * to construct.
  */
 
 
@@ -24256,7 +24370,7 @@ function $$RAFProvider() { //rAF
  * Every application has a single root {@link ng.$rootScope.Scope scope}.
  * All other scopes are descendant scopes of the root scope. Scopes provide separation
  * between the model and the view, via a mechanism for watching the model for changes.
- * They also provide an event emission/broadcast and subscription facility. See the
+ * They also provide event emission/broadcast and subscription facility. See the
  * {@link guide/scope developer guide on scopes}.
  */
 function $RootScopeProvider() {
@@ -24291,6 +24405,29 @@ function $RootScopeProvider() {
 
     function destroyChildScope($event) {
         $event.currentScope.$$destroyed = true;
+    }
+
+    function cleanUpScope($scope) {
+
+      if (msie === 9) {
+        // There is a memory leak in IE9 if all child scopes are not disconnected
+        // completely when a scope is destroyed. So this code will recurse up through
+        // all this scopes children
+        //
+        // See issue https://github.com/angular/angular.js/issues/10706
+        $scope.$$childHead && cleanUpScope($scope.$$childHead);
+        $scope.$$nextSibling && cleanUpScope($scope.$$nextSibling);
+      }
+
+      // The code below works around IE9 and V8's memory leaks
+      //
+      // See:
+      // - https://code.google.com/p/v8/issues/detail?id=2073#c26
+      // - https://github.com/angular/angular.js/issues/6794#issuecomment-38648909
+      // - https://github.com/angular/angular.js/issues/1313#issuecomment-10378451
+
+      $scope.$parent = $scope.$$nextSibling = $scope.$$prevSibling = $scope.$$childHead =
+          $scope.$$childTail = $scope.$root = $scope.$$watchers = null;
     }
 
     /**
@@ -25089,16 +25226,9 @@ function $RootScopeProvider() {
         this.$on = this.$watch = this.$watchGroup = function() { return noop; };
         this.$$listeners = {};
 
-        // All of the code below is bogus code that works around V8's memory leak via optimized code
-        // and inline caches.
-        //
-        // see:
-        // - https://code.google.com/p/v8/issues/detail?id=2073#c26
-        // - https://github.com/angular/angular.js/issues/6794#issuecomment-38648909
-        // - https://github.com/angular/angular.js/issues/1313#issuecomment-10378451
-
-        this.$parent = this.$$nextSibling = this.$$prevSibling = this.$$childHead =
-            this.$$childTail = this.$root = this.$$watchers = null;
+        // Disconnect the next sibling to prevent `cleanUpScope` destroying those too
+        this.$$nextSibling = null;
+        cleanUpScope(this);
       },
 
       /**
@@ -26094,7 +26224,7 @@ function $SceDelegateProvider() {
  * By default, Angular only loads templates from the same domain and protocol as the application
  * document.  This is done by calling {@link ng.$sce#getTrustedResourceUrl
  * $sce.getTrustedResourceUrl} on the template URL.  To load templates from other domains and/or
- * protocols, you may either either {@link ng.$sceDelegateProvider#resourceUrlWhitelist whitelist
+ * protocols, you may either {@link ng.$sceDelegateProvider#resourceUrlWhitelist whitelist
  * them} or {@link ng.$sce#trustAsResourceUrl wrap it} into a trusted value.
  *
  * *Please note*:
@@ -27868,6 +27998,7 @@ function formatNumber(number, pattern, groupSep, decimalSep, fractionSize) {
     if (fractionSize > 0 && number < 1) {
       formatedText = number.toFixed(fractionSize);
       number = parseFloat(formatedText);
+      formatedText = formatedText.replace(DECIMAL_SEP, decimalSep);
     }
   }
 
@@ -28344,7 +28475,7 @@ function limitToFilter() {
     if (!isArray(input) && !isString(input)) return input;
 
     begin = (!begin || isNaN(begin)) ? 0 : toInt(begin);
-    begin = (begin < 0 && begin >= -input.length) ? input.length + begin : begin;
+    begin = (begin < 0) ? Math.max(0, input.length + begin) : begin;
 
     if (limit >= 0) {
       return input.slice(begin, begin + limit);
@@ -29704,7 +29835,8 @@ var ngFormDirective = formDirectiveFactory(true);
 
 // Regex code is obtained from SO: https://stackoverflow.com/questions/3143070/javascript-regex-iso-datetime#answer-3143231
 var ISO_DATE_REGEXP = /\d{4}-[01]\d-[0-3]\dT[0-2]\d:[0-5]\d:[0-5]\d\.\d+([+-][0-2]\d:[0-5]\d|Z)/;
-var URL_REGEXP = /^(ftp|http|https):\/\/(\w+:{0,1}\w*@)?(\S+)(:[0-9]+)?(\/|\/([\w#!:.?+=&%@!\-\/]))?$/;
+// See valid URLs in RFC3987 (http://tools.ietf.org/html/rfc3987)
+var URL_REGEXP = /^[A-Za-z][A-Za-z\d.+-]*:\/*(?:\w+(?::\w+)?@)?[^\s/]+(?::\d+)?(?:\/[\w#!:.?+=&%@\-/]*)?$/;
 var EMAIL_REGEXP = /^[a-z0-9!#$%&'*+\/=?^_`{|}~.-]+@[a-z0-9]([a-z0-9-]*[a-z0-9])?(\.[a-z0-9]([a-z0-9-]*[a-z0-9])?)*$/i;
 var NUMBER_REGEXP = /^\s*(\-|\+)?(\d+|(\d*(\.\d*)))([eE][+-]?\d+)?\s*$/;
 var DATE_REGEXP = /^(\d{4})-(\d{2})-(\d{2})$/;
@@ -33270,7 +33402,13 @@ var ngIfDirective = ['$animate', function($animate) {
  * @param {string} ngInclude|src angular expression evaluating to URL. If the source is a string constant,
  *                 make sure you wrap it in **single** quotes, e.g. `src="'myPartialTemplate.html'"`.
  * @param {string=} onload Expression to evaluate when a new partial is loaded.
- *
+ *                  <div class="alert alert-warning">
+ *                  **Note:** When using onload on SVG elements in IE11, the browser will try to call
+ *                  a function with the name on the window element, which will usually throw a
+ *                  "function is undefined" error. To fix this, you can instead use `data-onload` or a
+ *                  different form that {@link guide/directive#normalization matches} `onload`.
+ *                  </div>
+   *
  * @param {string=} autoscroll Whether `ngInclude` should call {@link ng.$anchorScroll
  *                  $anchorScroll} to scroll the viewport after the content is loaded.
  *
@@ -33663,7 +33801,7 @@ var ngInitDirective = ngDirective({
  *   </file>
  * </example>
  *
- * ### Example - splitting on whitespace
+ * ### Example - splitting on newline
  * <example name="ngList-directive-newlines">
  *   <file name="index.html">
  *    <textarea ng-model="list" ng-list="&#10;" ng-trim="false"></textarea>
@@ -33748,7 +33886,9 @@ var ngModelMinErr = minErr('ngModel');
  * @ngdoc type
  * @name ngModel.NgModelController
  *
- * @property {string} $viewValue Actual string value in the view.
+ * @property {*} $viewValue The actual value from the control's view. For `input` elements, this is a
+ * String. See {@link ngModel.NgModelController#$setViewValue} for information about when the $viewValue
+ * is set.
  * @property {*} $modelValue The value in the model that the control is bound to.
  * @property {Array.<Function>} $parsers Array of functions to execute, as a pipeline, whenever
        the control reads value from the DOM. The functions are called in array order, each passing
@@ -34861,12 +35001,13 @@ var DEFAULT_REGEXP = /(\s+|^)default(\s+|$)/;
           </label><br />
         </form>
         <pre>user.name = <span ng-bind="user.name"></span></pre>
+        <pre>user.data = <span ng-bind="user.data"></span></pre>
       </div>
     </file>
     <file name="app.js">
       angular.module('optionsExample', [])
         .controller('ExampleController', ['$scope', function($scope) {
-          $scope.user = { name: 'say', data: '' };
+          $scope.user = { name: 'John', data: '' };
 
           $scope.cancel = function(e) {
             if (e.keyCode == 27) {
@@ -34881,20 +35022,20 @@ var DEFAULT_REGEXP = /(\s+|^)default(\s+|$)/;
       var other = element(by.model('user.data'));
 
       it('should allow custom events', function() {
-        input.sendKeys(' hello');
+        input.sendKeys(' Doe');
         input.click();
-        expect(model.getText()).toEqual('say');
+        expect(model.getText()).toEqual('John');
         other.click();
-        expect(model.getText()).toEqual('say hello');
+        expect(model.getText()).toEqual('John Doe');
       });
 
       it('should $rollbackViewValue when model changes', function() {
-        input.sendKeys(' hello');
-        expect(input.getAttribute('value')).toEqual('say hello');
+        input.sendKeys(' Doe');
+        expect(input.getAttribute('value')).toEqual('John Doe');
         input.sendKeys(protractor.Key.ESCAPE);
-        expect(input.getAttribute('value')).toEqual('say');
+        expect(input.getAttribute('value')).toEqual('John');
         other.click();
-        expect(model.getText()).toEqual('say');
+        expect(model.getText()).toEqual('John');
       });
     </file>
   </example>
@@ -34920,7 +35061,7 @@ var DEFAULT_REGEXP = /(\s+|^)default(\s+|$)/;
     <file name="app.js">
       angular.module('optionsExample', [])
         .controller('ExampleController', ['$scope', function($scope) {
-          $scope.user = { name: 'say' };
+          $scope.user = { name: 'Igor' };
         }]);
     </file>
   </example>
@@ -35153,19 +35294,27 @@ var ngOptionsMinErr = minErr('ngOptions');
  *
  * ## Complex Models (objects or collections)
  *
- * **Note:** By default, `ngModel` watches the model by reference, not value. This is important when
- * binding any input directive to a model that is an object or a collection.
+ * By default, `ngModel` watches the model by reference, not value. This is important to know when
+ * binding the select to a model that is an object or a collection.
  *
- * Since this is a common situation for `ngOptions` the directive additionally watches the model using
- * `$watchCollection` when the select has the `multiple` attribute or when there is a `track by` clause in
- * the options expression. This allows ngOptions to trigger a re-rendering of the options even if the actual
- * object/collection has not changed identity but only a property on the object or an item in the collection
- * changes.
+ * One issue occurs if you want to preselect an option. For example, if you set
+ * the model to an object that is equal to an object in your collection, `ngOptions` won't be able to set the selection,
+ * because the objects are not identical. So by default, you should always reference the item in your collection
+ * for preselections, e.g.: `$scope.selected = $scope.collection[3]`.
+ *
+ * Another solution is to use a `track by` clause, because then `ngOptions` will track the identity
+ * of the item not by reference, but by the result of the `track by` expression. For example, if your
+ * collection items have an id property, you would `track by item.id`.
+ *
+ * A different issue with objects or collections is that ngModel won't detect if an object property or
+ * a collection item changes. For that reason, `ngOptions` additionally watches the model using
+ * `$watchCollection`, when the expression contains a `track by` clause or the the select has the `multiple` attribute.
+ * This allows ngOptions to trigger a re-rendering of the options even if the actual object/collection
+ * has not changed identity, but only a property on the object or an item in the collection changes.
  *
  * Note that `$watchCollection` does a shallow comparison of the properties of the object (or the items in the collection
- * if the model is an array). This means that changing a property deeper inside the object/collection that the
- * first level will not trigger a re-rendering.
- *
+ * if the model is an array). This means that changing a property deeper than the first level inside the
+ * object/collection will not trigger a re-rendering.
  *
  * ## `select` **`as`**
  *
@@ -35178,17 +35327,13 @@ var ngOptionsMinErr = minErr('ngOptions');
  * ### `select` **`as`** and **`track by`**
  *
  * <div class="alert alert-warning">
- * Do not use `select` **`as`** and **`track by`** in the same expression. They are not designed to work together.
+ * Be careful when using `select` **`as`** and **`track by`** in the same expression.
  * </div>
  *
- * Consider the following example:
- *
- * ```html
- * <select ng-options="item.subItem as item.label for item in values track by item.id" ng-model="selected"></select>
- * ```
+ * Given this array of items on the $scope:
  *
  * ```js
- * $scope.values = [{
+ * $scope.items = [{
  *   id: 1,
  *   label: 'aLabel',
  *   subItem: { name: 'aSubItem' }
@@ -35197,20 +35342,33 @@ var ngOptionsMinErr = minErr('ngOptions');
  *   label: 'bLabel',
  *   subItem: { name: 'bSubItem' }
  * }];
- *
- * $scope.selected = { name: 'aSubItem' };
  * ```
  *
- * With the purpose of preserving the selection, the **`track by`** expression is always applied to the element
- * of the data source (to `item` in this example). To calculate whether an element is selected, we do the
- * following:
+ * This will work:
  *
- * 1. Apply **`track by`** to the elements in the array. In the example: `[1, 2]`
- * 2. Apply **`track by`** to the already selected value in `ngModel`.
- *    In the example: this is not possible as **`track by`** refers to `item.id`, but the selected
- *    value from `ngModel` is `{name: 'aSubItem'}`, so the **`track by`** expression is applied to
- *    a wrong object, the selected element can't be found, `<select>` is always reset to the "not
- *    selected" option.
+ * ```html
+ * <select ng-options="item as item.label for item in items track by item.id" ng-model="selected"></select>
+ * ```
+ * ```js
+ * $scope.selected = $scope.items[0];
+ * ```
+ *
+ * but this will not work:
+ *
+ * ```html
+ * <select ng-options="item.subItem as item.label for item in items track by item.id" ng-model="selected"></select>
+ * ```
+ * ```js
+ * $scope.selected = $scope.items[0].subItem;
+ * ```
+ *
+ * In both examples, the **`track by`** expression is applied successfully to each `item` in the
+ * `items` array. Because the selected option has been set programmatically in the controller, the
+ * **`track by`** expression is also applied to the `ngModel` value. In the first example, the
+ * `ngModel` value is `items[0]` and the **`track by`** expression evaluates to `items[0].id` with
+ * no issue. In the second example, the `ngModel` value is `items[0].subItem` and the **`track by`**
+ * expression evaluates to `items[0].subItem.id` (which is undefined). As a result, the model value
+ * is not matched against any `<option>` and the `<select>` appears as having no selected value.
  *
  *
  * @param {string} ngModel Assignable angular expression to data-bind to.
@@ -35512,11 +35670,8 @@ var ngOptionsDirective = ['$compile', '$parse', function($compile, $parse) {
   var optionTemplate = document.createElement('option'),
       optGroupTemplate = document.createElement('optgroup');
 
-  return {
-    restrict: 'A',
-    terminal: true,
-    require: ['select', '?ngModel'],
-    link: function(scope, selectElement, attr, ctrls) {
+
+    function ngOptionsPostLink(scope, selectElement, attr, ctrls) {
 
       // if ngModel is not defined, we don't need to do anything
       var ngModelCtrl = ctrls[1];
@@ -35570,7 +35725,6 @@ var ngOptionsDirective = ['$compile', '$parse', function($compile, $parse) {
       var removeUnknownOption = function() {
         unknownOption.remove();
       };
-
 
       // Update the controller methods for multiple selectable options
       if (!multiple) {
@@ -35699,11 +35853,16 @@ var ngOptionsDirective = ['$compile', '$parse', function($compile, $parse) {
       function updateOptionElement(option, element) {
         option.element = element;
         element.disabled = option.disabled;
-        if (option.value !== element.value) element.value = option.selectValue;
+        // NOTE: The label must be set before the value, otherwise IE10/11/EDGE create unresponsive
+        // selects in certain circumstances when multiple selects are next to each other and display
+        // the option list in listbox style, i.e. the select is [multiple], or specifies a [size].
+        // See https://github.com/angular/angular.js/issues/11314 for more info.
+        // This is unfortunately untestable with unit / e2e tests
         if (option.label !== element.label) {
           element.label = option.label;
           element.textContent = option.label;
         }
+        if (option.value !== element.value) element.value = option.selectValue;
       }
 
       function addOrReuseElement(parent, current, type, templateElement) {
@@ -35741,10 +35900,15 @@ var ngOptionsDirective = ['$compile', '$parse', function($compile, $parse) {
         var emptyOption_ = emptyOption && emptyOption[0];
         var unknownOption_ = unknownOption && unknownOption[0];
 
+        // We cannot rely on the extracted empty option being the same as the compiled empty option,
+        // because the compiled empty option might have been replaced by a comment because
+        // it had an "element" transclusion directive on it (such as ngIf)
         if (emptyOption_ || unknownOption_) {
           while (current &&
                 (current === emptyOption_ ||
-                current === unknownOption_)) {
+                current === unknownOption_ ||
+                current.nodeType === NODE_TYPE_COMMENT ||
+                current.value === '')) {
             current = current.nextSibling;
           }
         }
@@ -35841,7 +36005,20 @@ var ngOptionsDirective = ['$compile', '$parse', function($compile, $parse) {
         }
 
       }
+  }
 
+  return {
+    restrict: 'A',
+    terminal: true,
+    require: ['select', '?ngModel'],
+    link: {
+      pre: function ngOptionsPreLink(scope, selectElement, attr, ctrls) {
+        // Deactivate the SelectController.register method to prevent
+        // option directives from accidentally registering themselves
+        // (and unwanted $destroy handlers etc.)
+        ctrls[0].registerOption = noop;
+      },
+      post: ngOptionsPostLink
     }
   };
 }];
@@ -36128,7 +36305,7 @@ var ngPluralizeDirective = ['$locale', '$interpolate', '$log', function($locale,
  * Version 1.4 removed the alphabetic sorting. We now rely on the order returned by the browser
  * when running `for key in myObj`. It seems that browsers generally follow the strategy of providing
  * keys in the order in which they were defined, although there are exceptions when keys are deleted
- * and reinstated. See https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Operators/delete#Cross-browser_issues
+ * and reinstated. See the [MDN page on `delete` for more info](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Operators/delete#Cross-browser_notes).
  *
  * If this is not desired, the recommended workaround is to convert your object into an array
  * that is sorted into the order that you prefer before providing it to `ngRepeat`.  You could
@@ -36138,15 +36315,21 @@ var ngPluralizeDirective = ['$locale', '$interpolate', '$log', function($locale,
  *
  * # Tracking and Duplicates
  *
- * When the contents of the collection change, `ngRepeat` makes the corresponding changes to the DOM:
+ * `ngRepeat` uses {@link $rootScope.Scope#$watchCollection $watchCollection} to detect changes in
+ * the collection. When a change happens, ngRepeat then makes the corresponding changes to the DOM:
  *
  * * When an item is added, a new instance of the template is added to the DOM.
  * * When an item is removed, its template instance is removed from the DOM.
  * * When items are reordered, their respective templates are reordered in the DOM.
  *
- * By default, `ngRepeat` does not allow duplicate items in arrays. This is because when
- * there are duplicates, it is not possible to maintain a one-to-one mapping between collection
- * items and DOM elements.
+ * To minimize creation of DOM elements, `ngRepeat` uses a function
+ * to "keep track" of all items in the collection and their corresponding DOM elements.
+ * For example, if an item is added to the collection, ngRepeat will know that all other items
+ * already have DOM elements, and will not re-render them.
+ *
+ * The default tracking function (which tracks items by their identity) does not allow
+ * duplicate items in arrays. This is because when there are duplicates, it is not possible
+ * to maintain a one-to-one mapping between collection items and DOM elements.
  *
  * If you do need to repeat duplicate items, you can substitute the default tracking behavior
  * with your own using the `track by` expression.
@@ -36159,7 +36342,7 @@ var ngPluralizeDirective = ['$locale', '$interpolate', '$log', function($locale,
  *    </div>
  * ```
  *
- * You may use arbitrary expressions in `track by`, including references to custom functions
+ * You may also use arbitrary expressions in `track by`, including references to custom functions
  * on the scope:
  * ```html
  *    <div ng-repeat="n in [42, 42, 43, 43] track by myTrackingFunction(n)">
@@ -36167,10 +36350,14 @@ var ngPluralizeDirective = ['$locale', '$interpolate', '$log', function($locale,
  *    </div>
  * ```
  *
- * If you are working with objects that have an identifier property, you can track
+ * <div class="alert alert-success">
+ * If you are working with objects that have an identifier property, you should track
  * by the identifier instead of the whole object. Should you reload your data later, `ngRepeat`
  * will not have to rebuild the DOM elements for items it has already rendered, even if the
- * JavaScript objects in the collection have been substituted for new ones:
+ * JavaScript objects in the collection have been substituted for new ones. For large collections,
+ * this signifincantly improves rendering performance. If you don't have a unique identifier,
+ * `track by $index` can also provide a performance boost.
+ * </div>
  * ```html
  *    <div ng-repeat="model in collection track by model.id">
  *      {{model.name}}
@@ -37328,6 +37515,15 @@ var scriptDirective = ['$templateCache', function($templateCache) {
 
 var noopNgModelController = { $setViewValue: noop, $render: noop };
 
+function chromeHack(optionElement) {
+  // Workaround for https://code.google.com/p/chromium/issues/detail?id=381459
+  // Adding an <option selected="selected"> element to a <select required="required"> should
+  // automatically select the new element
+  if (optionElement[0].hasAttribute('selected')) {
+    optionElement[0].selected = true;
+  }
+}
+
 /**
  * @ngdoc type
  * @name  select.SelectController
@@ -37403,6 +37599,8 @@ var SelectController =
     }
     var count = optionsMap.get(value) || 0;
     optionsMap.put(value, count + 1);
+    self.ngModelCtrl.$render();
+    chromeHack(element);
   };
 
   // Tell the select control that an option, with the given value, has been removed
@@ -37423,6 +37621,39 @@ var SelectController =
   // Check whether the select control has an option matching the given value
   self.hasOption = function(value) {
     return !!optionsMap.get(value);
+  };
+
+
+  self.registerOption = function(optionScope, optionElement, optionAttrs, interpolateValueFn, interpolateTextFn) {
+
+    if (interpolateValueFn) {
+      // The value attribute is interpolated
+      var oldVal;
+      optionAttrs.$observe('value', function valueAttributeObserveAction(newVal) {
+        if (isDefined(oldVal)) {
+          self.removeOption(oldVal);
+        }
+        oldVal = newVal;
+        self.addOption(newVal, optionElement);
+      });
+    } else if (interpolateTextFn) {
+      // The text content is interpolated
+      optionScope.$watch(interpolateTextFn, function interpolateWatchAction(newVal, oldVal) {
+        optionAttrs.$set('value', newVal);
+        if (oldVal !== newVal) {
+          self.removeOption(oldVal);
+        }
+        self.addOption(newVal, optionElement);
+      });
+    } else {
+      // The value attribute is static
+      self.addOption(optionAttrs.value, optionElement);
+    }
+
+    optionElement.on('$destroy', function() {
+      self.removeOption(optionAttrs.value);
+      self.ngModelCtrl.$render();
+    });
   };
 }];
 
@@ -37469,6 +37700,8 @@ var SelectController =
  *
  * @param {string} ngModel Assignable angular expression to data-bind to.
  * @param {string=} name Property name of the form under which the control is published.
+ * @param {string=} multiple Allows multiple options to be selected. The selected values will be
+ *     bound to the model as an array.
  * @param {string=} required Sets `required` validation error key if the value is not entered.
  * @param {string=} ngRequired Adds required attribute and required validation constraint to
  * the element when the ngRequired expression evaluates to true. Use ngRequired instead of required
@@ -37492,7 +37725,7 @@ var SelectController =
  *     </select><br>
  *
  *     <label for="singleSelect"> Single select with "not selected" option and dynamic option values: </label><br>
- *     <select name="singleSelect" ng-model="data.singleSelect">
+ *     <select name="singleSelect" id="singleSelect" ng-model="data.singleSelect">
  *       <option value="">---Please select---</option> <!-- not selected / blank option -->
  *       <option value="{{data.option1}}">Option 1</option> <!-- interpolation -->
  *       <option value="option-2">Option 2</option>
@@ -37533,7 +37766,7 @@ var SelectController =
  * <div ng-controller="ExampleController">
  *   <form name="myForm">
  *     <label for="repeatSelect"> Repeat select: </label>
- *     <select name="repeatSelect" ng-model="data.repeatSelect">
+ *     <select name="repeatSelect" id="repeatSelect" ng-model="data.repeatSelect">
  *       <option ng-repeat="option in data.availableOptions" value="{{option.id}}">{{option.name}}</option>
  *     </select>
  *   </form>
@@ -37545,7 +37778,7 @@ var SelectController =
  *  angular.module('ngrepeatSelect', [])
  *    .controller('ExampleController', ['$scope', function($scope) {
  *      $scope.data = {
- *       singleSelect: null,
+ *       repeatSelect: null,
  *       availableOptions: [
  *         {id: '1', name: 'Option A'},
  *         {id: '2', name: 'Option B'},
@@ -37634,7 +37867,13 @@ var selectDirective = function() {
     restrict: 'E',
     require: ['select', '?ngModel'],
     controller: SelectController,
-    link: function(scope, element, attr, ctrls) {
+    priority: 1,
+    link: {
+      pre: selectPreLink
+    }
+  };
+
+  function selectPreLink(scope, element, attr, ctrls) {
 
       // if ngModel is not defined, we don't need to do anything
       var ngModelCtrl = ctrls[1];
@@ -37704,7 +37943,6 @@ var selectDirective = function() {
 
       }
     }
-  };
 };
 
 
@@ -37712,16 +37950,6 @@ var selectDirective = function() {
 // of dynamically created (and destroyed) option elements to their containing select
 // directive via its controller.
 var optionDirective = ['$interpolate', function($interpolate) {
-
-  function chromeHack(optionElement) {
-    // Workaround for https://code.google.com/p/chromium/issues/detail?id=381459
-    // Adding an <option selected="selected"> element to a <select required="required"> should
-    // automatically select the new element
-    if (optionElement[0].hasAttribute('selected')) {
-      optionElement[0].selected = true;
-    }
-  }
-
   return {
     restrict: 'E',
     priority: 100,
@@ -37729,12 +37957,12 @@ var optionDirective = ['$interpolate', function($interpolate) {
 
       if (isDefined(attr.value)) {
         // If the value attribute is defined, check if it contains an interpolation
-        var valueInterpolated = $interpolate(attr.value, true);
+        var interpolateValueFn = $interpolate(attr.value, true);
       } else {
         // If the value attribute is not defined then we fall back to the
         // text content of the option element, which may be interpolated
-        var interpolateFn = $interpolate(element.text(), true);
-        if (!interpolateFn) {
+        var interpolateTextFn = $interpolate(element.text(), true);
+        if (!interpolateTextFn) {
           attr.$set('value', element.text());
         }
       }
@@ -37748,44 +37976,8 @@ var optionDirective = ['$interpolate', function($interpolate) {
             selectCtrl = parent.data(selectCtrlName) ||
               parent.parent().data(selectCtrlName); // in case we are in optgroup
 
-        function addOption(optionValue) {
-          selectCtrl.addOption(optionValue, element);
-          selectCtrl.ngModelCtrl.$render();
-          chromeHack(element);
-        }
-
-        // Only update trigger option updates if this is an option within a `select`
-        // that also has `ngModel` attached
-        if (selectCtrl && selectCtrl.ngModelCtrl) {
-
-          if (valueInterpolated) {
-            // The value attribute is interpolated
-            var oldVal;
-            attr.$observe('value', function valueAttributeObserveAction(newVal) {
-              if (isDefined(oldVal)) {
-                selectCtrl.removeOption(oldVal);
-              }
-              oldVal = newVal;
-              addOption(newVal);
-            });
-          } else if (interpolateFn) {
-            // The text content is interpolated
-            scope.$watch(interpolateFn, function interpolateWatchAction(newVal, oldVal) {
-              attr.$set('value', newVal);
-              if (oldVal !== newVal) {
-                selectCtrl.removeOption(oldVal);
-              }
-              addOption(newVal);
-            });
-          } else {
-            // The value attribute is static
-            addOption(attr.value);
-          }
-
-          element.on('$destroy', function() {
-            selectCtrl.removeOption(attr.value);
-            selectCtrl.ngModelCtrl.$render();
-          });
+        if (selectCtrl) {
+          selectCtrl.registerOption(scope, element, attr, interpolateValueFn, interpolateTextFn);
         }
       };
     }
@@ -38036,7 +38228,7 @@ $provide.value("$locale", {
 
 !window.angular.$$csp().noInlineStyle && window.angular.element(document.head).prepend('<style type="text/css">@charset "UTF-8";[ng\\:cloak],[ng-cloak],[data-ng-cloak],[x-ng-cloak],.ng-cloak,.x-ng-cloak,.ng-hide:not(.ng-hide-animate){display:none !important;}ng\\:form{display:block;}.ng-animate-shim{visibility:hidden;}.ng-anchor{position:absolute;}</style>');
 /**
- * @license AngularJS v1.4.6
+ * @license AngularJS v1.4.8
  * (c) 2010-2015 Google, Inc. http://angularjs.org
  * License: MIT
  */
@@ -38410,12 +38602,6 @@ function concatWithSpace(a,b) {
   return a + ' ' + b;
 }
 
-function $$BodyProvider() {
-  this.$get = ['$document', function($document) {
-    return jqLite($document[0].body);
-  }];
-}
-
 var $$rAFSchedulerFactory = ['$$rAF', function($$rAF) {
   var queue, cancelFn;
 
@@ -38665,8 +38851,10 @@ var ANIMATE_TIMER_KEY = '$$animateCss';
  *
  * * `event` - The DOM event (e.g. enter, leave, move). When used, a generated CSS class of `ng-EVENT` and `ng-EVENT-active` will be applied
  * to the element during the animation. Multiple events can be provided when spaces are used as a separator. (Note that this will not perform any DOM operation.)
+ * * `structural` - Indicates that the `ng-` prefix will be added to the event class. Setting to `false` or omitting will turn `ng-EVENT` and
+ * `ng-EVENT-active` in `EVENT` and `EVENT-active`. Unused if `event` is omitted.
  * * `easing` - The CSS easing value that will be applied to the transition or keyframe animation (or both).
- * * `transition` - The raw CSS transition style that will be used (e.g. `1s linear all`).
+ * * `transitionStyle` - The raw CSS transition style that will be used (e.g. `1s linear all`).
  * * `keyframeStyle` - The raw CSS keyframe animation style that will be used (e.g. `1s my_animation linear`).
  * * `from` - The starting CSS styles (a key/value object) that will be applied at the start of the animation.
  * * `to` - The ending CSS styles (a key/value object) that will be applied across the animation via a CSS transition.
@@ -38683,6 +38871,10 @@ var ANIMATE_TIMER_KEY = '$$animateCss';
  * * `staggerIndex` - The numeric index representing the stagger item (e.g. a value of 5 is equal to the sixth item in the stagger; therefore when a
  * * `stagger` option value of `0.1` is used then there will be a stagger delay of `600ms`)
  * * `applyClassesEarly` - Whether or not the classes being added or removed will be used when detecting the animation. This is set by `$animate` when enter/leave/move animations are fired to ensure that the CSS classes are resolved in time. (Note that this will prevent any transitions from occuring on the classes being added and removed.)
+ * * `cleanupStyles` - Whether or not the provided `from` and `to` styles will be removed once
+ *    the animation is closed. This is useful for when the styles are used purely for the sake of
+ *    the animation and do not have a lasting visual effect on the element (e.g. a colapse and open animation).
+ *    By default this value is set to `false`.
  *
  * @return {object} an object with start and end methods and details about the animation.
  *
@@ -38803,6 +38995,23 @@ function createLocalCacheLookup() {
   };
 }
 
+// we do not reassign an already present style value since
+// if we detect the style property value again we may be
+// detecting styles that were added via the `from` styles.
+// We make use of `isDefined` here since an empty string
+// or null value (which is what getPropertyValue will return
+// for a non-existing style) will still be marked as a valid
+// value for the style (a falsy value implies that the style
+// is to be removed at the end of the animation). If we had a simple
+// "OR" statement then it would not be enough to catch that.
+function registerRestorableStyles(backup, node, properties) {
+  forEach(properties, function(prop) {
+    backup[prop] = isDefined(backup[prop])
+        ? backup[prop]
+        : node.style.getPropertyValue(prop);
+  });
+}
+
 var $AnimateCssProvider = ['$animateProvider', function($animateProvider) {
   var gcsLookup = createLocalCacheLookup();
   var gcsStaggerLookup = createLocalCacheLookup();
@@ -38903,6 +39112,7 @@ var $AnimateCssProvider = ['$animateProvider', function($animateProvider) {
     }
 
     return function init(element, options) {
+      var restoreStyles = {};
       var node = getDomNode(element);
       if (!node
           || !node.parentNode
@@ -39104,7 +39314,12 @@ var $AnimateCssProvider = ['$animateProvider', function($animateProvider) {
                                        stagger.animationDuration === 0;
       }
 
-      applyAnimationFromStyles(element, options);
+      if (options.from) {
+        if (options.cleanupStyles) {
+          registerRestorableStyles(restoreStyles, node, Object.keys(options.from));
+        }
+        applyAnimationFromStyles(element, options);
+      }
 
       if (flags.blockTransition || flags.blockKeyframeAnimation) {
         applyBlocking(maxDuration);
@@ -39170,6 +39385,13 @@ var $AnimateCssProvider = ['$animateProvider', function($animateProvider) {
 
         applyAnimationClasses(element, options);
         applyAnimationStyles(element, options);
+
+        if (Object.keys(restoreStyles).length) {
+          forEach(restoreStyles, function(value, prop) {
+            value ? node.style.setProperty(prop, value)
+                  : node.style.removeProperty(prop);
+          });
+        }
 
         // the reason why we have this option is to allow a synchronous closing callback
         // that is fired as SOON as the animation ends (when the CSS is removed) or if
@@ -39365,7 +39587,12 @@ var $AnimateCssProvider = ['$animateProvider', function($animateProvider) {
           }
 
           element.on(events.join(' '), onAnimationProgress);
-          applyAnimationToStyles(element, options);
+          if (options.to) {
+            if (options.cleanupStyles) {
+              registerRestorableStyles(restoreStyles, node, Object.keys(options.to));
+            }
+            applyAnimationToStyles(element, options);
+          }
         }
 
         function onAnimationExpired() {
@@ -39419,16 +39646,25 @@ var $$AnimateCssDriverProvider = ['$$animationProvider', function($$animationPro
   var NG_OUT_ANCHOR_CLASS_NAME = 'ng-anchor-out';
   var NG_IN_ANCHOR_CLASS_NAME = 'ng-anchor-in';
 
-  this.$get = ['$animateCss', '$rootScope', '$$AnimateRunner', '$rootElement', '$$body', '$sniffer', '$$jqLite',
-       function($animateCss,   $rootScope,   $$AnimateRunner,   $rootElement,   $$body,   $sniffer,   $$jqLite) {
+  function isDocumentFragment(node) {
+    return node.parentNode && node.parentNode.nodeType === 11;
+  }
+
+  this.$get = ['$animateCss', '$rootScope', '$$AnimateRunner', '$rootElement', '$sniffer', '$$jqLite', '$document',
+       function($animateCss,   $rootScope,   $$AnimateRunner,   $rootElement,   $sniffer,   $$jqLite,   $document) {
 
     // only browsers that support these properties can render animations
     if (!$sniffer.animations && !$sniffer.transitions) return noop;
 
-    var bodyNode = getDomNode($$body);
+    var bodyNode = $document[0].body;
     var rootNode = getDomNode($rootElement);
 
-    var rootBodyElement = jqLite(bodyNode.parentNode === rootNode ? bodyNode : rootNode);
+    var rootBodyElement = jqLite(
+      // this is to avoid using something that exists outside of the body
+      // we also special case the doc fragement case because our unit test code
+      // appends the $rootElement to the body after the app has been bootstrapped
+      isDocumentFragment(rootNode) || bodyNode.contains(rootNode) ? rootNode : bodyNode
+    );
 
     var applyAnimationClasses = applyAnimationClassesFactory($$jqLite);
 
@@ -40055,14 +40291,32 @@ var $$AnimateQueueProvider = ['$animateProvider', function($animateProvider) {
     return (nO.addClass && nO.addClass === cO.removeClass) || (nO.removeClass && nO.removeClass === cO.addClass);
   });
 
-  this.$get = ['$$rAF', '$rootScope', '$rootElement', '$document', '$$body', '$$HashMap',
+  this.$get = ['$$rAF', '$rootScope', '$rootElement', '$document', '$$HashMap',
                '$$animation', '$$AnimateRunner', '$templateRequest', '$$jqLite', '$$forceReflow',
-       function($$rAF,   $rootScope,   $rootElement,   $document,   $$body,   $$HashMap,
+       function($$rAF,   $rootScope,   $rootElement,   $document,   $$HashMap,
                 $$animation,   $$AnimateRunner,   $templateRequest,   $$jqLite,   $$forceReflow) {
 
     var activeAnimationsLookup = new $$HashMap();
     var disabledElementsLookup = new $$HashMap();
     var animationsEnabled = null;
+
+    function postDigestTaskFactory() {
+      var postDigestCalled = false;
+      return function(fn) {
+        // we only issue a call to postDigest before
+        // it has first passed. This prevents any callbacks
+        // from not firing once the animation has completed
+        // since it will be out of the digest cycle.
+        if (postDigestCalled) {
+          fn();
+        } else {
+          $rootScope.$$postDigest(function() {
+            postDigestCalled = true;
+            fn();
+          });
+        }
+      };
+    }
 
     // Wait until all directive and route-related templates are downloaded and
     // compiled. The $templateRequest.totalPendingRequests variable keeps track of
@@ -40110,8 +40364,9 @@ var $$AnimateQueueProvider = ['$animateProvider', function($animateProvider) {
       return mergeAnimationOptions(element, options, {});
     }
 
-    function findCallbacks(element, event) {
+    function findCallbacks(parent, element, event) {
       var targetNode = getDomNode(element);
+      var targetParentNode = getDomNode(parent);
 
       var matches = [];
       var entries = callbackRegistry[event];
@@ -40119,19 +40374,13 @@ var $$AnimateQueueProvider = ['$animateProvider', function($animateProvider) {
         forEach(entries, function(entry) {
           if (entry.node.contains(targetNode)) {
             matches.push(entry.callback);
+          } else if (event === 'leave' && entry.node.contains(targetParentNode)) {
+            matches.push(entry.callback);
           }
         });
       }
 
       return matches;
-    }
-
-    function triggerCallback(event, element, phase, data) {
-      $$rAF(function() {
-        forEach(findCallbacks(element, event), function(callback) {
-          callback(element, phase, data);
-        });
-      });
     }
 
     return {
@@ -40227,6 +40476,9 @@ var $$AnimateQueueProvider = ['$animateProvider', function($animateProvider) {
       // we create a fake runner with a working promise.
       // These methods will become available after the digest has passed
       var runner = new $$AnimateRunner();
+
+      // this is used to trigger callbacks in postDigest mode
+      var runInNextPostDigestOrNow = postDigestTaskFactory();
 
       if (isArray(options.addClass)) {
         options.addClass = options.addClass.join(' ');
@@ -40448,7 +40700,20 @@ var $$AnimateQueueProvider = ['$animateProvider', function($animateProvider) {
       return runner;
 
       function notifyProgress(runner, event, phase, data) {
-        triggerCallback(event, element, phase, data);
+        runInNextPostDigestOrNow(function() {
+          var callbacks = findCallbacks(parent, element, event);
+          if (callbacks.length) {
+            // do not optimize this call here to RAF because
+            // we don't know how heavy the callback code here will
+            // be and if this code is buffered then this can
+            // lead to a performance regression.
+            $$rAF(function() {
+              forEach(callbacks, function(callback) {
+                callback(element, phase, data);
+              });
+            });
+          }
+        });
         runner.progress(event, phase, data);
       }
 
@@ -40491,7 +40756,8 @@ var $$AnimateQueueProvider = ['$animateProvider', function($animateProvider) {
     }
 
     function areAnimationsAllowed(element, parentElement, event) {
-      var bodyElementDetected = isMatchingElement(element, $$body) || element[0].nodeName === 'HTML';
+      var bodyElement = jqLite($document[0].body);
+      var bodyElementDetected = isMatchingElement(element, bodyElement) || element[0].nodeName === 'HTML';
       var rootElementDetected = isMatchingElement(element, $rootElement);
       var parentAnimationDetected = false;
       var animateChildren;
@@ -40547,7 +40813,7 @@ var $$AnimateQueueProvider = ['$animateProvider', function($animateProvider) {
         if (!bodyElementDetected) {
           // we also need to ensure that the element is or will be apart of the body element
           // otherwise it is pointless to even issue an animation to be rendered
-          bodyElementDetected = isMatchingElement(parentElement, $$body);
+          bodyElementDetected = isMatchingElement(parentElement, bodyElement);
         }
 
         parentElement = parentElement.parent();
@@ -41138,7 +41404,6 @@ var $$AnimationProvider = ['$animateProvider', function($animateProvider) {
 
 /* global angularAnimateModule: true,
 
-   $$BodyProvider,
    $$AnimateAsyncRunFactory,
    $$rAFSchedulerFactory,
    $$AnimateChildrenDirective,
@@ -41427,7 +41692,7 @@ var $$AnimationProvider = ['$animateProvider', function($animateProvider) {
  *       jQuery(element).fadeOut(1000, doneFn);
  *     }
  *   }
- * }]
+ * }]);
  * ```
  *
  * The nice thing about JS-based animations is that we can inject other services and make use of advanced animation libraries such as
@@ -41458,7 +41723,7 @@ var $$AnimationProvider = ['$animateProvider', function($animateProvider) {
  *       // do some cool animation and call the doneFn
  *     }
  *   }
- * }]
+ * }]);
  * ```
  *
  * ## CSS + JS Animations Together
@@ -41480,7 +41745,7 @@ var $$AnimationProvider = ['$animateProvider', function($animateProvider) {
  *       jQuery(element).slideIn(1000, doneFn);
  *     }
  *   }
- * }]
+ * }]);
  * ```
  *
  * ```css
@@ -41500,16 +41765,15 @@ var $$AnimationProvider = ['$animateProvider', function($animateProvider) {
  * ```js
  * myModule.animation('.slide', ['$animateCss', function($animateCss) {
  *   return {
- *     enter: function(element, doneFn) {
+ *     enter: function(element) {
 *        // this will trigger `.slide.ng-enter` and `.slide.ng-enter-active`.
- *       var runner = $animateCss(element, {
+ *       return $animateCss(element, {
  *         event: 'enter',
  *         structural: true
- *       }).start();
-*        runner.done(doneFn);
+ *       });
  *     }
  *   }
- * }]
+ * }]);
  * ```
  *
  * The nice thing here is that we can save bandwidth by sticking to our CSS-based animation code and we don't need to rely on a 3rd-party animation framework.
@@ -41521,19 +41785,17 @@ var $$AnimationProvider = ['$animateProvider', function($animateProvider) {
  * ```js
  * myModule.animation('.slide', ['$animateCss', function($animateCss) {
  *   return {
- *     enter: function(element, doneFn) {
- *       var runner = $animateCss(element, {
+ *     enter: function(element) {
+ *       return $animateCss(element, {
  *         event: 'enter',
  *         structural: true,
  *         addClass: 'maroon-setting',
  *         from: { height:0 },
  *         to: { height: 200 }
- *       }).start();
- *
- *       runner.done(doneFn);
+ *       });
  *     }
  *   }
- * }]
+ * }]);
  * ```
  *
  * Now we can fill in the rest via our transition CSS code:
@@ -41878,8 +42140,6 @@ var $$AnimationProvider = ['$animateProvider', function($animateProvider) {
  * Click here {@link ng.$animate to learn more about animations with `$animate`}.
  */
 angular.module('ngAnimate', [])
-  .provider('$$body', $$BodyProvider)
-
   .directive('ngAnimateChildren', $$AnimateChildrenDirective)
   .factory('$$rAFScheduler', $$rAFSchedulerFactory)
 
@@ -41899,7 +42159,7 @@ angular.module('ngAnimate', [])
 })(window, window.angular);
 
 /**
- * @license AngularJS v1.4.6
+ * @license AngularJS v1.4.8
  * (c) 2010-2015 Google, Inc. http://angularjs.org
  * License: MIT
  */
@@ -42140,7 +42400,8 @@ ngAriaModule.directive('ngShow', ['$aria', function($aria) {
           }
         },
         post: function(scope, elem, attr, ngModel) {
-          var needsTabIndex = shouldAttachAttr('tabindex', 'tabindex', elem);
+          var needsTabIndex = shouldAttachAttr('tabindex', 'tabindex', elem)
+                                && !isNodeOneOf(elem, nodeBlackList);
 
           function ngAriaWatchModelValue() {
             return ngModel.$modelValue;
@@ -42297,7 +42558,7 @@ ngAriaModule.directive('ngShow', ['$aria', function($aria) {
 })(window, window.angular);
 
 /**
- * @license AngularJS v1.4.6
+ * @license AngularJS v1.4.8
  * (c) 2010-2015 Google, Inc. http://angularjs.org
  * License: MIT
  */
@@ -42619,7 +42880,7 @@ angular.module('ngCookies').provider('$$cookieWriter', function $$CookieWriterPr
 })(window, window.angular);
 
 /**
- * @license AngularJS v1.4.6
+ * @license AngularJS v1.4.8
  * (c) 2010-2015 Google, Inc. http://angularjs.org
  * License: MIT
  */
@@ -42950,6 +43211,9 @@ angular.module('ngMessages', [])
        controller: ['$element', '$scope', '$attrs', function($element, $scope, $attrs) {
          var ctrl = this;
          var latestKey = 0;
+         var nextAttachId = 0;
+
+         this.getAttachId = function getAttachId() { return nextAttachId++; };
 
          var messages = this.messages = {};
          var renderLater, cachedCollection;
@@ -43261,11 +43525,15 @@ function ngMessageDirectiveFactory(restrict) {
                 $animate.enter(elm, null, element);
                 currentElement = elm;
 
+                // Each time we attach this node to a message we get a new id that we can match
+                // when we are destroying the node later.
+                var $$attachId = currentElement.$$attachId = ngMessagesCtrl.getAttachId();
+
                 // in the event that the parent element is destroyed
                 // by any other structural directive then it's time
                 // to deregister the message from the controller
                 currentElement.on('$destroy', function() {
-                  if (currentElement) {
+                  if (currentElement && currentElement.$$attachId === $$attachId) {
                     ngMessagesCtrl.deregister(commentNode);
                     messageCtrl.detach();
                   }
@@ -43298,7 +43566,7 @@ function ngMessageDirectiveFactory(restrict) {
 })(window, window.angular);
 
 /**
- * @license AngularJS v1.4.6
+ * @license AngularJS v1.4.8
  * (c) 2010-2015 Google, Inc. http://angularjs.org
  * License: MIT
  */
@@ -43872,8 +44140,17 @@ angular.module('ngResource', ['ng']).
               undefined;
 
             forEach(action, function(value, key) {
-              if (key != 'params' && key != 'isArray' && key != 'interceptor') {
-                httpConfig[key] = copy(value);
+              switch (key) {
+                default:
+                  httpConfig[key] = copy(value);
+                  break;
+                case 'params':
+                case 'isArray':
+                case 'interceptor':
+                  break;
+                case 'timeout':
+                  httpConfig[key] = value;
+                  break;
               }
             });
 
@@ -43974,7 +44251,7 @@ angular.module('ngResource', ['ng']).
 })(window, window.angular);
 
 /**
- * @license AngularJS v1.4.6
+ * @license AngularJS v1.4.8
  * (c) 2010-2015 Google, Inc. http://angularjs.org
  * License: MIT
  */
@@ -44966,7 +45243,7 @@ function ngViewFillContentFactory($compile, $controller, $route) {
 })(window, window.angular);
 
 /**
- * @license AngularJS v1.4.6
+ * @license AngularJS v1.4.8
  * (c) 2010-2015 Google, Inc. http://angularjs.org
  * License: MIT
  */
@@ -45650,7 +45927,7 @@ angular.module('ngSanitize').filter('linky', ['$sanitize', function($sanitize) {
 })(window, window.angular);
 
 /**
- * @license AngularJS v1.4.6
+ * @license AngularJS v1.4.8
  * (c) 2010-2015 Google, Inc. http://angularjs.org
  * License: MIT
  */
@@ -51731,7 +52008,7 @@ if ( typeof Object.getPrototypeOf !== "function" ) {
 })();
 
 /*!
- * Bootstrap v3.3.5 (http://getbootstrap.com)
+ * Bootstrap v3.3.6 (http://getbootstrap.com)
  * Copyright 2011-2015 Twitter, Inc.
  * Licensed under the MIT license
  */
@@ -51743,13 +52020,13 @@ if (typeof jQuery === 'undefined') {
 +function ($) {
   'use strict';
   var version = $.fn.jquery.split(' ')[0].split('.')
-  if ((version[0] < 2 && version[1] < 9) || (version[0] == 1 && version[1] == 9 && version[2] < 1)) {
-    throw new Error('Bootstrap\'s JavaScript requires jQuery version 1.9.1 or higher')
+  if ((version[0] < 2 && version[1] < 9) || (version[0] == 1 && version[1] == 9 && version[2] < 1) || (version[0] > 2)) {
+    throw new Error('Bootstrap\'s JavaScript requires jQuery version 1.9.1 or higher, but lower than version 3')
   }
 }(jQuery);
 
 /* ========================================================================
- * Bootstrap: transition.js v3.3.5
+ * Bootstrap: transition.js v3.3.6
  * http://getbootstrap.com/javascript/#transitions
  * ========================================================================
  * Copyright 2011-2015 Twitter, Inc.
@@ -51809,7 +52086,7 @@ if (typeof jQuery === 'undefined') {
 }(jQuery);
 
 /* ========================================================================
- * Bootstrap: alert.js v3.3.5
+ * Bootstrap: alert.js v3.3.6
  * http://getbootstrap.com/javascript/#alerts
  * ========================================================================
  * Copyright 2011-2015 Twitter, Inc.
@@ -51828,7 +52105,7 @@ if (typeof jQuery === 'undefined') {
     $(el).on('click', dismiss, this.close)
   }
 
-  Alert.VERSION = '3.3.5'
+  Alert.VERSION = '3.3.6'
 
   Alert.TRANSITION_DURATION = 150
 
@@ -51904,7 +52181,7 @@ if (typeof jQuery === 'undefined') {
 }(jQuery);
 
 /* ========================================================================
- * Bootstrap: button.js v3.3.5
+ * Bootstrap: button.js v3.3.6
  * http://getbootstrap.com/javascript/#buttons
  * ========================================================================
  * Copyright 2011-2015 Twitter, Inc.
@@ -51924,7 +52201,7 @@ if (typeof jQuery === 'undefined') {
     this.isLoading = false
   }
 
-  Button.VERSION  = '3.3.5'
+  Button.VERSION  = '3.3.6'
 
   Button.DEFAULTS = {
     loadingText: 'loading...'
@@ -52025,7 +52302,7 @@ if (typeof jQuery === 'undefined') {
 }(jQuery);
 
 /* ========================================================================
- * Bootstrap: carousel.js v3.3.5
+ * Bootstrap: carousel.js v3.3.6
  * http://getbootstrap.com/javascript/#carousel
  * ========================================================================
  * Copyright 2011-2015 Twitter, Inc.
@@ -52056,7 +52333,7 @@ if (typeof jQuery === 'undefined') {
       .on('mouseleave.bs.carousel', $.proxy(this.cycle, this))
   }
 
-  Carousel.VERSION  = '3.3.5'
+  Carousel.VERSION  = '3.3.6'
 
   Carousel.TRANSITION_DURATION = 600
 
@@ -52263,7 +52540,7 @@ if (typeof jQuery === 'undefined') {
 }(jQuery);
 
 /* ========================================================================
- * Bootstrap: collapse.js v3.3.5
+ * Bootstrap: collapse.js v3.3.6
  * http://getbootstrap.com/javascript/#collapse
  * ========================================================================
  * Copyright 2011-2015 Twitter, Inc.
@@ -52293,7 +52570,7 @@ if (typeof jQuery === 'undefined') {
     if (this.options.toggle) this.toggle()
   }
 
-  Collapse.VERSION  = '3.3.5'
+  Collapse.VERSION  = '3.3.6'
 
   Collapse.TRANSITION_DURATION = 350
 
@@ -52475,7 +52752,7 @@ if (typeof jQuery === 'undefined') {
 }(jQuery);
 
 /* ========================================================================
- * Bootstrap: dropdown.js v3.3.5
+ * Bootstrap: dropdown.js v3.3.6
  * http://getbootstrap.com/javascript/#dropdowns
  * ========================================================================
  * Copyright 2011-2015 Twitter, Inc.
@@ -52495,7 +52772,7 @@ if (typeof jQuery === 'undefined') {
     $(element).on('click.bs.dropdown', this.toggle)
   }
 
-  Dropdown.VERSION = '3.3.5'
+  Dropdown.VERSION = '3.3.6'
 
   function getParent($this) {
     var selector = $this.attr('data-target')
@@ -52527,7 +52804,7 @@ if (typeof jQuery === 'undefined') {
       if (e.isDefaultPrevented()) return
 
       $this.attr('aria-expanded', 'false')
-      $parent.removeClass('open').trigger('hidden.bs.dropdown', relatedTarget)
+      $parent.removeClass('open').trigger($.Event('hidden.bs.dropdown', relatedTarget))
     })
   }
 
@@ -52561,7 +52838,7 @@ if (typeof jQuery === 'undefined') {
 
       $parent
         .toggleClass('open')
-        .trigger('shown.bs.dropdown', relatedTarget)
+        .trigger($.Event('shown.bs.dropdown', relatedTarget))
     }
 
     return false
@@ -52641,7 +52918,7 @@ if (typeof jQuery === 'undefined') {
 }(jQuery);
 
 /* ========================================================================
- * Bootstrap: modal.js v3.3.5
+ * Bootstrap: modal.js v3.3.6
  * http://getbootstrap.com/javascript/#modals
  * ========================================================================
  * Copyright 2011-2015 Twitter, Inc.
@@ -52675,7 +52952,7 @@ if (typeof jQuery === 'undefined') {
     }
   }
 
-  Modal.VERSION  = '3.3.5'
+  Modal.VERSION  = '3.3.6'
 
   Modal.TRANSITION_DURATION = 300
   Modal.BACKDROP_TRANSITION_DURATION = 150
@@ -52979,7 +53256,7 @@ if (typeof jQuery === 'undefined') {
 }(jQuery);
 
 /* ========================================================================
- * Bootstrap: tooltip.js v3.3.5
+ * Bootstrap: tooltip.js v3.3.6
  * http://getbootstrap.com/javascript/#tooltip
  * Inspired by the original jQuery.tipsy by Jason Frame
  * ========================================================================
@@ -53006,7 +53283,7 @@ if (typeof jQuery === 'undefined') {
     this.init('tooltip', element, options)
   }
 
-  Tooltip.VERSION  = '3.3.5'
+  Tooltip.VERSION  = '3.3.6'
 
   Tooltip.TRANSITION_DURATION = 150
 
@@ -53494,7 +53771,7 @@ if (typeof jQuery === 'undefined') {
 }(jQuery);
 
 /* ========================================================================
- * Bootstrap: popover.js v3.3.5
+ * Bootstrap: popover.js v3.3.6
  * http://getbootstrap.com/javascript/#popovers
  * ========================================================================
  * Copyright 2011-2015 Twitter, Inc.
@@ -53514,7 +53791,7 @@ if (typeof jQuery === 'undefined') {
 
   if (!$.fn.tooltip) throw new Error('Popover requires tooltip.js')
 
-  Popover.VERSION  = '3.3.5'
+  Popover.VERSION  = '3.3.6'
 
   Popover.DEFAULTS = $.extend({}, $.fn.tooltip.Constructor.DEFAULTS, {
     placement: 'right',
@@ -53603,7 +53880,7 @@ if (typeof jQuery === 'undefined') {
 }(jQuery);
 
 /* ========================================================================
- * Bootstrap: scrollspy.js v3.3.5
+ * Bootstrap: scrollspy.js v3.3.6
  * http://getbootstrap.com/javascript/#scrollspy
  * ========================================================================
  * Copyright 2011-2015 Twitter, Inc.
@@ -53632,7 +53909,7 @@ if (typeof jQuery === 'undefined') {
     this.process()
   }
 
-  ScrollSpy.VERSION  = '3.3.5'
+  ScrollSpy.VERSION  = '3.3.6'
 
   ScrollSpy.DEFAULTS = {
     offset: 10
@@ -53776,7 +54053,7 @@ if (typeof jQuery === 'undefined') {
 }(jQuery);
 
 /* ========================================================================
- * Bootstrap: tab.js v3.3.5
+ * Bootstrap: tab.js v3.3.6
  * http://getbootstrap.com/javascript/#tabs
  * ========================================================================
  * Copyright 2011-2015 Twitter, Inc.
@@ -53796,7 +54073,7 @@ if (typeof jQuery === 'undefined') {
     // jscs:enable requireDollarBeforejQueryAssignment
   }
 
-  Tab.VERSION = '3.3.5'
+  Tab.VERSION = '3.3.6'
 
   Tab.TRANSITION_DURATION = 150
 
@@ -53932,7 +54209,7 @@ if (typeof jQuery === 'undefined') {
 }(jQuery);
 
 /* ========================================================================
- * Bootstrap: affix.js v3.3.5
+ * Bootstrap: affix.js v3.3.6
  * http://getbootstrap.com/javascript/#affix
  * ========================================================================
  * Copyright 2011-2015 Twitter, Inc.
@@ -53961,7 +54238,7 @@ if (typeof jQuery === 'undefined') {
     this.checkPosition()
   }
 
-  Affix.VERSION  = '3.3.5'
+  Affix.VERSION  = '3.3.6'
 
   Affix.RESET    = 'affix affix-top affix-bottom'
 
@@ -73107,1999 +73384,3 @@ angular.module("template/typeahead/typeahead-popup.html", []).run(["$templateCac
     "");
 }]);
 !angular.$$csp() && angular.element(document).find('head').prepend('<style type="text/css">.ng-animate.item:not(.left):not(.right){-webkit-transition:0s ease-in-out left;transition:0s ease-in-out left}</style>');
-/**!
- * AngularJS file upload directives and services. Supoorts: file upload/drop/paste, resume, cancel/abort,
- * progress, resize, thumbnail, preview, validation and CORS
- * @author  Danial  <danial.farid@gmail.com>
- * @version 10.0.2
- */
-
-if (window.XMLHttpRequest && !(window.FileAPI && FileAPI.shouldLoad)) {
-  window.XMLHttpRequest.prototype.setRequestHeader = (function (orig) {
-    return function (header, value) {
-      if (header === '__setXHR_') {
-        var val = value(this);
-        // fix for angular < 1.2.0
-        if (val instanceof Function) {
-          val(this);
-        }
-      } else {
-        orig.apply(this, arguments);
-      }
-    };
-  })(window.XMLHttpRequest.prototype.setRequestHeader);
-}
-
-var ngFileUpload = angular.module('ngFileUpload', []);
-
-ngFileUpload.version = '10.0.2';
-
-ngFileUpload.service('UploadBase', ['$http', '$q', '$timeout', function ($http, $q, $timeout) {
-  var upload = this;
-
-  this.isResumeSupported = function () {
-    return window.Blob && (Blob instanceof Function) && new Blob().slice;
-  };
-
-  var resumeSupported = this.isResumeSupported();
-
-  function sendHttp(config) {
-    config.method = config.method || 'POST';
-    config.headers = config.headers || {};
-
-    var deferred = config._deferred = config._deferred || $q.defer();
-    var promise = deferred.promise;
-
-    function notifyProgress(e) {
-      if (deferred.notify) {
-        deferred.notify(e);
-      }
-      if (promise.progressFunc) {
-        $timeout(function () {
-          promise.progressFunc(e);
-        });
-      }
-    }
-
-    function getNotifyEvent(n) {
-      if (config._start != null && resumeSupported) {
-        return {
-          loaded: n.loaded + config._start, total: config._file.size, type: n.type, config: config,
-          lengthComputable: true, target: n.target
-        };
-      } else {
-        return n;
-      }
-    }
-
-    if (!config.disableProgress) {
-      config.headers.__setXHR_ = function () {
-        return function (xhr) {
-          if (!xhr || !(xhr instanceof XMLHttpRequest)) return;
-          config.__XHR = xhr;
-          if (config.xhrFn) config.xhrFn(xhr);
-          xhr.upload.addEventListener('progress', function (e) {
-            e.config = config;
-            notifyProgress(getNotifyEvent(e));
-          }, false);
-          //fix for firefox not firing upload progress end, also IE8-9
-          xhr.upload.addEventListener('load', function (e) {
-            if (e.lengthComputable) {
-              e.config = config;
-              notifyProgress(getNotifyEvent(e));
-            }
-          }, false);
-        };
-      };
-    }
-
-    function uploadWithAngular() {
-      $http(config).then(function (r) {
-        if (resumeSupported && config._chunkSize && !config._finished) {
-          notifyProgress({loaded: config._end, total: config._file.size, config: config, type: 'progress'});
-          upload.upload(config);
-        } else {
-          if (config._finished) delete config._finished;
-          deferred.resolve(r);
-        }
-      }, function (e) {
-        deferred.reject(e);
-      }, function (n) {
-        deferred.notify(n);
-      });
-    }
-
-    if (!resumeSupported) {
-      uploadWithAngular();
-    } else if (config._chunkSize && config._end && !config._finished) {
-      config._start = config._end;
-      config._end += config._chunkSize;
-      uploadWithAngular();
-    } else if (config.resumeSizeUrl) {
-      $http.get(config.resumeSizeUrl).then(function (resp) {
-        if (config.resumeSizeResponseReader) {
-          config._start = config.resumeSizeResponseReader(resp.data);
-        } else {
-          config._start = parseInt((resp.data.size == null ? resp.data : resp.data.size).toString());
-        }
-        if (config._chunkSize) {
-          config._end = config._start + config._chunkSize;
-        }
-        uploadWithAngular();
-      }, function (e) {
-        throw e;
-      });
-    } else if (config.resumeSize) {
-      config.resumeSize().then(function (size) {
-        config._start = size;
-        uploadWithAngular();
-      }, function (e) {
-        throw e;
-      });
-    } else {
-      uploadWithAngular();
-    }
-
-
-    promise.success = function (fn) {
-      promise.then(function (response) {
-        fn(response.data, response.status, response.headers, config);
-      });
-      return promise;
-    };
-
-    promise.error = function (fn) {
-      promise.then(null, function (response) {
-        fn(response.data, response.status, response.headers, config);
-      });
-      return promise;
-    };
-
-    promise.progress = function (fn) {
-      promise.progressFunc = fn;
-      promise.then(null, null, function (n) {
-        fn(n);
-      });
-      return promise;
-    };
-    promise.abort = promise.pause = function () {
-      if (config.__XHR) {
-        $timeout(function () {
-          config.__XHR.abort();
-        });
-      }
-      return promise;
-    };
-    promise.xhr = function (fn) {
-      config.xhrFn = (function (origXhrFn) {
-        return function () {
-          if (origXhrFn) origXhrFn.apply(promise, arguments);
-          fn.apply(promise, arguments);
-        };
-      })(config.xhrFn);
-      return promise;
-    };
-
-    return promise;
-  }
-
-  this.rename = function (file, name) {
-    file.ngfName = name;
-    return file;
-  };
-
-  this.jsonBlob = function (val) {
-    if (val != null && !angular.isString(val)) {
-      val = JSON.stringify(val);
-    }
-    var blob = new Blob([val], {type: 'application/json'});
-    blob._ngfBlob = true;
-    return blob;
-  };
-
-  this.json = function (val) {
-    return angular.toJson(val);
-  };
-
-  this.upload = function (config) {
-    function isFile(file) {
-      return file != null && (file instanceof Blob || (file.flashId && file.name && file.size));
-    }
-
-    function toResumeFile(file, formData) {
-      if (file._ngfBlob) return file;
-      config._file = config._file || file;
-      if (config._start != null && resumeSupported) {
-        if (config._end && config._end >= file.size) {
-          config._finished = true;
-          config._end = file.size;
-        }
-        var slice = file.slice(config._start, config._end || file.size);
-        slice.name = file.name;
-        slice.ngfName = file.ngfName;
-        if (config._chunkSize) {
-          formData.append('_chunkSize', config._end - config._start);
-          formData.append('_chunkNumber', Math.floor(config._start / config._chunkSize));
-          formData.append('_totalSize', config._file.size);
-        }
-        return slice;
-      }
-      return file;
-    }
-
-    function addFieldToFormData(formData, val, key) {
-      if (val !== undefined) {
-        if (angular.isDate(val)) {
-          val = val.toISOString();
-        }
-        if (angular.isString(val)) {
-          formData.append(key, val);
-        } else if (isFile(val)) {
-          var file = toResumeFile(val, formData);
-          var split = key.split(',');
-          if (split[1]) {
-            file.ngfName = split[1].replace(/^\s+|\s+$/g, '');
-            key = split[0];
-          }
-          config._fileKey = config._fileKey || key;
-          formData.append(key, file, file.ngfName || file.name);
-        } else {
-          if (angular.isObject(val)) {
-            if (val.$$ngfCircularDetection) throw 'ngFileUpload: Circular reference in config.data. Make sure specified data for Upload.upload() has no circular reference: ' + key;
-
-            val.$$ngfCircularDetection = true;
-            try {
-              for (var k in val) {
-                if (val.hasOwnProperty(k) && k !== '$$ngfCircularDetection') {
-                  var objectKey = config.objectKey == null ? '[i]' : config.objectKey;
-                  if (val.length && parseInt(k) > -1) {
-                    objectKey = config.arrayKey == null ? objectKey : config.arrayKey;
-                  }
-                  addFieldToFormData(formData, val[k], key + objectKey.replace(/[ik]/g, k));
-                }
-              }
-            } finally {
-              delete val.$$ngfCircularDetection;
-            }
-          } else {
-            formData.append(key, val);
-          }
-        }
-      }
-    }
-
-    function digestConfig() {
-      config._chunkSize = upload.translateScalars(config.resumeChunkSize);
-      config._chunkSize = config._chunkSize ? parseInt(config._chunkSize.toString()) : null;
-
-      config.headers = config.headers || {};
-      config.headers['Content-Type'] = undefined;
-      config.transformRequest = config.transformRequest ?
-        (angular.isArray(config.transformRequest) ?
-          config.transformRequest : [config.transformRequest]) : [];
-      config.transformRequest.push(function (data) {
-        var formData = new FormData(), key;
-        data = data || config.fields || {};
-        if (config.file) {
-          data.file = config.file;
-        }
-        for (key in data) {
-          if (data.hasOwnProperty(key)) {
-            var val = data[key];
-            if (config.formDataAppender) {
-              config.formDataAppender(formData, key, val);
-            } else {
-              addFieldToFormData(formData, val, key);
-            }
-          }
-        }
-
-        return formData;
-      });
-    }
-
-    if (!config._isDigested) {
-      config._isDigested = true;
-      digestConfig();
-    }
-
-    return sendHttp(config);
-  };
-
-  this.http = function (config) {
-    config.transformRequest = config.transformRequest || function (data) {
-        if ((window.ArrayBuffer && data instanceof window.ArrayBuffer) || data instanceof Blob) {
-          return data;
-        }
-        return $http.defaults.transformRequest[0].apply(this, arguments);
-      };
-    config._chunkSize = upload.translateScalars(config.resumeChunkSize);
-    config._chunkSize = config._chunkSize ? parseInt(config._chunkSize.toString()) : null;
-
-    return sendHttp(config);
-  };
-
-  this.translateScalars = function (str) {
-    if (angular.isString(str)) {
-      if (str.search(/kb/i) === str.length - 2) {
-        return parseFloat(str.substring(0, str.length - 2) * 1000);
-      } else if (str.search(/mb/i) === str.length - 2) {
-        return parseFloat(str.substring(0, str.length - 2) * 1000000);
-      } else if (str.search(/gb/i) === str.length - 2) {
-        return parseFloat(str.substring(0, str.length - 2) * 1000000000);
-      } else if (str.search(/b/i) === str.length - 1) {
-        return parseFloat(str.substring(0, str.length - 1));
-      } else if (str.search(/s/i) === str.length - 1) {
-        return parseFloat(str.substring(0, str.length - 1));
-      } else if (str.search(/m/i) === str.length - 1) {
-        return parseFloat(str.substring(0, str.length - 1) * 60);
-      } else if (str.search(/h/i) === str.length - 1) {
-        return parseFloat(str.substring(0, str.length - 1) * 3600);
-      }
-    }
-    return str;
-  };
-
-  this.setDefaults = function (defaults) {
-    this.defaults = defaults || {};
-  };
-
-  this.defaults = {};
-  this.version = ngFileUpload.version;
-}
-
-]);
-
-ngFileUpload.service('Upload', ['$parse', '$timeout', '$compile', '$q', 'UploadExif', function ($parse, $timeout, $compile, $q, UploadExif) {
-  var upload = UploadExif;
-  upload.getAttrWithDefaults = function (attr, name) {
-    if (attr[name] != null) return attr[name];
-    var def = upload.defaults[name];
-    return (def == null ? def : (angular.isString(def) ? def : JSON.stringify(def)));
-  };
-
-  upload.attrGetter = function (name, attr, scope, params) {
-    var attrVal = this.getAttrWithDefaults(attr, name);
-    if (scope) {
-      try {
-        if (params) {
-          return $parse(attrVal)(scope, params);
-        } else {
-          return $parse(attrVal)(scope);
-        }
-      } catch (e) {
-        // hangle string value without single qoute
-        if (name.search(/min|max|pattern/i)) {
-          return attrVal;
-        } else {
-          throw e;
-        }
-      }
-    } else {
-      return attrVal;
-    }
-  };
-
-  upload.shouldUpdateOn = function (type, attr, scope) {
-    var modelOptions = upload.attrGetter('ngModelOptions', attr, scope);
-    if (modelOptions && modelOptions.updateOn) {
-      return modelOptions.updateOn.split(' ').indexOf(type) > -1;
-    }
-    return true;
-  };
-
-  upload.emptyPromise = function () {
-    var d = $q.defer();
-    var args = arguments;
-    $timeout(function () {
-      d.resolve.apply(d, args);
-    });
-    return d.promise;
-  };
-
-  upload.happyPromise = function (promise, data) {
-    var d = $q.defer();
-    promise.then(function (result) {
-      d.resolve(result);
-    }, function (error) {
-      $timeout(function () {
-        throw error;
-      });
-      d.resolve(data);
-    });
-    return d.promise;
-  };
-
-  function applyExifRotations(files, attr, scope) {
-    var promises = [upload.emptyPromise()];
-    angular.forEach(files, function (f, i) {
-      if (f.type.indexOf('image/jpeg') === 0 && upload.attrGetter('ngfFixOrientation', attr, scope, {$file: f})) {
-        promises.push(upload.happyPromise(upload.applyExifRotation(f), f).then(function (fixedFile) {
-          files.splice(i, 1, fixedFile);
-        }));
-      }
-    });
-    return $q.all(promises);
-  }
-
-  function resize(files, attr, scope) {
-    var param = upload.attrGetter('ngfResize', attr, scope);
-    if (!param || !upload.isResizeSupported() || !files.length) return upload.emptyPromise();
-    var promises = [upload.emptyPromise()];
-    angular.forEach(files, function (f, i) {
-      if (f.type.indexOf('image') === 0) {
-        var promise = upload.resize(f, param.width, param.height, param.quality, param.type);
-        promises.push(promise);
-        promise.then(function (resizedFile) {
-          files.splice(i, 1, resizedFile);
-        }, function (e) {
-          f.$error = 'resize';
-          f.$errorParam = (e ? (e.message ? e.message : e) + ': ' : '') + (f && f.name);
-        });
-      }
-    });
-    return $q.all(promises);
-  }
-
-  function handleKeep(files, prevFiles, attr, scope) {
-    var dupFiles = [];
-    var keep = upload.attrGetter('ngfKeep', attr, scope);
-    if (keep) {
-      var hasNew = false;
-
-      if (keep === 'distinct' || upload.attrGetter('ngfKeepDistinct', attr, scope) === true) {
-        var len = prevFiles.length;
-        if (files) {
-          for (var i = 0; i < files.length; i++) {
-            for (var j = 0; j < len; j++) {
-              if (files[i].name === prevFiles[j].name) {
-                dupFiles.push(files[i]);
-                break;
-              }
-            }
-            if (j === len) {
-              prevFiles.push(files[i]);
-              hasNew = true;
-            }
-          }
-        }
-        files = prevFiles;
-      } else {
-        files = prevFiles.concat(files || []);
-      }
-    }
-    return {files: files, dupFiles: dupFiles, keep: keep};
-  }
-
-  upload.updateModel = function (ngModel, attr, scope, fileChange, files, evt, noDelay) {
-    function update(files, invalidFiles, newFiles, dupFiles, isSingleModel) {
-      var file = files && files.length ? files[0] : null;
-
-      if (ngModel) {
-        upload.applyModelValidation(ngModel, files);
-        ngModel.$ngfModelChange = true;
-        ngModel.$setViewValue(isSingleModel ? file : files);
-      }
-
-      if (fileChange) {
-        $parse(fileChange)(scope, {
-          $files: files,
-          $file: file,
-          $newFiles: newFiles,
-          $duplicateFiles: dupFiles,
-          $invalidFiles: invalidFiles,
-          $event: evt
-        });
-      }
-
-      var invalidModel = upload.attrGetter('ngfModelInvalid', attr);
-      if (invalidModel) {
-        $timeout(function () {
-          $parse(invalidModel).assign(scope, invalidFiles);
-        });
-      }
-      $timeout(function () {
-        // scope apply changes
-      });
-    }
-
-    var newFiles = files;
-    var prevFiles = ((ngModel && ngModel.$modelValue) || attr.$$ngfPrevFiles || []).slice(0);
-    var keepResult = handleKeep(files, prevFiles, attr, scope);
-    files = keepResult.files;
-    var dupFiles = keepResult.dupFiles;
-    var isSingleModel = !upload.attrGetter('ngfMultiple', attr, scope) && !upload.attrGetter('multiple', attr) && !keepResult.keep;
-
-    attr.$$ngfPrevFiles = files;
-
-    if (keepResult.keep && (!newFiles || !newFiles.length)) return;
-
-    upload.validate(newFiles, ngModel, attr, scope).then(function () {
-      if (noDelay) {
-        update(files, [], newFiles, dupFiles, isSingleModel);
-      } else {
-        var options = upload.attrGetter('ngModelOptions', attr, scope);
-        if (!options || !options.allowInvalid) {
-          var valids = [], invalids = [];
-          angular.forEach(files, function (file) {
-            if (file.$error) {
-              invalids.push(file);
-            } else {
-              valids.push(file);
-            }
-          });
-          files = valids;
-        }
-        var fixOrientation = upload.emptyPromise(files);
-        if (upload.attrGetter('ngfFixOrientation', attr, scope) && upload.isExifSupported()) {
-          fixOrientation = applyExifRotations(files, attr, scope);
-        }
-        fixOrientation.then(function () {
-          resize(files, attr, scope).then(function () {
-            $timeout(function () {
-              update(files, invalids, newFiles, dupFiles, isSingleModel);
-            }, options && options.debounce ? options.debounce.change || options.debounce : 0);
-          }, function (e) {
-            throw 'Could not resize files ' + e;
-          });
-        });
-      }
-    });
-
-    // cleaning object url memories
-    var l = prevFiles.length;
-    while (l--) {
-      var prevFile = prevFiles[l];
-      if (window.URL && prevFile.blobUrl) {
-        URL.revokeObjectURL(prevFile.blobUrl);
-        delete prevFile.blobUrl;
-      }
-    }
-  };
-
-  return upload;
-}]);
-
-ngFileUpload.directive('ngfSelect', ['$parse', '$timeout', '$compile', 'Upload', function ($parse, $timeout, $compile, Upload) {
-  var generatedElems = [];
-
-  function isDelayedClickSupported(ua) {
-    // fix for android native browser < 4.4 and safari windows
-    var m = ua.match(/Android[^\d]*(\d+)\.(\d+)/);
-    if (m && m.length > 2) {
-      var v = Upload.defaults.androidFixMinorVersion || 4;
-      return parseInt(m[1]) < 4 || (parseInt(m[1]) === v && parseInt(m[2]) < v);
-    }
-
-    // safari on windows
-    return ua.indexOf('Chrome') === -1 && /.*Windows.*Safari.*/.test(ua);
-  }
-
-  function linkFileSelect(scope, elem, attr, ngModel, $parse, $timeout, $compile, upload) {
-    /** @namespace attr.ngfSelect */
-    /** @namespace attr.ngfChange */
-    /** @namespace attr.ngModel */
-    /** @namespace attr.ngModelOptions */
-    /** @namespace attr.ngfMultiple */
-    /** @namespace attr.ngfCapture */
-    /** @namespace attr.ngfValidate */
-    /** @namespace attr.ngfKeep */
-    var attrGetter = function (name, scope) {
-      return upload.attrGetter(name, attr, scope);
-    };
-
-    function isInputTypeFile() {
-      return elem[0].tagName.toLowerCase() === 'input' && attr.type && attr.type.toLowerCase() === 'file';
-    }
-
-    function fileChangeAttr() {
-      return attrGetter('ngfChange') || attrGetter('ngfSelect');
-    }
-
-    function changeFn(evt) {
-      if (upload.shouldUpdateOn('change', attr, scope)) {
-        var fileList = evt.__files_ || (evt.target && evt.target.files), files = [];
-        for (var i = 0; i < fileList.length; i++) {
-          files.push(fileList[i]);
-        }
-        upload.updateModel(ngModel, attr, scope, fileChangeAttr(),
-          files.length ? files : null, evt);
-      }
-    }
-
-    upload.registerModelChangeValidator(ngModel, attr, scope);
-
-    var unwatches = [];
-    unwatches.push(scope.$watch(attrGetter('ngfMultiple'), function () {
-      fileElem.attr('multiple', attrGetter('ngfMultiple', scope));
-    }));
-    unwatches.push(scope.$watch(attrGetter('ngfCapture'), function () {
-      fileElem.attr('capture', attrGetter('ngfCapture', scope));
-    }));
-    attr.$observe('accept', function () {
-      fileElem.attr('accept', attrGetter('accept'));
-    });
-    unwatches.push(function () {
-      if (attr.$$observers) delete attr.$$observers.accept;
-    });
-    function bindAttrToFileInput(fileElem) {
-      if (elem !== fileElem) {
-        for (var i = 0; i < elem[0].attributes.length; i++) {
-          var attribute = elem[0].attributes[i];
-          if (attribute.name !== 'type' && attribute.name !== 'class' &&
-            attribute.name !== 'id' && attribute.name !== 'style') {
-            if (attribute.value == null || attribute.value === '') {
-              if (attribute.name === 'required') attribute.value = 'required';
-              if (attribute.name === 'multiple') attribute.value = 'multiple';
-            }
-            fileElem.attr(attribute.name, attribute.value);
-          }
-        }
-      }
-    }
-
-    function createFileInput() {
-      if (isInputTypeFile()) {
-        return elem;
-      }
-
-      var fileElem = angular.element('<input type="file">');
-      bindAttrToFileInput(fileElem);
-
-      fileElem.css('visibility', 'hidden').css('position', 'absolute').css('overflow', 'hidden')
-        .css('width', '0px').css('height', '0px').css('border', 'none')
-        .css('margin', '0px').css('padding', '0px').attr('tabindex', '-1');
-      generatedElems.push({el: elem, ref: fileElem});
-      document.body.appendChild(fileElem[0]);
-
-      return fileElem;
-    }
-
-    var initialTouchStartY = 0;
-
-    function clickHandler(evt) {
-      if (elem.attr('disabled') || attrGetter('ngfSelectDisabled', scope)) return false;
-
-      var r = handleTouch(evt);
-      if (r != null) return r;
-
-      resetModel(evt);
-
-      // fix for md when the element is removed from the DOM and added back #460
-      try {
-        if (!isInputTypeFile() && !document.body.contains(fileElem[0])) {
-          generatedElems.push({el: elem, ref: fileElem});
-          document.body.appendChild(fileElem[0]);
-          fileElem.bind('change', changeFn);
-        }
-      } catch(e){/*ignore*/}
-
-      if (isDelayedClickSupported(navigator.userAgent)) {
-        setTimeout(function () {
-          fileElem[0].click();
-        }, 0);
-      } else {
-        fileElem[0].click();
-      }
-
-      return false;
-    }
-
-    function handleTouch(evt) {
-      var touches = evt.changedTouches || (evt.originalEvent && evt.originalEvent.changedTouches);
-      if (evt.type === 'touchstart') {
-        initialTouchStartY = touches ? touches[0].clientY : 0;
-        return true; // don't block event default
-      } else {
-        evt.stopPropagation();
-        evt.preventDefault();
-
-        // prevent scroll from triggering event
-        if (evt.type === 'touchend') {
-          var currentLocation = touches ? touches[0].clientY : 0;
-          if (Math.abs(currentLocation - initialTouchStartY) > 20) return false;
-        }
-      }
-    }
-
-    var fileElem = elem;
-
-    function resetModel(evt) {
-      if (upload.shouldUpdateOn('click', attr, scope) && fileElem.val()) {
-        fileElem.val(null);
-        upload.updateModel(ngModel, attr, scope, fileChangeAttr(), null, evt, true);
-      }
-    }
-
-    if (!isInputTypeFile()) {
-      fileElem = createFileInput();
-    }
-    fileElem.bind('change', changeFn);
-
-    if (!isInputTypeFile()) {
-      elem.bind('click touchstart touchend', clickHandler);
-    } else {
-      elem.bind('click', resetModel);
-    }
-
-    function ie10SameFileSelectFix(evt) {
-      if (fileElem && !fileElem.attr('__ngf_ie10_Fix_')) {
-        if (!fileElem[0].parentNode) {
-          fileElem = null;
-          return;
-        }
-        evt.preventDefault();
-        evt.stopPropagation();
-        fileElem.unbind('click');
-        var clone = fileElem.clone();
-        fileElem.replaceWith(clone);
-        fileElem = clone;
-        fileElem.attr('__ngf_ie10_Fix_', 'true');
-        fileElem.bind('change', changeFn);
-        fileElem.bind('click', ie10SameFileSelectFix);
-        fileElem[0].click();
-        return false;
-      } else {
-        fileElem.removeAttr('__ngf_ie10_Fix_');
-      }
-    }
-
-    if (navigator.appVersion.indexOf('MSIE 10') !== -1) {
-      fileElem.bind('click', ie10SameFileSelectFix);
-    }
-
-    if (ngModel) ngModel.$formatters.push(function (val) {
-      if (val == null || val.length === 0) {
-        if (fileElem.val()) {
-          fileElem.val(null);
-        }
-      }
-      return val;
-    });
-
-    scope.$on('$destroy', function () {
-      if (!isInputTypeFile()) fileElem.remove();
-      angular.forEach(unwatches, function (unwatch) {
-        unwatch();
-      });
-    });
-
-    $timeout(function () {
-      for (var i = 0; i < generatedElems.length; i++) {
-        var g = generatedElems[i];
-        if (!document.body.contains(g.el[0])) {
-          generatedElems.splice(i, 1);
-          g.ref.remove();
-        }
-      }
-    });
-
-    if (window.FileAPI && window.FileAPI.ngfFixIE) {
-      window.FileAPI.ngfFixIE(elem, fileElem, changeFn);
-    }
-  }
-
-  return {
-    restrict: 'AEC',
-    require: '?ngModel',
-    link: function (scope, elem, attr, ngModel) {
-      linkFileSelect(scope, elem, attr, ngModel, $parse, $timeout, $compile, Upload);
-    }
-  };
-}]);
-
-(function () {
-
-  ngFileUpload.service('UploadDataUrl', ['UploadBase', '$timeout', '$q', function (UploadBase, $timeout, $q) {
-    var upload = UploadBase;
-    upload.base64DataUrl = function (file) {
-      if (angular.isArray(file)) {
-        var d = $q.defer(), count = 0;
-        angular.forEach(file, function (f) {
-          upload.dataUrl(f, true)['finally'](function () {
-            count++;
-            if (count === file.length) {
-              var urls = [];
-              angular.forEach(file, function (ff) {
-                urls.push(ff.$ngfDataUrl);
-              });
-              d.resolve(urls, file);
-            }
-          });
-        });
-        return d.promise;
-      } else {
-        return upload.dataUrl(file, true);
-      }
-    };
-    upload.dataUrl = function (file, disallowObjectUrl) {
-      if (!file) return upload.emptyPromise(file, file);
-      if ((disallowObjectUrl && file.$ngfDataUrl != null) || (!disallowObjectUrl && file.$ngfBlobUrl != null)) {
-        return upload.emptyPromise(disallowObjectUrl ? file.$ngfDataUrl : file.$ngfBlobUrl, file);
-      }
-      var p = disallowObjectUrl ? file.$$ngfDataUrlPromise : file.$$ngfBlobUrlPromise;
-      if (p) return p;
-
-      var deferred = $q.defer();
-      $timeout(function () {
-        if (window.FileReader && file &&
-          (!window.FileAPI || navigator.userAgent.indexOf('MSIE 8') === -1 || file.size < 20000) &&
-          (!window.FileAPI || navigator.userAgent.indexOf('MSIE 9') === -1 || file.size < 4000000)) {
-          //prefer URL.createObjectURL for handling refrences to files of all sizes
-          //since it doesn´t build a large string in memory
-          var URL = window.URL || window.webkitURL;
-          if (URL && URL.createObjectURL && !disallowObjectUrl) {
-            var url;
-            try {
-              url = URL.createObjectURL(file);
-            } catch (e) {
-              $timeout(function () {
-                file.$ngfBlobUrl = '';
-                deferred.reject();
-              });
-              return;
-            }
-            $timeout(function () {
-              file.$ngfBlobUrl = url;
-              if (url) deferred.resolve(url, file);
-            });
-          } else {
-            var fileReader = new FileReader();
-            fileReader.onload = function (e) {
-              $timeout(function () {
-                file.$ngfDataUrl = e.target.result;
-                deferred.resolve(e.target.result, file);
-              });
-            };
-            fileReader.onerror = function () {
-              $timeout(function () {
-                file.$ngfDataUrl = '';
-                deferred.reject();
-              });
-            };
-            fileReader.readAsDataURL(file);
-          }
-        } else {
-          $timeout(function () {
-            file[disallowObjectUrl ? 'dataUrl' : 'blobUrl'] = '';
-            deferred.reject();
-          });
-        }
-      });
-
-      if (disallowObjectUrl) {
-        p = file.$$ngfDataUrlPromise = deferred.promise;
-      } else {
-        p = file.$$ngfBlobUrlPromise = deferred.promise;
-      }
-      p['finally'](function () {
-        delete file[disallowObjectUrl ? '$$ngfDataUrlPromise' : '$$ngfBlobUrlPromise'];
-      });
-      return p;
-    };
-    return upload;
-  }]);
-
-  function getTagType(el) {
-    if (el.tagName.toLowerCase() === 'img') return 'image';
-    if (el.tagName.toLowerCase() === 'audio') return 'audio';
-    if (el.tagName.toLowerCase() === 'video') return 'video';
-    return /./;
-  }
-
-  function linkFileDirective(Upload, $timeout, scope, elem, attr, directiveName, resizeParams, isBackground) {
-    function constructDataUrl(file) {
-      var disallowObjectUrl = Upload.attrGetter('ngfNoObjectUrl', attr, scope);
-      Upload.dataUrl(file, disallowObjectUrl)['finally'](function () {
-        $timeout(function () {
-          var src = (disallowObjectUrl ? file.$ngfDataUrl : file.$ngfBlobUrl) || file.$ngfDataUrl;
-          if (isBackground) {
-            elem.css('background-image', 'url(\'' + (src || '') + '\')');
-          } else {
-            elem.attr('src', src);
-          }
-          if (src) {
-            elem.removeClass('ng-hide');
-          } else {
-            elem.addClass('ng-hide');
-          }
-        });
-      });
-    }
-
-    $timeout(function () {
-      var unwatch = scope.$watch(attr[directiveName], function (file) {
-        var size = resizeParams;
-        if (directiveName === 'ngfThumbnail') {
-          if (!size) {
-            size = {width: elem[0].clientWidth, height: elem[0].clientHeight};
-          }
-          if (size.width === 0 && window.getComputedStyle) {
-            var style = getComputedStyle(elem[0]);
-            size = {
-              width: parseInt(style.width.slice(0, -2)),
-              height: parseInt(style.height.slice(0, -2))
-            };
-          }
-        }
-
-        if (angular.isString(file)) {
-          elem.removeClass('ng-hide');
-          if (isBackground) {
-            return elem.css('background-image', 'url(\'' + file + '\')');
-          } else {
-            return elem.attr('src', file);
-          }
-        }
-        if (file && file.type && file.type.search(getTagType(elem[0])) === 0 &&
-          (!isBackground || file.type.indexOf('image') === 0)) {
-          if (size && Upload.isResizeSupported()) {
-            Upload.resize(file, size.width, size.height, size.quality).then(
-              function (f) {
-                constructDataUrl(f);
-              }, function (e) {
-                throw e;
-              }
-            );
-          } else {
-            constructDataUrl(file);
-          }
-        } else {
-          elem.addClass('ng-hide');
-        }
-      });
-
-      scope.$on('$destroy', function () {
-        unwatch();
-      });
-    });
-  }
-
-
-  /** @namespace attr.ngfSrc */
-  /** @namespace attr.ngfNoObjectUrl */
-  ngFileUpload.directive('ngfSrc', ['Upload', '$timeout', function (Upload, $timeout) {
-    return {
-      restrict: 'AE',
-      link: function (scope, elem, attr) {
-        linkFileDirective(Upload, $timeout, scope, elem, attr, 'ngfSrc',
-          Upload.attrGetter('ngfResize', attr, scope), false);
-      }
-    };
-  }]);
-
-  /** @namespace attr.ngfBackground */
-  /** @namespace attr.ngfNoObjectUrl */
-  ngFileUpload.directive('ngfBackground', ['Upload', '$timeout', function (Upload, $timeout) {
-    return {
-      restrict: 'AE',
-      link: function (scope, elem, attr) {
-        linkFileDirective(Upload, $timeout, scope, elem, attr, 'ngfBackground',
-          Upload.attrGetter('ngfResize', attr, scope), true);
-      }
-    };
-  }]);
-
-  /** @namespace attr.ngfThumbnail */
-  /** @namespace attr.ngfAsBackground */
-  /** @namespace attr.ngfSize */
-  /** @namespace attr.ngfNoObjectUrl */
-  ngFileUpload.directive('ngfThumbnail', ['Upload', '$timeout', function (Upload, $timeout) {
-    return {
-      restrict: 'AE',
-      link: function (scope, elem, attr) {
-        var size = Upload.attrGetter('ngfSize', attr, scope);
-        linkFileDirective(Upload, $timeout, scope, elem, attr, 'ngfThumbnail', size,
-          Upload.attrGetter('ngfAsBackground', attr, scope));
-      }
-    };
-  }]);
-
-  ngFileUpload.config(['$compileProvider', function ($compileProvider) {
-    if ($compileProvider.imgSrcSanitizationWhitelist) $compileProvider.imgSrcSanitizationWhitelist(/^\s*(https?|ftp|mailto|tel|local|file|data|blob):/);
-    if ($compileProvider.aHrefSanitizationWhitelist) $compileProvider.aHrefSanitizationWhitelist(/^\s*(https?|ftp|mailto|tel|local|file|data|blob):/);
-  }]);
-
-  ngFileUpload.filter('ngfDataUrl', ['UploadDataUrl', '$sce', function (UploadDataUrl, $sce) {
-    return function (file, disallowObjectUrl, trustedUrl) {
-      if (angular.isString(file)) {
-        return $sce.trustAsResourceUrl(file);
-      }
-      var src = file && ((disallowObjectUrl ? file.$ngfDataUrl : file.$ngfBlobUrl) || file.$ngfDataUrl);
-      if (file && !src) {
-        if (!file.$ngfDataUrlFilterInProgress && angular.isObject(file)) {
-          file.$ngfDataUrlFilterInProgress = true;
-          UploadDataUrl.dataUrl(file, disallowObjectUrl);
-        }
-        return '';
-      }
-      if (file) delete file.$ngfDataUrlFilterInProgress;
-      return (file && src ? (trustedUrl ? $sce.trustAsResourceUrl(src) : src) : file) || '';
-    };
-  }]);
-
-})();
-
-ngFileUpload.service('UploadValidate', ['UploadDataUrl', '$q', '$timeout', function (UploadDataUrl, $q, $timeout) {
-  var upload = UploadDataUrl;
-
-  function globStringToRegex(str) {
-    var regexp = '', excludes = [];
-    if (str.length > 2 && str[0] === '/' && str[str.length - 1] === '/') {
-      regexp = str.substring(1, str.length - 1);
-    } else {
-      var split = str.split(',');
-      if (split.length > 1) {
-        for (var i = 0; i < split.length; i++) {
-          var r = globStringToRegex(split[i]);
-          if (r.regexp) {
-            regexp += '(' + r.regexp + ')';
-            if (i < split.length - 1) {
-              regexp += '|';
-            }
-          } else {
-            excludes = excludes.concat(r.excludes);
-          }
-        }
-      } else {
-        if (str.indexOf('!') === 0) {
-          excludes.push('^((?!' + globStringToRegex(str.substring(1)).regexp + ').)*$');
-        } else {
-          if (str.indexOf('.') === 0) {
-            str = '*' + str;
-          }
-          regexp = '^' + str.replace(new RegExp('[.\\\\+*?\\[\\^\\]$(){}=!<>|:\\-]', 'g'), '\\$&') + '$';
-          regexp = regexp.replace(/\\\*/g, '.*').replace(/\\\?/g, '.');
-        }
-      }
-    }
-    return {regexp: regexp, excludes: excludes};
-  }
-
-  upload.validatePattern = function (file, val) {
-    if (!val) {
-      return true;
-    }
-    var pattern = globStringToRegex(val), valid = true;
-    if (pattern.regexp && pattern.regexp.length) {
-      var regexp = new RegExp(pattern.regexp, 'i');
-      valid = (file.type != null && regexp.test(file.type)) ||
-        (file.name != null && regexp.test(file.name));
-    }
-    var len = pattern.excludes.length;
-    while (len--) {
-      var exclude = new RegExp(pattern.excludes[len], 'i');
-      valid = valid && (file.type == null || exclude.test(file.type)) &&
-        (file.name == null || exclude.test(file.name));
-    }
-    return valid;
-  };
-
-  upload.registerModelChangeValidator = function (ngModel, attr, scope) {
-    if (ngModel) {
-      ngModel.$formatters.push(function (files) {
-        if (!ngModel.$ngfModelChange) {
-          upload.validate(files, ngModel, attr, scope, function () {
-            upload.applyModelValidation(ngModel, files);
-          });
-        } else {
-          ngModel.$ngfModelChange = false;
-        }
-      });
-    }
-  };
-
-  function markModelAsDirty(ngModel, files) {
-    if (files != null && !ngModel.$dirty) {
-      if (ngModel.$setDirty) {
-        ngModel.$setDirty();
-      } else {
-        ngModel.$dirty = true;
-      }
-    }
-  }
-
-  upload.applyModelValidation = function (ngModel, files) {
-    markModelAsDirty(ngModel, files);
-    angular.forEach(ngModel.$ngfValidations, function (validation) {
-      ngModel.$setValidity(validation.name, validation.valid);
-    });
-  };
-
-  upload.validate = function (files, ngModel, attr, scope) {
-    ngModel = ngModel || {};
-    ngModel.$ngfValidations = ngModel.$ngfValidations || [];
-
-    angular.forEach(ngModel.$ngfValidations, function (v) {
-      v.valid = true;
-    });
-
-    var attrGetter = function (name, params) {
-      return upload.attrGetter(name, attr, scope, params);
-    };
-
-    if (files == null || files.length === 0) {
-      return upload.emptyPromise(ngModel);
-    }
-
-    files = files.length === undefined ? [files] : files.slice(0);
-
-    function validateSync(name, validatorVal, fn) {
-      if (files) {
-        var dName = 'ngf' + name[0].toUpperCase() + name.substr(1);
-        var i = files.length, valid = null;
-        while (i--) {
-          var file = files[i];
-          if (file) {
-            var val = attrGetter(dName, {'$file': file});
-            if (val == null) {
-              val = validatorVal(attrGetter('ngfValidate') || {});
-              valid = valid == null ? true : valid;
-            }
-            if (val != null) {
-              if (!fn(file, val)) {
-                file.$error = name;
-                file.$errorParam = val;
-                files.splice(i, 1);
-                valid = false;
-              }
-            }
-          }
-        }
-        if (valid !== null) {
-          ngModel.$ngfValidations.push({name: name, valid: valid});
-        }
-      }
-    }
-
-    validateSync('pattern', function (cons) {
-      return cons.pattern;
-    }, upload.validatePattern);
-    validateSync('minSize', function (cons) {
-      return cons.size && cons.size.min;
-    }, function (file, val) {
-      return file.size >= upload.translateScalars(val);
-    });
-    validateSync('maxSize', function (cons) {
-      return cons.size && cons.size.max;
-    }, function (file, val) {
-      return file.size <= upload.translateScalars(val);
-    });
-    var totalSize = 0;
-    validateSync('maxTotalSize', function (cons) {
-      return cons.maxTotalSize && cons.maxTotalSize;
-    }, function (file, val) {
-      totalSize += file.size;
-      if (totalSize > upload.translateScalars(val)) {
-        files.splice(0, files.length);
-        return false;
-      }
-      return true;
-    });
-
-    validateSync('validateFn', function () {
-      return null;
-    }, function (file, r) {
-      return r === true || r === null || r === '';
-    });
-
-    if (!files.length) {
-      return upload.emptyPromise(ngModel, ngModel.$ngfValidations);
-    }
-
-    function validateAsync(name, validatorVal, type, asyncFn, fn) {
-      var promises = [upload.emptyPromise()];
-      if (files) {
-        var dName = 'ngf' + name[0].toUpperCase() + name.substr(1);
-        files = files.length === undefined ? [files] : files;
-        angular.forEach(files, function (file) {
-          var defer = $q.defer();
-          promises.push(defer.promise);
-          if (type && (file.type == null || file.type.search(type) !== 0)) {
-            defer.resolve();
-            return;
-          }
-          var val = attrGetter(dName, {'$file': file}) || validatorVal(attrGetter('ngfValidate', {'$file': file}) || {});
-          if (val) {
-            asyncFn(file, val).then(function (d) {
-              if (!fn(d, val)) {
-                file.$error = name;
-                file.$errorParam = val;
-                defer.reject();
-              } else {
-                defer.resolve();
-              }
-            }, function () {
-              if (attrGetter('ngfValidateForce', {'$file': file})) {
-                file.$error = name;
-                file.$errorParam = val;
-                defer.reject();
-              } else {
-                defer.resolve();
-              }
-            });
-          } else {
-            defer.resolve();
-          }
-        });
-        return $q.all(promises).then(function () {
-          ngModel.$ngfValidations.push({name: name, valid: true});
-        }, function () {
-          ngModel.$ngfValidations.push({name: name, valid: false});
-        });
-      }
-    }
-
-    var deffer = $q.defer();
-    var promises = [];
-
-    promises.push(upload.happyPromise(validateAsync('maxHeight', function (cons) {
-      return cons.height && cons.height.max;
-    }, /image/, this.imageDimensions, function (d, val) {
-      return d.height <= val;
-    })));
-    promises.push(upload.happyPromise(validateAsync('minHeight', function (cons) {
-      return cons.height && cons.height.min;
-    }, /image/, this.imageDimensions, function (d, val) {
-      return d.height >= val;
-    })));
-    promises.push(upload.happyPromise(validateAsync('maxWidth', function (cons) {
-      return cons.width && cons.width.max;
-    }, /image/, this.imageDimensions, function (d, val) {
-      return d.width <= val;
-    })));
-    promises.push(upload.happyPromise(validateAsync('minWidth', function (cons) {
-      return cons.width && cons.width.min;
-    }, /image/, this.imageDimensions, function (d, val) {
-      return d.width >= val;
-    })));
-    promises.push(upload.happyPromise(validateAsync('ratio', function (cons) {
-      return cons.ratio;
-    }, /image/, this.imageDimensions, function (d, val) {
-      var split = val.toString().split(','), valid = false;
-
-      for (var i = 0; i < split.length; i++) {
-        var r = split[i], xIndex = r.search(/x/i);
-        if (xIndex > -1) {
-          r = parseFloat(r.substring(0, xIndex)) / parseFloat(r.substring(xIndex + 1));
-        } else {
-          r = parseFloat(r);
-        }
-        if (Math.abs((d.width / d.height) - r) < 0.0001) {
-          valid = true;
-        }
-      }
-      return valid;
-    })));
-    promises.push(upload.happyPromise(validateAsync('maxDuration', function (cons) {
-      return cons.duration && cons.duration.max;
-    }, /audio|video/, this.mediaDuration, function (d, val) {
-      return d <= upload.translateScalars(val);
-    })));
-    promises.push(upload.happyPromise(validateAsync('minDuration', function (cons) {
-      return cons.duration && cons.duration.min;
-    }, /audio|video/, this.mediaDuration, function (d, val) {
-      return d >= upload.translateScalars(val);
-    })));
-
-    promises.push(upload.happyPromise(validateAsync('validateAsyncFn', function () {
-      return null;
-    }, null, function (file, val) {
-      return val;
-    }, function (r) {
-      return r === true || r === null || r === '';
-    })));
-
-    return $q.all(promises).then(function () {
-      deffer.resolve(ngModel, ngModel.$ngfValidations);
-    });
-  };
-
-  upload.imageDimensions = function (file) {
-    if (file.$ngfWidth && file.$ngfHeight) {
-      var d = $q.defer();
-      $timeout(function () {
-        d.resolve({width: file.$ngfWidth, height: file.$ngfHeight});
-      });
-      return d.promise;
-    }
-    if (file.$ngfDimensionPromise) return file.$ngfDimensionPromise;
-
-    var deferred = $q.defer();
-    $timeout(function () {
-      if (file.type.indexOf('image') !== 0) {
-        deferred.reject('not image');
-        return;
-      }
-      upload.dataUrl(file).then(function (dataUrl) {
-        var img = angular.element('<img>').attr('src', dataUrl).css('visibility', 'hidden').css('position', 'fixed');
-
-        function success() {
-          var width = img[0].clientWidth;
-          var height = img[0].clientHeight;
-          img.remove();
-          file.$ngfWidth = width;
-          file.$ngfHeight = height;
-          deferred.resolve({width: width, height: height});
-        }
-
-        function error() {
-          img.remove();
-          deferred.reject('load error');
-        }
-
-        img.on('load', success);
-        img.on('error', error);
-        var count = 0;
-
-        function checkLoadError() {
-          $timeout(function () {
-            if (img[0].parentNode) {
-              if (img[0].clientWidth) {
-                success();
-              } else if (count > 10) {
-                error();
-              } else {
-                checkLoadError();
-              }
-            }
-          }, 1000);
-        }
-
-        checkLoadError();
-
-        angular.element(document.getElementsByTagName('body')[0]).append(img);
-      }, function () {
-        deferred.reject('load error');
-      });
-    });
-
-    file.$ngfDimensionPromise = deferred.promise;
-    file.$ngfDimensionPromise['finally'](function () {
-      delete file.$ngfDimensionPromise;
-    });
-    return file.$ngfDimensionPromise;
-  };
-
-  upload.mediaDuration = function (file) {
-    if (file.$ngfDuration) {
-      var d = $q.defer();
-      $timeout(function () {
-        d.resolve(file.$ngfDuration);
-      });
-      return d.promise;
-    }
-    if (file.$ngfDurationPromise) return file.$ngfDurationPromise;
-
-    var deferred = $q.defer();
-    $timeout(function () {
-      if (file.type.indexOf('audio') !== 0 && file.type.indexOf('video') !== 0) {
-        deferred.reject('not media');
-        return;
-      }
-      upload.dataUrl(file).then(function (dataUrl) {
-        var el = angular.element(file.type.indexOf('audio') === 0 ? '<audio>' : '<video>')
-          .attr('src', dataUrl).css('visibility', 'none').css('position', 'fixed');
-
-        function success() {
-          var duration = el[0].duration;
-          file.$ngfDuration = duration;
-          el.remove();
-          deferred.resolve(duration);
-        }
-
-        function error() {
-          el.remove();
-          deferred.reject('load error');
-        }
-
-        el.on('loadedmetadata', success);
-        el.on('error', error);
-        var count = 0;
-
-        function checkLoadError() {
-          $timeout(function () {
-            if (el[0].parentNode) {
-              if (el[0].duration) {
-                success();
-              } else if (count > 10) {
-                error();
-              } else {
-                checkLoadError();
-              }
-            }
-          }, 1000);
-        }
-
-        checkLoadError();
-
-        angular.element(document.body).append(el);
-      }, function () {
-        deferred.reject('load error');
-      });
-    });
-
-    file.$ngfDurationPromise = deferred.promise;
-    file.$ngfDurationPromise['finally'](function () {
-      delete file.$ngfDurationPromise;
-    });
-    return file.$ngfDurationPromise;
-  };
-  return upload;
-}
-]);
-
-ngFileUpload.service('UploadResize', ['UploadValidate', '$q', function (UploadValidate, $q) {
-  var upload = UploadValidate;
-
-  /**
-   * Conserve aspect ratio of the original region. Useful when shrinking/enlarging
-   * images to fit into a certain area.
-   * Source:  http://stackoverflow.com/a/14731922
-   *
-   * @param {Number} srcWidth Source area width
-   * @param {Number} srcHeight Source area height
-   * @param {Number} maxWidth Nestable area maximum available width
-   * @param {Number} maxHeight Nestable area maximum available height
-   * @return {Object} { width, height }
-   */
-  var calculateAspectRatioFit = function (srcWidth, srcHeight, maxWidth, maxHeight) {
-    var ratio = Math.min(maxWidth / srcWidth, maxHeight / srcHeight);
-    return {width: srcWidth * ratio, height: srcHeight * ratio};
-  };
-
-  // Extracted from https://github.com/romelgomez/angular-firebase-image-upload/blob/master/app/scripts/fileUpload.js#L89
-  var resize = function (imagen, width, height, quality, type) {
-    var deferred = $q.defer();
-    var canvasElement = document.createElement('canvas');
-    var imageElement = document.createElement('img');
-
-    imageElement.onload = function () {
-      try {
-        if (!width) {
-          width = imageElement.width;
-        }
-        if (!height) {
-          height = imageElement.height;
-        }
-        var dimensions = calculateAspectRatioFit(imageElement.width, imageElement.height, width, height);
-        canvasElement.width = dimensions.width;
-        canvasElement.height = dimensions.height;
-        var context = canvasElement.getContext('2d');
-        context.drawImage(imageElement, 0, 0, dimensions.width, dimensions.height);
-        deferred.resolve(canvasElement.toDataURL(type || 'image/WebP', quality || 1.0));
-      } catch (e) {
-        deferred.reject(e);
-      }
-    };
-    imageElement.onerror = function () {
-      deferred.reject();
-    };
-    imageElement.src = imagen;
-    return deferred.promise;
-  };
-
-  upload.dataUrltoBlob = function (dataurl, name) {
-    var arr = dataurl.split(','), mime = arr[0].match(/:(.*?);/)[1],
-      bstr = atob(arr[1]), n = bstr.length, u8arr = new Uint8Array(n);
-    while (n--) {
-      u8arr[n] = bstr.charCodeAt(n);
-    }
-    var blob = new Blob([u8arr], {type: mime});
-    blob.name = name;
-    return blob;
-  };
-
-  upload.isResizeSupported = function () {
-    var elem = document.createElement('canvas');
-    return window.atob && elem.getContext && elem.getContext('2d');
-  };
-
-  if (upload.isResizeSupported()) {
-    // add name getter to the blob constructor prototype
-    Object.defineProperty(Blob.prototype, 'name', {
-      get: function () {
-        return this.$ngfName;
-      },
-      set: function (v) {
-        this.$ngfName = v;
-      },
-      configurable: true
-    });
-  }
-
-  upload.resize = function (file, width, height, quality, type) {
-    if (file.type.indexOf('image') !== 0) return upload.emptyPromise(file);
-
-    var deferred = $q.defer();
-    upload.dataUrl(file, true).then(function (url) {
-      resize(url, width, height, quality, type || file.type).then(function (dataUrl) {
-        deferred.resolve(upload.dataUrltoBlob(dataUrl, file.name));
-      }, function () {
-        deferred.reject();
-      });
-    }, function () {
-      deferred.reject();
-    });
-    return deferred.promise;
-  };
-
-  return upload;
-}]);
-
-(function () {
-  ngFileUpload.directive('ngfDrop', ['$parse', '$timeout', '$location', 'Upload', '$http',
-    function ($parse, $timeout, $location, Upload, $http) {
-      return {
-        restrict: 'AEC',
-        require: '?ngModel',
-        link: function (scope, elem, attr, ngModel) {
-          linkDrop(scope, elem, attr, ngModel, $parse, $timeout, $location, Upload, $http);
-        }
-      };
-    }]);
-
-  ngFileUpload.directive('ngfNoFileDrop', function () {
-    return function (scope, elem) {
-      if (dropAvailable()) elem.css('display', 'none');
-    };
-  });
-
-  ngFileUpload.directive('ngfDropAvailable', ['$parse', '$timeout', 'Upload', function ($parse, $timeout, Upload) {
-    return function (scope, elem, attr) {
-      if (dropAvailable()) {
-        var model = $parse(Upload.attrGetter('ngfDropAvailable', attr));
-        $timeout(function () {
-          model(scope);
-          if (model.assign) {
-            model.assign(scope, true);
-          }
-        });
-      }
-    };
-  }]);
-
-  function linkDrop(scope, elem, attr, ngModel, $parse, $timeout, $location, upload, $http) {
-    var available = dropAvailable();
-
-    var attrGetter = function (name, scope, params) {
-      return upload.attrGetter(name, attr, scope, params);
-    };
-
-    if (attrGetter('dropAvailable')) {
-      $timeout(function () {
-        if (scope[attrGetter('dropAvailable')]) {
-          scope[attrGetter('dropAvailable')].value = available;
-        } else {
-          scope[attrGetter('dropAvailable')] = available;
-        }
-      });
-    }
-    if (!available) {
-      if (attrGetter('ngfHideOnDropNotAvailable', scope) === true) {
-        elem.css('display', 'none');
-      }
-      return;
-    }
-
-    function isDisabled() {
-      return elem.attr('disabled') || attrGetter('ngfDropDisabled', scope);
-    }
-
-    if (attrGetter('ngfSelect') == null) {
-      upload.registerModelChangeValidator(ngModel, attr, scope);
-    }
-
-    var leaveTimeout = null;
-    var stopPropagation = $parse(attrGetter('ngfStopPropagation'));
-    var dragOverDelay = 1;
-    var actualDragOverClass;
-
-    elem[0].addEventListener('dragover', function (evt) {
-      if (isDisabled()) return;
-      evt.preventDefault();
-      if (stopPropagation(scope)) evt.stopPropagation();
-      // handling dragover events from the Chrome download bar
-      if (navigator.userAgent.indexOf('Chrome') > -1) {
-        var b = evt.dataTransfer.effectAllowed;
-        evt.dataTransfer.dropEffect = ('move' === b || 'linkMove' === b) ? 'move' : 'copy';
-      }
-      $timeout.cancel(leaveTimeout);
-      if (!actualDragOverClass) {
-        actualDragOverClass = 'C';
-        calculateDragOverClass(scope, attr, evt, function (clazz) {
-          actualDragOverClass = clazz;
-          elem.addClass(actualDragOverClass);
-          attrGetter('ngfDrag', scope, {$isDragging: true, $class: actualDragOverClass, $event: evt});
-        });
-      }
-    }, false);
-    elem[0].addEventListener('dragenter', function (evt) {
-      if (isDisabled()) return;
-      evt.preventDefault();
-      if (stopPropagation(scope)) evt.stopPropagation();
-    }, false);
-    elem[0].addEventListener('dragleave', function (evt) {
-      if (isDisabled()) return;
-      evt.preventDefault();
-      if (stopPropagation(scope)) evt.stopPropagation();
-      leaveTimeout = $timeout(function () {
-        if (actualDragOverClass) elem.removeClass(actualDragOverClass);
-        actualDragOverClass = null;
-        attrGetter('ngfDrag', scope, {$isDragging: false, $event: evt});
-      }, dragOverDelay || 100);
-    }, false);
-    elem[0].addEventListener('drop', function (evt) {
-      if (isDisabled() || !upload.shouldUpdateOn('drop', attr, scope)) return;
-      evt.preventDefault();
-      if (stopPropagation(scope)) evt.stopPropagation();
-      if (actualDragOverClass) elem.removeClass(actualDragOverClass);
-      actualDragOverClass = null;
-      var html;
-      try {
-        html = (evt.dataTransfer && evt.dataTransfer.getData && evt.dataTransfer.getData('text/html'));
-      } catch (e) {/* Fix IE11 that throw error calling getData */}
-      if (html) {
-        var url;
-        html.replace(/<img .*src *=\"([^\"]*)\"/, function (m, src) {
-          url = src;
-        });
-        if (url) {
-          $http({url: url, method: 'get', responseType: 'arraybuffer'}).then(function (resp) {
-            var arrayBufferView = new Uint8Array(resp.data);
-            var type = resp.headers('content-type') || 'image/WebP';
-            var blob = new Blob([arrayBufferView], {type: type});
-            //var split = type.split('[/;]');
-            //blob.name = url.substring(0, 150).replace(/\W+/g, '') + '.' + (split.length > 1 ? split[1] : 'jpg');
-            upload.updateModel(ngModel, attr, scope, attrGetter('ngfChange') || attrGetter('ngfDrop'), [blob], evt);
-          });
-        }
-      } else {
-        extractFiles(evt, function (files) {
-            upload.updateModel(ngModel, attr, scope, attrGetter('ngfChange') || attrGetter('ngfDrop'), files, evt);
-          }, attrGetter('ngfAllowDir', scope) !== false,
-          attrGetter('multiple') || attrGetter('ngfMultiple', scope));
-      }
-    }, false);
-    elem[0].addEventListener('paste', function (evt) {
-      if (isDisabled() || !upload.shouldUpdateOn('paste', attr, scope)) return;
-      var files = [];
-      var clipboard = evt.clipboardData || evt.originalEvent.clipboardData;
-      if (clipboard && clipboard.items) {
-        for (var k = 0; k < clipboard.items.length; k++) {
-          if (clipboard.items[k].type.indexOf('image') !== -1) {
-            files.push(clipboard.items[k].getAsFile());
-          }
-        }
-        upload.updateModel(ngModel, attr, scope, attrGetter('ngfChange') || attrGetter('ngfDrop'), files, evt);
-      }
-    }, false);
-
-    function calculateDragOverClass(scope, attr, evt, callback) {
-      var obj = attrGetter('ngfDragOverClass', scope, {$event: evt}), dClass = 'dragover';
-      if (angular.isString(obj)) {
-        dClass = obj;
-      } else if (obj) {
-        if (obj.delay) dragOverDelay = obj.delay;
-        if (obj.accept || obj.reject) {
-          var items = evt.dataTransfer.items;
-          if (items == null || !items.length) {
-            dClass = obj.accept;
-          } else {
-            var pattern = obj.pattern || attrGetter('ngfPattern', scope, {$event: evt});
-            var len = items.length;
-            while (len--) {
-              if (!upload.validatePattern(items[len], pattern)) {
-                dClass = obj.reject;
-                break;
-              } else {
-                dClass = obj.accept;
-              }
-            }
-          }
-        }
-      }
-      callback(dClass);
-    }
-
-    function extractFiles(evt, callback, allowDir, multiple) {
-      var files = [], processing = 0;
-
-      function traverseFileTree(files, entry, path) {
-        if (entry != null) {
-          if (entry.isDirectory) {
-            var filePath = (path || '') + entry.name;
-            files.push({name: entry.name, type: 'directory', path: filePath});
-            var dirReader = entry.createReader();
-            var entries = [];
-            processing++;
-            var readEntries = function () {
-              dirReader.readEntries(function (results) {
-                try {
-                  if (!results.length) {
-                    for (var i = 0; i < entries.length; i++) {
-                      traverseFileTree(files, entries[i], (path ? path : '') + entry.name + '/');
-                    }
-                    processing--;
-                  } else {
-                    entries = entries.concat(Array.prototype.slice.call(results || [], 0));
-                    readEntries();
-                  }
-                } catch (e) {
-                  processing--;
-                  console.error(e);
-                }
-              }, function () {
-                processing--;
-              });
-            };
-            readEntries();
-          } else {
-            processing++;
-            entry.file(function (file) {
-              try {
-                processing--;
-                file.path = (path ? path : '') + file.name;
-                files.push(file);
-              } catch (e) {
-                processing--;
-                console.error(e);
-              }
-            }, function () {
-              processing--;
-            });
-          }
-        }
-      }
-
-      var items = evt.dataTransfer.items;
-
-      if (items && items.length > 0 && $location.protocol() !== 'file') {
-        for (var i = 0; i < items.length; i++) {
-          if (items[i].webkitGetAsEntry && items[i].webkitGetAsEntry() && items[i].webkitGetAsEntry().isDirectory) {
-            var entry = items[i].webkitGetAsEntry();
-            if (entry.isDirectory && !allowDir) {
-              continue;
-            }
-            if (entry != null) {
-              traverseFileTree(files, entry);
-            }
-          } else {
-            var f = items[i].getAsFile();
-            if (f != null) files.push(f);
-          }
-          if (!multiple && files.length > 0) break;
-        }
-      } else {
-        var fileList = evt.dataTransfer.files;
-        if (fileList != null) {
-          for (var j = 0; j < fileList.length; j++) {
-            files.push(fileList.item(j));
-            if (!multiple && files.length > 0) {
-              break;
-            }
-          }
-        }
-      }
-      var delays = 0;
-      (function waitForProcess(delay) {
-        $timeout(function () {
-          if (!processing) {
-            if (!multiple && files.length > 1) {
-              i = 0;
-              while (files[i].type === 'directory') i++;
-              files = [files[i]];
-            }
-            callback(files);
-          } else {
-            if (delays++ * 10 < 20 * 1000) {
-              waitForProcess(10);
-            }
-          }
-        }, delay || 0);
-      })();
-    }
-  }
-
-  function dropAvailable() {
-    var div = document.createElement('div');
-    return ('draggable' in div) && ('ondrop' in div) && !/Edge\/12./i.test(navigator.userAgent);
-  }
-
-})();
-
-// customized version of https://github.com/exif-js/exif-js
-ngFileUpload.service('UploadExif', ['UploadResize', '$q', function (UploadResize, $q) {
-  var upload = UploadResize;
-
-  function findEXIFinJPEG(file) {
-    var dataView = new DataView(file);
-
-    if ((dataView.getUint8(0) !== 0xFF) || (dataView.getUint8(1) !== 0xD8)) {
-      return 'Not a valid JPEG';
-    }
-
-    var offset = 2,
-      length = file.byteLength,
-      marker;
-
-    while (offset < length) {
-      if (dataView.getUint8(offset) !== 0xFF) {
-        return 'Not a valid marker at offset ' + offset + ', found: ' + dataView.getUint8(offset);
-      }
-
-      marker = dataView.getUint8(offset + 1);
-      if (marker === 225) {
-        return readEXIFData(dataView, offset + 4, dataView.getUint16(offset + 2) - 2);
-      } else {
-        offset += 2 + dataView.getUint16(offset + 2);
-      }
-    }
-  }
-
-  function readOrientation(file, tiffStart, dirStart, bigEnd) {
-    var entries = file.getUint16(dirStart, !bigEnd),
-      entryOffset, i;
-
-    for (i = 0; i < entries; i++) {
-      entryOffset = dirStart + i * 12 + 2;
-      var val = file.getUint16(entryOffset, !bigEnd);
-      if (0x0112 === val) {
-        return readTagValue(file, entryOffset, tiffStart, bigEnd);
-      }
-    }
-    return null;
-  }
-
-  function readTagValue(file, entryOffset, tiffStart, bigEnd) {
-    var numValues = file.getUint32(entryOffset + 4, !bigEnd),
-      valueOffset = file.getUint32(entryOffset + 8, !bigEnd) + tiffStart, offset, vals, n;
-
-    if (numValues === 1) {
-      return file.getUint16(entryOffset + 8, !bigEnd);
-    } else {
-      offset = numValues > 2 ? valueOffset : (entryOffset + 8);
-      vals = [];
-      for (n = 0; n < numValues; n++) {
-        vals[n] = file.getUint16(offset + 2 * n, !bigEnd);
-      }
-      return vals;
-    }
-  }
-
-  function getStringFromDB(buffer, start, length) {
-    var outstr = '';
-    for (var n = start; n < start + length; n++) {
-      outstr += String.fromCharCode(buffer.getUint8(n));
-    }
-    return outstr;
-  }
-
-  function readEXIFData(file, start) {
-    if (getStringFromDB(file, start, 4) !== 'Exif') {
-      return 'Not valid EXIF data! ' + getStringFromDB(file, start, 4);
-    }
-
-    var bigEnd,
-      tiffOffset = start + 6;
-
-    // test for TIFF validity and endianness
-    if (file.getUint16(tiffOffset) === 0x4949) {
-      bigEnd = false;
-    } else if (file.getUint16(tiffOffset) === 0x4D4D) {
-      bigEnd = true;
-    } else {
-      return 'Not valid TIFF data! (no 0x4949 or 0x4D4D)';
-    }
-
-    if (file.getUint16(tiffOffset + 2, !bigEnd) !== 0x002A) {
-      return 'Not valid TIFF data! (no 0x002A)';
-    }
-
-    var firstIFDOffset = file.getUint32(tiffOffset + 4, !bigEnd);
-
-    if (firstIFDOffset < 0x00000008) {
-      return 'Not valid TIFF data! (First offset less than 8)', file.getUint32(tiffOffset + 4, !bigEnd);
-    }
-
-    return readOrientation(file, tiffOffset, tiffOffset + firstIFDOffset, bigEnd);
-
-  }
-
-  upload.isExifSupported = function() {
-    return window.FileReader && new FileReader().readAsArrayBuffer && upload.isResizeSupported();
-  };
-
-  upload.orientation = function (file) {
-    if (file.$ngfOrientation != null) {
-      return upload.emptyPromise(file.$ngfOrientation);
-    }
-    var defer = $q.defer();
-    var fileReader = new FileReader();
-    fileReader.onload = function (e) {
-      var orientation;
-      try {
-        orientation = findEXIFinJPEG(e.target.result);
-      } catch (e) {
-        defer.reject(e);
-        return;
-      }
-      if (angular.isString(orientation)) {
-        defer.reject(orientation);
-      } else {
-        file.$ngfOrientation = orientation;
-        defer.resolve(orientation);
-      }
-    };
-    fileReader.onerror = function (e) {
-      defer.reject(e);
-    };
-
-    fileReader.readAsArrayBuffer(file);
-    return defer.promise;
-  };
-
-
-  function applyTransform(ctx, orientation, width, height) {
-    switch (orientation) {
-      case 2:
-        return ctx.transform(-1, 0, 0, 1, width, 0);
-      case 3:
-        return ctx.transform(-1, 0, 0, -1, width, height);
-      case 4:
-        return ctx.transform(1, 0, 0, -1, 0, height);
-      case 5:
-        return ctx.transform(0, 1, 1, 0, 0, 0);
-      case 6:
-        return ctx.transform(0, 1, -1, 0, height, 0);
-      case 7:
-        return ctx.transform(0, -1, -1, 0, height, width);
-      case 8:
-        return ctx.transform(0, -1, 1, 0, 0, width);
-    }
-  }
-
-  upload.applyExifRotation = function (file) {
-    if (file.type.indexOf('image/jpeg') !== 0) {
-      return upload.emptyPromise(file);
-    }
-
-    var deferred = $q.defer();
-    upload.orientation(file).then(function (orientation) {
-      if (!orientation || orientation < 2 || orientation > 8) {
-        deferred.resolve(file);
-      }
-      upload.dataUrl(file, true).then(function (url) {
-        var canvas = document.createElement('canvas');
-        var img = document.createElement('img');
-
-        img.onload = function () {
-          try {
-            canvas.width = orientation > 4 ? img.height : img.width;
-            canvas.height = orientation > 4 ? img.width : img.height;
-            var ctx = canvas.getContext('2d');
-            applyTransform(ctx, orientation, img.width, img.height);
-            ctx.drawImage(img, 0, 0);
-            var dataUrl = canvas.toDataURL(file.type || 'image/WebP', 1.0);
-            var blob = upload.dataUrltoBlob(dataUrl, file.name);
-            deferred.resolve(blob);
-          } catch (e) {
-            deferred.reject(e);
-          }
-        };
-        img.onerror = function () {
-          deferred.reject();
-        };
-        img.src = url;
-      }, function (e) {
-        deferred.reject(e);
-      });
-    }, function (e) {
-      deferred.reject(e);
-    });
-    return deferred.promise;
-  };
-
-  return upload;
-}]);
-

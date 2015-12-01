@@ -209,7 +209,7 @@ angular.module('accessopolisApp')
   }]);
 
 angular.module('firebase.config', [])
-  .constant('FBURL', 'https://accessopolis.firebaseio.com')
+  .constant('FBURL', 'https://accessopolis-dev.firebaseio.com')
   .constant('SIMPLE_LOGIN_PROVIDERS', ['google'])
 
   .constant('loginRedirectPath', '/login');
@@ -490,54 +490,33 @@ angular.module('accessopolisApp')
     };
   }]);
 
-angular.module('accessopolisApp')
-    .directive('itemUpload', ['$timeout', 'Upload', function($timeout, Upload) {
+angular.module('accessopolisApp').directive('itemUpload', ['$timeout', function($timeout) {
 
       'use strict';
 
       return {
         restrict: 'E',
         scope: true,
-        controllerAs: 'uploadctrl',
+        controllerAs: 'imageUploadCtrl',
         bindToController: {
-            saveInDb: '=',
+            doUpload : '=',
             accept : '@'
         },
-        controller: function() {
-            var self = this;
-            self.uploadFiles = function(filesToUpload) {
-                angular.forEach(filesToUpload, function(file) {
-                    var fileReader = new FileReader();
-                    fileReader.readAsArrayBuffer(file);
-                    fileReader.onload = function(e) {
-                        file.upload = Upload.http({
-                            url: 'https://api.imgur.com/3/upload',
-                            headers: {
-                                Authorization: 'Client-ID 7a37861e931f779',
-                                'Content-Type': file.type
-                            },
-                            data: e.target.result
-                        });
+        link: function(scope, element) {
 
-                        file.upload.then(function (response) {
-                            file.result = response.data.data;
-                            self.saveInDb(file.result);
-                        }, function (response) {
-                            if (response.status > 0)
-                                file.errorMsg = response.status + ': ' + response.data;
-                        }, function (evt) {
-                            file.progress = Math.min(100, parseInt(100.0 *
-                                evt.loaded / evt.total));
-                        });
-                    }
-                });
+          var inputElem = element.find('input')[0];
+          inputElem.addEventListener('change', function() {
+            var image = inputElem.files[0];
+            if(image) {
+              $timeout(function() {
+                scope.imageUploadCtrl.doUpload(image);
+              });
             }
-
-
+          }, false);
         },
-        template:'<button ngf-select="uploadctrl.uploadFiles(uploadctrl.files)" ng-model="uploadctrl.files" multiple '+
-                    'accept="{{uploadctrl.accept}}" ngf-max-height="1000" ngf-max-size="1MB">'+
-                    'Select Files</button>'
+        controller: function() {
+        },
+        template: '<span class="btn btn-primary btn-file">Browse <input type="file"  accept="imageUploadCtrl.accept" capture="camera" ng-show-auth></span>'
       };
 }]);
 
@@ -873,7 +852,7 @@ angular.module('accessopolisApp')
 
 (function() {
     "use strict";
-    angular.module('accessopolis.locationDetail', ['accessopolis.navigation', 'ngFileUpload'])
+    angular.module('accessopolis.locationDetail', ['accessopolis.navigation'])
         .service('LocationDetailService', LocationDetailService)
         .service('LocationVideoService', LocationVideoService)
         .controller('LocationDetailController', LocationDetailController)
@@ -1097,14 +1076,20 @@ angular.module('accessopolisApp')
 
 
 
-        this.addImage = function(newImgurlFile) {
-           var httpsImageUrl = newImgurlFile.link.replace(/^http\:/, "https:");
-           var toAdd = {imageUrl: httpsImageUrl};
-           if(self.imageUpload.imageType) {
-              toAdd.imageType = self.imageUpload.imageType;
-              toAdd.description = self.imageUpload.description;
-          }
-          self.images.$add(toAdd).catch(alert);
+        this.addImage = function() {
+          var file = self.imageUpload.file;
+          var imageType = self.imageUpload.imageType;
+          var description = self.imageUpload.description;
+          self.imageUpload = {};
+          return imgur.upload(file).then(function(model) {
+              var httpsImageUrl = model.link.replace(/^http\:/, "https:");
+              var toAdd = {imageUrl: httpsImageUrl};
+              if(imageType) {
+                  toAdd.imageType = imageType;
+                  toAdd.description = description;
+              }
+              self.images.$add(toAdd).catch(alert);
+          });
         }
 
         function loadImages() {
