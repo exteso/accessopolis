@@ -20,7 +20,7 @@
     template: ['<div><div>',
                   '<div class="ap-search-result-icon-container">', iconTemplate(),'</div>',
                   '<div class="ap-search-result-description" ng-click="apSearchResult.showDetail()"><a href="">', 
-                    '<h1 class="ap-search-result-text">{{::apSearchResult.result.text}}</h1>',
+                    '<h3 class="ap-search-result-text">{{::apSearchResult.result.text}}</h3>',
                     '<div class="ap-search-result-address">{{::apSearchResult.result.address}}</div>',
                   '</a></div>',
                '</div></div>'].join('')

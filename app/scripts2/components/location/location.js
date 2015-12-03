@@ -3,15 +3,17 @@
   angular.module('accessopolisApp').component('apLocation', {
   
     template: topTemplate() + bodyTemplate(),
-    
-    controller: ['$routeParams', '$location', 'LocationService', function($routeParams, $location, LocationService) {
+    bindings: {
+      identifier:'=',
+    },
+    controller: ['$location', 'LocationService', function($location, LocationService) {
       var vm = this;
       
-      LocationService.find($routeParams.identifier).then(function(location) {
+      LocationService.find(this.identifier).then(function(location) {
         vm.location = location;
       });
       
-      LocationService.getComments($routeParams.identifier).then(function(comments) {
+      LocationService.getComments(this.identifier).then(function(comments) {
         vm.comments = comments;
       });
       
@@ -47,6 +49,7 @@
   function bodyTemplate() {
     return ['<div class="col-xs-12">',
               '<div class="container accessopolis-location-detail-content">',
+                '<div class="accessopolis-bg-white col-md-12 col-sm-12 col-xs-12 accessopolis-location-detail-content-slide"></div>',
                 '<div class="col-md-12 col-sm-12 col-xs-12 accessopolis-bg-white" style="padding-bottom: 50px; margin-bottom: 20px;  margin-top: 10px;">', //comments
                    '<h1>Commenti:</h1>',
                    '<ul class="list-group col-md-12 col-sm-12 col-xs-12" style="list-style-type: none">',
