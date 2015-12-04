@@ -6,8 +6,13 @@
     bindings: {
       identifier:'=',
     },
-    controller: ['$location', 'LocationService', function($location, LocationService) {
+    controller: ['$location', 'LocationService', 'Auth', function($location, LocationService, Auth) {
       var vm = this;
+      
+      Auth.$onAuth(function(authData) {
+        vm.isAuth = !!authData;
+      });
+        
       
       LocationService.find(this.identifier).then(function(location) {
         vm.location = location;
@@ -21,8 +26,18 @@
         $location.path('/');
       }
       
+      function addNewComment() {
+        vm.savingComment = true;
+        
+        vm.comments.$add({text: vm.newComment}).then(function() {
+          vm.newComment = null;
+          vm.savingComment = false;
+        });        
+      };
+      
       
       this.backToHome = backToHome;
+      this.addNewComment = addNewComment;
     }]
   })
 
@@ -55,6 +70,7 @@
                    '<ul class="list-group col-md-12 col-sm-12 col-xs-12" style="list-style-type: none">',
                     commentTemplate(),
                    '</ul>',
+                   insertCommentTemplate(),
                 '</div>',
               '</div>',
             '</div>'].join('');
@@ -71,6 +87,17 @@
               '<div style="float: left; height: 50px; line-height: 50px; margin-left: 10px; " ng-bind="::comment.text"></div>',
             '</li>',
             '<li ng-if="apLocation.comments.length == 0">Nessun commento!</li>'].join('');
+  }
+  
+  function insertCommentTemplate() {
+    return ['<div class="col-md-12 col-sm-12 col-xs-12" ng-if="apLocation.isAuth">',
+                    '<form ng-submit="apLocation.addNewComment()">',
+                        '<div class="form-group">',
+                            '<input type="text" class="form-control" placeholder="Il vostro commento..." ng-model="apLocation.newComment">',
+                        '</div>',
+                        '<button type="submit" class="btn btn-sm btn-primary" ng-disabled="!apLocation.newComment || apLocation.savingComment">Commenta</button>',
+                    '</form>',
+                '</div>'].join('');
   }
 
 
