@@ -1,0 +1,34 @@
+ap-rating {
+  display:table;
+  width:100%;
+  height: 100%;
+}
+
+ap-rating > div {
+  display:table-row;
+}
+
+ap-rating > div > div {
+  display:table-cell;
+  width:50%;
+}
+
+ap-rating > div > div:first-child {
+  border-right: 1px solid rgba(0,0,0,0.2);
+}
+
+ap-rating .ap-rating-rating {
+  height:50px;
+  line-height:50px;
+  font-size:18px;
+}
+
+ap-rating .ap-rating-icon-and-text {
+  height:100px;
+}
+
+ap-rating .ap-rating-icon-and-text > span {
+  height:50px;
+  line-height:50px;
+  font-size:24px;
+}

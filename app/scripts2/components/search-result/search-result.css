@@ -30,6 +30,15 @@ ap-search-result .ap-search-result-icon-container .fa {
   color: #aaa;
 }
 
+ap-search-result .ap-search-result-rating {
+  display:table-cell;
+  width:150px;
+  height: 150px;
+  vertical-align:middle;
+  text-align:center;
+  background-color:  rgba(255, 255, 255, 0.7);
+}
+
     
 
 ap-search-result .ap-search-result-description {

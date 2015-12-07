@@ -47,6 +47,7 @@
     };
 
     function rate(newRate){
+        //FIXME
         return $firebaseArray(Ref.child('ratings')).$add(newRate);
     };
     

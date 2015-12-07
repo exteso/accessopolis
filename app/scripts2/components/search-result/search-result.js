@@ -23,6 +23,7 @@
                     '<h3 class="ap-search-result-text">{{::apSearchResult.result.text}}</h3>',
                     '<div class="ap-search-result-address">{{::apSearchResult.result.address}}</div>',
                   '</a></div>',
+                  '<div class="ap-search-result-rating"><ap-rating location="apSearchResult.result"></ap-rating></div>',
                '</div></div>'].join('')
   })
   
