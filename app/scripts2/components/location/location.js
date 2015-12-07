@@ -51,7 +51,7 @@
                 '</button>',
             '</div>',
             '<div class="accessopolis-location-detail-header col-md-12 col-sm-12 col-xs-12">',
-                '<div class="accessopolis-location-detail-header-title col-md-8 col-sm-8 col-xs-8">',
+                '<div class="accessopolis-location-detail-header-title col-md-8 col-sm-8 col-xs-12">',
                     '<h1>{{apLocation.location.text}}</h1>',
                     '<div>{{apLocation.location.address}}</div>',
                 '</div>',
