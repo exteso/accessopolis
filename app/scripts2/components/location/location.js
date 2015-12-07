@@ -55,6 +55,7 @@
                     '<h1>{{apLocation.location.text}}</h1>',
                     '<div>{{apLocation.location.address}}</div>',
                 '</div>',
+                '<div class="col-md4 col-sm-4 col-xs-4 hidden-xs hidden-sm accessopolis-location-detail-header-rating "><ap-rating ng-if="apLocation.location" location="apLocation.location"></ap-rating></div>',
             '</div>',
       '</div>',
     '</div>'
