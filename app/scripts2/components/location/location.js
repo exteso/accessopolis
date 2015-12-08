@@ -29,7 +29,7 @@
       function addNewComment() {
         vm.savingComment = true;
         
-        vm.comments.$add({text: vm.newComment}).then(function() {
+        vm.comments.$add({text: vm.newComment, userId : Auth.$getAuth().uid}).then(function() {
           vm.newComment = null;
           vm.savingComment = false;
         });        
@@ -81,8 +81,8 @@
   function commentTemplate() {
     return ['<li class="list-group-item" ng-repeat="comment in apLocation.comments track by comment.$id" style="float: left; width: 100%;">',
               '<div style="width: 50px; height: 50px; float: left; ">',
-                '<div style="float: left; width: 50px; height: 50px; background: #ccc; color:#fff; text-align: center; border-radius: 50%;  line-height: 50px;">',
-                  '<span class="fa fa-user"></span>',
+                '<div style="float: left; overflow:hidden;width: 50px; height: 50px; background: #ccc; color:#fff; text-align: center; border-radius: 50%;  line-height: 50px;border:1px solid #ccc; ">',
+                  '<ap-avatar user-id="comment.userId"></ap-avatar>',
                 '</div>',
               '</div>',
               '<div style="float: left; height: 50px; line-height: 50px; margin-left: 10px; " ng-bind="::comment.text"></div>',
