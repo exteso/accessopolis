@@ -40,7 +40,21 @@
     
     function getMedia(id) {
       return $q.all([getImages(id), getVideos(id)]).then(function(imagesAndVideos) {
-        return {images: imagesAndVideos[0], videos: imagesAndVideos[1]};
+      
+        var medias = [];
+        angular.forEach(imagesAndVideos[0], function(image) {
+          image.imageThumbnailUrl = image.imageUrl;
+          image.mediaType = 'image';
+          medias.push(image);
+        });
+        
+        angular.forEach(imagesAndVideos[1], function(video) {
+          image.imageThumbnailUrl = image.thumbnail.replace(/default.+$/,"0.jpg");
+          image.mediaType = 'video';
+          medias.push(video);
+        });
+        
+        return medias;
       });
     }
 

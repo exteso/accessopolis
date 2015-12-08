@@ -106,10 +106,15 @@
   }
   
   function imagesAndLocationTemplate() {
-    return ['<div class="col-xs-12 col-md-6">{{apLocation.media | json}}</div>',
+    return ['<div class="col-xs-12 col-md-6 ap-location-media">',mediaTemplate(),'</div>',
             '<div class="col-xs-12 col-md-6 ap-location-google-map" data-ng-if="apLocation.location">',
               locationTemplate(),
             '</div>'].join('');
+  }
+  
+  
+  function mediaTemplate() {
+    return ['<div><img ng-if="apLocation.media[0]" ng-src="{{apLocation.media[0].imageThumbnailUrl}}" class="img-responsive center-block"></div>'].join('');
   }
   
   
