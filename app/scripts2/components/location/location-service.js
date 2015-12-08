@@ -12,7 +12,7 @@
                 resolve(val);
             });
         });
-    };
+    }
 
     function getComments(id) {
         return $q(function(resolve, reject) {
@@ -20,7 +20,7 @@
                 resolve(val);
             });
         });
-    };
+    }
 
     function getImages(id) {
         return $q(function(resolve, reject) {
@@ -28,7 +28,21 @@
             resolve(val);
           });
         });
-    };
+    }
+    
+    function getVideos(id) {
+      return $q(function(resolve, reject) {
+          $firebaseArray(Ref.child('videos/'+id)).$loaded(function(val) {
+            resolve(val);
+          });
+        });
+    }
+    
+    function getMedia(id) {
+      return $q.all([getImages(id), getVideos(id)]).then(function(imagesAndVideos) {
+        return {images: imagesAndVideos[0], videos: imagesAndVideos[1]};
+      });
+    }
 
     function update(location){
         if (location.$id){
@@ -40,16 +54,16 @@
             });
             return obj;
         }
-    };
+    }
 
     function create(location) {
         return $firebaseArray(Ref.child('locations')).$add(location);
-    };
+    }
 
     function rate(newRate){
         //FIXME
         return $firebaseArray(Ref.child('ratings')).$add(newRate);
-    };
+    }
     
     //
     this.find = find;
@@ -58,6 +72,7 @@
     this.update = update;
     this.create = create;
     this.rate = rate;
+    this.getMedia = getMedia;
   }
 
     

@@ -1,0 +1,26 @@
+ap-location .accessopolis-location-detail-content-slide > div {
+  padding:0;
+}
+
+@media (min-width: 992px) {
+  ap-location .ap-location-google-map div {
+    float:right;
+  }
+}
+
+@media (max-width: 991px) {
+
+  ap-location .ap-location-google-map {
+    text-align:center;
+  }
+
+  ap-location .ap-location-google-map div {
+    display:inline-block;
+  }
+}
+
+@media (max-width: 767px) {
+  ap-location .ap-location-google-map div.visible-xs {
+      display: inline-block !important;
+  }
+}

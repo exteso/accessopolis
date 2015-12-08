@@ -22,6 +22,10 @@
         vm.comments = comments;
       });
       
+      LocationService.getMedia(this.identifier).then(function(media) {
+        vm.media = media;
+      });
+      
       function backToHome() {
         $location.path('/');
       }
@@ -65,7 +69,7 @@
   function bodyTemplate() {
     return ['<div class="col-xs-12">',
               '<div class="container accessopolis-location-detail-content">',
-                '<div class="accessopolis-bg-white col-md-12 col-sm-12 col-xs-12 accessopolis-location-detail-content-slide"></div>',
+                '<div class="accessopolis-bg-white col-md-12 col-sm-12 col-xs-12 accessopolis-location-detail-content-slide">'+imagesAndLocationTemplate()+'</div>',
                 '<div class="col-md-12 col-sm-12 col-xs-12 accessopolis-bg-white" style="padding-bottom: 50px; margin-bottom: 20px;  margin-top: 10px;">', //comments
                    '<h1>Commenti:</h1>',
                    '<ul class="list-group col-md-12 col-sm-12 col-xs-12" style="list-style-type: none">',
@@ -99,6 +103,21 @@
                         '<button type="submit" class="btn btn-sm btn-primary" ng-disabled="!apLocation.newComment || apLocation.savingComment">Commenta</button>',
                     '</form>',
                 '</div>'].join('');
+  }
+  
+  function imagesAndLocationTemplate() {
+    return ['<div class="col-xs-12 col-md-6">{{apLocation.media | json}}</div>',
+            '<div class="col-xs-12 col-md-6 ap-location-google-map" data-ng-if="apLocation.location">',
+              locationTemplate(),
+            '</div>'].join('');
+  }
+  
+  
+  function locationTemplate() {
+    return ['<a href="https://google.com/maps?z=12&t=m&q=loc:{{apLocation.location.lat}}+{{apLocation.location.long}}" title="{{apLocation.location.text}}, {{apLocation.location.address}}" target="_blank">',
+              '<div class="hidden-xs" style="height:400px;width:400px; background-image: url(\'https://maps.googleapis.com/maps/api/staticmap?center={{apLocation.location.lat}},{{apLocation.location.long}}&zoom=15&size=400x400&maptype=roadmap&markers=color:red%7Clabel:C%7C{{apLocation.location.lat}},{{apLocation.location.long}}\'); background-size: cover"></div>',
+              '<div class="visible-xs" style="height:244px;width:244px; background-image: url(\'https://maps.googleapis.com/maps/api/staticmap?center={{apLocation.location.lat}},{{apLocation.location.long}}&zoom=15&size=244x244&maptype=roadmap&markers=color:red%7Clabel:C%7C{{apLocation.location.lat}},{{apLocation.location.long}}\'); background-size: cover"></div>',
+            '</a>'].join('');
   }
 
 
