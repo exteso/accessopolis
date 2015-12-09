@@ -1,0 +1,23 @@
+ap-search-box .accessopolis-search-field {
+  background-color: rgba(255, 255, 255, 0.6);
+  border-radius: 4px;
+  padding-top:16px;
+  padding-bottom:16px;
+  margin-top:5%;
+  margin-bottom:5%;
+}
+
+ap-search-box .accessopolis-search-field > div {
+  padding-left:16px;
+  padding-right:16px;
+}
+
+ap-search-box .accessopolis-search-field input {
+  padding-right:42px;
+}
+
+ap-search-box .accessopolis-search-icon {
+    position: absolute;
+    top: 8px;
+    right: 24px;
+}

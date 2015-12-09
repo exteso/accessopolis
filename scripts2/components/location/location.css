@@ -1,0 +1,36 @@
+ap-location .accessopolis-location-detail-content-slide > div {
+  padding:0;
+}
+
+ap-location .ap-location-media > div {
+  height:400px;
+  text-align:center;
+  line-height:400px;
+}
+
+ap-location .ap-location-media img {
+  display:inline-block;
+}
+
+@media (min-width: 992px) {
+  ap-location .ap-location-google-map div {
+    float:right;
+  }
+}
+
+@media (max-width: 991px) {
+
+  ap-location .ap-location-google-map {
+    text-align:center;
+  }
+
+  ap-location .ap-location-google-map div {
+    display:inline-block;
+  }
+}
+
+@media (max-width: 767px) {
+  ap-location .ap-location-google-map div.visible-xs {
+      display: inline-block !important;
+  }
+}

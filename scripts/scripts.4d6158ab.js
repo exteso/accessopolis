@@ -923,7 +923,7 @@ angular.module('accessopolisApp')
             }
         });
 
-    function LocationDetailService($q, $firebaseObject, Ref, $firebaseArray) {
+    function LocationDetailService($q, $firebaseObject, Ref, $firebaseArray, Auth) {
         this.find = function(id) {
             return $q(function(resolve, reject) {
                 var obj = $firebaseObject(Ref.child('locations/'+id));
@@ -968,11 +968,13 @@ angular.module('accessopolisApp')
         };
 
         this.rate = function(newRate){
+            newRate.userId = Auth.$getAuth().uid;
+            newRate.userType = 'public';
             return $firebaseArray(Ref.child('ratings')).$add(newRate);
         };
 
     }
-    LocationDetailService.$inject = ["$q", "$firebaseObject", "Ref", "$firebaseArray"];
+    LocationDetailService.$inject = ["$q", "$firebaseObject", "Ref", "$firebaseArray", "Auth"];
 
     LocationDetailService.prototype.$inject = ['$q', '$firebaseObject', 'Ref', '$firebaseArray'];
 
