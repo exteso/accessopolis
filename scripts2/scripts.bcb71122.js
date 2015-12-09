@@ -55,7 +55,7 @@ function UserService($q, $firebaseObject, Ref, $firebaseArray) {
     this.find = find;
 }
 
-})()
+})();
 
 
 
