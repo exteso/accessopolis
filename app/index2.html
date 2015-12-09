@@ -2,16 +2,16 @@
 <html>
   <head>
     <meta charset="utf-8">
-    <!-- build:css(.) styles/vendor.css -->
-    <!-- bower:css -->
-    <!-- endbower -->
-    <!-- endbuild -->
+    
+    <meta name="viewport" content="width=device-width">
+
     <!-- build:css(.tmp) styles/main.css -->
     <link rel="stylesheet" href="styles/main.css">
     <!-- endbuild -->
     
-    <meta name="viewport" content="width=device-width">
     
+    
+
     <link rel="stylesheet" href="scripts2/components/search-box/search-box.css">
     <link rel="stylesheet" href="scripts2/components/search-result-list/search-result-list.css">
     <link rel="stylesheet" href="scripts2/components/search-result/search-result.css">
@@ -100,9 +100,13 @@
     <script async defer src="https://maps.googleapis.com/maps/api/js?signed_in=true&libraries=places&key=AIzaSyCbm7ot6UqPk9I7sQVu3Z3PeU7hvwT0pbU&callback=initMap"></script>
     <script src="https://apis.google.com/js/client.js?onload=initVideo"></script>
     
+    <!-- build:js(.) scripts2/vendor.js -->
+    <!-- bower:js -->
     <script src="bower_components/lodash/lodash.js"></script>
     <script src="bower_components/firebase/firebase.js"></script>
     <script src="bower_components/angularfire/dist/angularfire.js"></script>
+    <!-- endbower -->
+    <!-- endbuild -->
     
     <!-- build:js({.tmp,app}) scripts2/scripts.js -->
     <script src="scripts2/app.js"></script>

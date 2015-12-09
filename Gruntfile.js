@@ -240,6 +240,7 @@ module.exports = function (grunt) {
       dist: {
         src: [
           '<%= yeoman.dist %>/scripts/{,*/}*.js',
+          '<%= yeoman.dist %>/scripts2/{,*/}*.js',
           '<%= yeoman.dist %>/styles/{,*/}*.css',
           '<%= yeoman.dist %>/images/{,*/}*.{png,jpg,jpeg,gif,webp,svg}',
           '<%= yeoman.dist %>/styles/fonts/*'
@@ -251,7 +252,7 @@ module.exports = function (grunt) {
     // concat, minify and revision files. Creates configurations in memory so
     // additional tasks can operate on them
     useminPrepare: {
-      html: '<%= yeoman.app %>/index.html',
+      html: '<%= yeoman.app %>/*.html',
       options: {
         dest: '<%= yeoman.dist %>',
         flow: {
@@ -379,6 +380,7 @@ module.exports = function (grunt) {
             '*.html',
             'views/{,*/}*.html',
             'scripts/feature/{,*/}*.html',
+            'scripts2/components/{,*/}*.css',
             'images/{,*/}*.{webp}',
             'styles/fonts/{,*/}*.*',
             'fonts/{,*/}*.*',
@@ -393,6 +395,11 @@ module.exports = function (grunt) {
           expand: true,
           cwd: '.tmp/concat/scripts',
           dest: '<%= yeoman.dist %>/scripts',
+          src: ['*']
+        }, { 
+          expand: true,
+          cwd: '.tmp/concat/scripts2',
+          dest: '<%= yeoman.dist %>/scripts2',
           src: ['*']
         }, {
           expand: true,
