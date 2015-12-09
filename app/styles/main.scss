@@ -104,8 +104,8 @@ body {
         &.accessopolis-bg {
             background: url('../images/bg_1.jpg');
             background-repeat: no-repeat;
-            background-size: 200%;
             background-position: top center;
+            background-attachment: fixed;
         }
     }
 }

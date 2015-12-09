@@ -16,6 +16,10 @@ ap-location .ap-location-media img {
   ap-location .ap-location-google-map div {
     float:right;
   }
+  
+  ap-location .ap-location-media > div {
+    padding-left: 16px;
+  }
 }
 
 @media (max-width: 991px) {
