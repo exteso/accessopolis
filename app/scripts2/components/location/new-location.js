@@ -4,7 +4,7 @@
 
     templateUrl: 'scripts2/components/location/new-location.html',
     bindings: {
-      //identifier:'=',
+      identifier:'=',
     },
 
     controller: ['$location', 'LocationService', 'Auth', function($location, LocationService, Auth) {
@@ -18,21 +18,25 @@
         vm.subtypes = subtypes;
       });
 
-      function save(frm) {
-            if(!frm.$valid) {
-                return;
-            }
-            if (vm.location.$id){
-                LocationService.update(vm.location)
-                $location.path('/location/' + vm.location.$id);
-            }else {
-                LocationService.create(vm.location).then(function (data) {
-                    $location.path('/location/' + data.key());
-                }, function (err) {
-                    alert(err);
-                })
-            };
-      };
+      LocationService.find(this.identifier).then(function(location) {
+        vm.location = location;
+      });
+
+    function save(frm) {
+        if(!frm.$valid) {
+            return;
+        }
+        if (vm.location.$id){
+            LocationService.update(vm.location)
+            $location.path('/location/' + vm.location.$id);
+        }else {
+            LocationService.create(vm.location).then(function (data) {
+                $location.path('/location/' + data.key());
+            }, function (err) {
+                alert(err);
+            })
+        };
+    };
 
       function currentUser(){
           Auth;

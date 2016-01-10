@@ -6,12 +6,8 @@
     bindings: {
       identifier:'=',
     },
-    controller: ['$location', 'LocationService', 'Auth', function($location, LocationService, Auth) {
+    controller: ['$location', 'LocationService', 'UserService', function($location, LocationService, UserService) {
       var vm = this;
-
-      Auth.$onAuth(function(authData) {
-        vm.isAuth = !!authData;
-      });
 
       LocationService.find(this.identifier).then(function(location) {
         vm.location = location;
@@ -27,6 +23,10 @@
 
       function isCurrentUser(user){
           return true;
+      }
+
+      function isAdmin(){
+        return UserService.getProfile() && UserService.getProfile().isAdmin;
       }
 
       function backToHome() {
@@ -51,10 +51,16 @@
           });
       };
 
+      function edit(location) {
+          $location.path('/location/'+location.$id+'/edit');
+      };
+
       this.backToHome = backToHome;
       this.addNewComment = addNewComment;
       this.updateComment = updateComment;
       this.isCurrentUser = isCurrentUser;
+      this.isAdmin = isAdmin;
+      this.edit = edit;
     }]
   })
 
@@ -65,6 +71,9 @@
             '<div class="accessopolis-location-detail-back col-md-12 col-sm-12 col-xs-12">',
                 '<button type="button" data-ng-click="apLocation.backToHome()" class="btn btn-primary btn-xs">',
                     '<span class="fa fa-chevron-left"></span> <span>Torna alla lista</span>',
+                '</button>',
+                '<button type="button" data-ng-if="apLocation.isAdmin()" ng-show-auth data-ng-click="apLocation.edit(apLocation.location)" class="btn btn-primary btn-xs">',
+                    '<span class="fa fa-edit"></span> <span data-translate>accessopolis.edit-location</span>',
                 '</button>',
             '</div>',
             '<div class="accessopolis-location-detail-header col-md-12 col-sm-12 col-xs-12">',

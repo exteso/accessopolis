@@ -19,8 +19,14 @@ angular.module('accessopolisApp', ['ngRoute', 'firebase'])
         controller: ['$routeParams', '$scope', function($routeParams, $scope) {
           $scope.identifier = $routeParams.identifier;
         }]
-      }).
-    when('/new-location', {
+      })
+      .when('/location/:identifier/edit',{
+          template: '<ap-new-location identifier="identifier"></ap-new-location>',
+          controller: ['$routeParams', '$scope', function($routeParams, $scope) {
+              $scope.identifier = $routeParams.identifier;
+          }]
+      })
+      .when('/new-location', {
         template: '<ap-new-location></ap-new-location>',
         controller: ['$routeParams', '$scope', function($routeParams, $scope) {
             $scope.text = '';
