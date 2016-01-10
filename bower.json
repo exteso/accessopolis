@@ -2,15 +2,15 @@
   "name": "accessopolis",
   "version": "0.5.0",
   "dependencies": {
-    "angular": "^1.4.6",
-    "angular-animate": "^1.4.6",
-    "angular-aria": "^1.4.6",
-    "angular-cookies": "^1.4.6",
-    "angular-messages": "^1.4.6",
-    "angular-resource": "^1.4.6",
-    "angular-route": "^1.4.6",
-    "angular-sanitize": "^1.4.6",
-    "angular-touch": "^1.4.6",
+    "angular": "^1.5.0-rc.0",
+    "angular-animate": "^1.5.0-rc.0",
+    "angular-aria": "^1.5.0-rc.0",
+    "angular-cookies": "^1.5.0-rc.0",
+    "angular-messages": "^1.5.0-rc.0",
+    "angular-resource": "^1.5.0-rc.0",
+    "angular-route": "^1.5.0-rc.0",
+    "angular-sanitize": "^1.5.0-rc.0",
+    "angular-touch": "^1.5.0-rc.0",
     "angular-translate": "~2.7.2",
     "angularfire": "1.1.2",
     "bootstrap-sass-official": "^3.2.0",
@@ -19,11 +19,12 @@
     "lodash": "~3.10.1",
     "numeral": "numeraljs#~1.5.3",
     "ng-imgur": "~0.1.5",
-    "angular-bootstrap": "~0.13.4"
+    "angular-bootstrap": "~0.13.4",
+    "ng-file-upload": "~10.0.2"
   },
   "devDependencies": {
     "mockfirebase": "0.11.0",
-    "angular-mocks": "^1.4.6"
+    "angular-mocks": "^1.5.0-rc.0"
   },
   "appPath": "app",
   "moduleName": "accessopolisApp"

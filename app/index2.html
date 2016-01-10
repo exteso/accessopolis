@@ -2,22 +2,22 @@
 <html>
   <head>
     <meta charset="utf-8">
-    
+
     <meta name="viewport" content="width=device-width">
 
     <!-- build:css(.tmp) styles/main.css -->
     <link rel="stylesheet" href="styles/main.css">
     <!-- endbuild -->
-    
-    
-    
+
+
+
 
     <link rel="stylesheet" href="scripts2/components/search-box/search-box.css">
     <link rel="stylesheet" href="scripts2/components/search-result-list/search-result-list.css">
     <link rel="stylesheet" href="scripts2/components/search-result/search-result.css">
     <link rel="stylesheet" href="scripts2/components/rating/rating.css">
     <link rel="stylesheet" href="scripts2/components/location/location.css">
-    
+
     <link rel="apple-touch-icon" sizes="57x57" href="images/icons/apple-icon-57x57.png">
     <link rel="apple-touch-icon" sizes="60x60" href="images/icons/apple-icon-60x60.png">
     <link rel="apple-touch-icon" sizes="72x72" href="images/icons/apple-icon-72x72.png">
@@ -37,11 +37,11 @@
     <meta name="theme-color" content="#ffffff">
   </head>
   <body class="accessopolis-bg" ng-app="accessopolisApp">
-  
+
   <div class="header  accessopolis-header">
     <a href="https://github.com/exteso/accessopolis" target="_blank" class="visible-lg"><img style="position: absolute; top: 0; right: 0; border: 0; z-index:150" src="https://camo.githubusercontent.com/52760788cde945287fbb584134c4cbc2bc36f904/68747470733a2f2f73332e616d617a6f6e6177732e636f6d2f6769746875622f726962626f6e732f666f726b6d655f72696768745f77686974655f6666666666662e706e67" alt="Fork me on GitHub" data-canonical-src="https://s3.amazonaws.com/github/ribbons/forkme_right_white_ffffff.png"></a>
-    
-    
+
+
     <div class="container">
       <div class="col-xs-12 col-md-12 col-sm-12 accessopolis-header-container">
         <div class="col-xs-8 col-md-8 col-sm-8 col-xs-8 accessopolis-header-logo" >
@@ -54,10 +54,10 @@
       </div>
     </div>
   </div>
-  
+
   <div ng-view autoscroll></div>
-  
-  
+
+
   <footer class="footer accessopolis-footer accessopolis-bg-white container-fluid" >
         <!-- Start main sponsor container -->
         <div class=" accessopolis-bg-blue container-fluid">
@@ -85,7 +85,7 @@
           </div>
         </div>
     </footer>
-    
+
     <script type="application/javascript">
         window.accessopolis = window.accessopolis || {};
         function initMap() {
@@ -95,19 +95,33 @@
             window.accessopolis.videoApiLoaded = true;
         }
     </script>
-    <script src="https://ajax.googleapis.com/ajax/libs/angularjs/1.5.0-beta.2/angular.min.js"></script>
-    <script src="https://ajax.googleapis.com/ajax/libs/angularjs/1.5.0-beta.2/angular-route.min.js"></script>
     <script async defer src="https://maps.googleapis.com/maps/api/js?signed_in=true&libraries=places&key=AIzaSyCbm7ot6UqPk9I7sQVu3Z3PeU7hvwT0pbU&callback=initMap"></script>
     <script src="https://apis.google.com/js/client.js?onload=initVideo"></script>
-    
+
     <!-- build:js(.) scripts2/vendor.js -->
     <!-- bower:js -->
-    <script src="bower_components/lodash/lodash.js"></script>
+    <script src="bower_components/jquery/dist/jquery.js"></script>
+    <script src="bower_components/angular/angular.js"></script>
+    <script src="bower_components/angular-animate/angular-animate.js"></script>
+    <script src="bower_components/angular-aria/angular-aria.js"></script>
+    <script src="bower_components/angular-cookies/angular-cookies.js"></script>
+    <script src="bower_components/angular-messages/angular-messages.js"></script>
+    <script src="bower_components/angular-resource/angular-resource.js"></script>
+    <script src="bower_components/angular-route/angular-route.js"></script>
+    <script src="bower_components/angular-sanitize/angular-sanitize.js"></script>
+    <script src="bower_components/angular-touch/angular-touch.js"></script>
+    <script src="bower_components/angular-translate/angular-translate.js"></script>
     <script src="bower_components/firebase/firebase.js"></script>
     <script src="bower_components/angularfire/dist/angularfire.js"></script>
+    <script src="bower_components/bootstrap-sass-official/assets/javascripts/bootstrap.js"></script>
+    <script src="bower_components/lodash/lodash.js"></script>
+    <script src="bower_components/numeral/numeral.js"></script>
+    <script src="bower_components/ng-imgur/dist/ng-imgur.js"></script>
+    <script src="bower_components/angular-bootstrap/ui-bootstrap-tpls.js"></script>
+    <script src="bower_components/ng-file-upload/ng-file-upload.js"></script>
     <!-- endbower -->
     <!-- endbuild -->
-    
+
     <!-- build:js({.tmp,app}) scripts2/scripts.js -->
     <script src="scripts2/app.js"></script>
     <script src="scripts2/services/user-service.js"></script>
@@ -117,6 +131,7 @@
     <script src="scripts2/components/search-result-list/search-result-list.js"></script>
     <script src="scripts2/components/search-result/search-result.js"></script>
     <script src="scripts2/components/location/location.js"></script>
+    <script src="scripts2/components/location/new-location.js"></script>
     <script src="scripts2/components/location/location-service.js"></script>
     <script src="scripts2/components/rating/rating.js"></script>
     <script src="scripts2/components/rating/rating-service.js"></script>

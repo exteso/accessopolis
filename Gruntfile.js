@@ -181,7 +181,7 @@ module.exports = function (grunt) {
         cwd: ''
       },
       app: {
-        src: ['<%= yeoman.app %>/index.html'],
+        src: ['<%= yeoman.app %>/index*.html'],
         ignorePath:  /\.\.\//
       },
       test: {
@@ -396,7 +396,7 @@ module.exports = function (grunt) {
           cwd: '.tmp/concat/scripts',
           dest: '<%= yeoman.dist %>/scripts',
           src: ['*']
-        }, { 
+        }, {
           expand: true,
           cwd: '.tmp/concat/scripts2',
           dest: '<%= yeoman.dist %>/scripts2',

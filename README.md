@@ -19,7 +19,7 @@ cd accessopolis && npm install && bower install
 grunt serve
 ```
 
-Open browser at http://localhost:9000
+Open browser at [http://localhost:9000](http://localhost:9000)
 
 *Note:* currently we have 2 Firebase databases:
    - accessopolis-dev.firebaseio.com to be used while DEVELOPING, you can log in with google account only from localhost:9000 or localhost:8080

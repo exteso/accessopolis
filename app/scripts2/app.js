@@ -8,7 +8,7 @@ angular.module('accessopolisApp', ['ngRoute', 'firebase'])
   //firebase related conf
   .constant('FBURL', 'https://accessopolis-dev.firebaseio.com')
   .constant('SIMPLE_LOGIN_PROVIDERS', ['google'])
-  
+
   .config(['$routeProvider', function($routeProvider) {
     $routeProvider
       .when('/', {
@@ -19,11 +19,17 @@ angular.module('accessopolisApp', ['ngRoute', 'firebase'])
         controller: ['$routeParams', '$scope', function($routeParams, $scope) {
           $scope.identifier = $routeParams.identifier;
         }]
-      });
-  
+      }).
+    when('/new-location', {
+        template: '<ap-new-location></ap-new-location>',
+        controller: ['$routeParams', '$scope', function($routeParams, $scope) {
+            $scope.text = '';
+        }]
+    });
+
   }])
-  
-  
+
+
   //firebase related objects
   .factory('Ref', ['$window', 'FBURL', function($window, FBURL) {
     return new $window.Firebase(FBURL);
@@ -32,6 +38,6 @@ angular.module('accessopolisApp', ['ngRoute', 'firebase'])
     return $firebaseAuth(Ref);
   }]);
   //
-  
-  
+
+
 })();

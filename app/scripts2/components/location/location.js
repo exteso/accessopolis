@@ -1,47 +1,60 @@
 (function() {
 
   angular.module('accessopolisApp').component('apLocation', {
-  
+
     template: topTemplate() + bodyTemplate(),
     bindings: {
       identifier:'=',
     },
     controller: ['$location', 'LocationService', 'Auth', function($location, LocationService, Auth) {
       var vm = this;
-      
+
       Auth.$onAuth(function(authData) {
         vm.isAuth = !!authData;
       });
-        
-      
+
       LocationService.find(this.identifier).then(function(location) {
         vm.location = location;
       });
-      
+
       LocationService.getComments(this.identifier).then(function(comments) {
         vm.comments = comments;
       });
-      
+
       LocationService.getMedia(this.identifier).then(function(media) {
         vm.media = media;
       });
-      
+
+      function isCurrentUser(user){
+          return true;
+      }
+
       function backToHome() {
         $location.path('/');
       }
-      
+
       function addNewComment() {
         vm.savingComment = true;
-        
+
         vm.comments.$add({text: vm.newComment, userId : Auth.$getAuth().uid}).then(function() {
           vm.newComment = null;
           vm.savingComment = false;
-        });        
+        });
       };
-      
-      
+
+      function updateComment(comment) {
+          vm.savingComment = true;
+          LocationService.updateComment(this.identifier, comment).then(function() {
+              vm.savingComment = false;
+          },function(error){
+              alert("Error while updating a comment. "+error);
+          });
+      };
+
       this.backToHome = backToHome;
       this.addNewComment = addNewComment;
+      this.updateComment = updateComment;
+      this.isCurrentUser = isCurrentUser;
     }]
   })
 
@@ -65,7 +78,7 @@
     '</div>'
     ].join('');
   }
-  
+
   function bodyTemplate() {
     return ['<div class="col-xs-12">',
               '<div class="container accessopolis-location-detail-content">',
@@ -80,8 +93,8 @@
               '</div>',
             '</div>'].join('');
   }
-  
-  
+
+
   function commentTemplate() {
     return ['<li class="list-group-item" ng-repeat="comment in apLocation.comments track by comment.$id" style="float: left; width: 100%;">',
               '<div style="width: 50px; height: 50px; float: left; ">',
@@ -89,11 +102,14 @@
                   '<ap-avatar user-id="comment.userId"></ap-avatar>',
                 '</div>',
               '</div>',
-              '<div style="float: left; height: 50px; line-height: 50px; margin-left: 10px; " ng-bind="::comment.text"></div>',
-            '</li>',
+              '<div ng-if="!comment.editMode" style="float: left; height: 50px; line-height: 50px; margin-left: 10px; " ng-bind="::comment.text"></div>',
+              '<input ng-if="comment.editMode"  type="text" class="form-control"  ng-model="comment.text" ng-blur="apLocation.updateComment(comment)">',
+              '<span ng-if="apLocation.isCurrentUser(comment.userId)" class="fa fa-trash" ng-click="apLocation.delete(comment)" style="float: right; margin-right: 10px; "></span>',
+              '<span class="fa fa-edit" ng-click="comment.editMode = !comment.editMode" style="float: right; margin-right: 10px; "></span>',
+        '</li>',
             '<li ng-if="apLocation.comments.length == 0">Nessun commento!</li>'].join('');
   }
-  
+
   function insertCommentTemplate() {
     return ['<div class="col-md-12 col-sm-12 col-xs-12" ng-if="apLocation.isAuth">',
                     '<form ng-submit="apLocation.addNewComment()">',
@@ -104,20 +120,20 @@
                     '</form>',
                 '</div>'].join('');
   }
-  
+
   function imagesAndLocationTemplate() {
     return ['<div class="col-xs-12 col-md-6 ap-location-media">',mediaTemplate(),'</div>',
             '<div class="col-xs-12 col-md-6 ap-location-google-map" data-ng-if="apLocation.location">',
               locationTemplate(),
             '</div>'].join('');
   }
-  
-  
+
+
   function mediaTemplate() {
     return ['<div><img ng-if="apLocation.media[0]" ng-src="{{apLocation.media[0].imageThumbnailUrl}}" class="img-responsive center-block"></div>'].join('');
   }
-  
-  
+
+
   function locationTemplate() {
     return ['<a href="https://google.com/maps?z=12&t=m&q=loc:{{apLocation.location.lat}}+{{apLocation.location.long}}" title="{{apLocation.location.text}}, {{apLocation.location.address}}" target="_blank">',
               '<div class="hidden-xs" style="height:400px;width:400px; background-image: url(\'https://maps.googleapis.com/maps/api/staticmap?center={{apLocation.location.lat}},{{apLocation.location.long}}&zoom=15&size=400x400&maptype=roadmap&markers=color:red%7Clabel:C%7C{{apLocation.location.lat}},{{apLocation.location.long}}\'); background-size: cover"></div>',

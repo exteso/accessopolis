@@ -2,7 +2,7 @@
   "name": "accessopolis",
   "version": "0.0.0",
   "dependencies": {
-    "angular": "^1.5.0-beta.0",
+    "angular": "^1.5.0-rc.0",
     "angular-ui-bootstrap": "^0.13.4",
     "bootstrap": "^3.3.5"
   },
