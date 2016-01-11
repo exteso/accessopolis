@@ -22,7 +22,7 @@
       });
 
       function isCurrentUser(user){
-          return true;
+          return Auth.$getAuth().uid == user;
       }
 
       function isAdmin(){
