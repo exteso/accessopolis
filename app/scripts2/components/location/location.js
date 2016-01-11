@@ -6,7 +6,7 @@
     bindings: {
       identifier:'=',
     },
-    controller: ['$location', 'LocationService', 'UserService', function($location, LocationService, UserService) {
+    controller: ['$location', 'LocationService', 'Auth', 'UserService', function($location, LocationService, Auth, UserService) {
       var vm = this;
 
       LocationService.find(this.identifier).then(function(location) {
@@ -113,14 +113,14 @@
               '</div>',
               '<div ng-if="!comment.editMode" style="float: left; height: 50px; line-height: 50px; margin-left: 10px; " ng-bind="::comment.text"></div>',
               '<input ng-if="comment.editMode"  type="text" class="form-control"  ng-model="comment.text" ng-blur="apLocation.updateComment(comment)">',
-              '<span ng-if="apLocation.isCurrentUser(comment.userId)" class="fa fa-trash" ng-click="apLocation.delete(comment)" style="float: right; margin-right: 10px; "></span>',
+              '<span ng-if="apLocation.isAdmin() || apLocation.isCurrentUser(comment.userId)" class="fa fa-trash" ng-click="apLocation.comments.$remove(comment)" style="float: right; margin-right: 10px; "></span>',
               '<span class="fa fa-edit" ng-click="comment.editMode = !comment.editMode" style="float: right; margin-right: 10px; "></span>',
         '</li>',
             '<li ng-if="apLocation.comments.length == 0">Nessun commento!</li>'].join('');
   }
 
   function insertCommentTemplate() {
-    return ['<div class="col-md-12 col-sm-12 col-xs-12" ng-if="apLocation.isAuth">',
+    return ['<div class="col-md-12 col-sm-12 col-xs-12" ng-show-auth>',
                     '<form ng-submit="apLocation.addNewComment()">',
                         '<div class="form-group">',
                             '<input type="text" class="form-control" placeholder="Il vostro commento..." ng-model="apLocation.newComment">',
