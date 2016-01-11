@@ -2,7 +2,7 @@
 
   angular.module('accessopolisApp').component('apNewLocation', {
 
-    templateUrl: 'scripts2/components/location/new-location.html',
+    templateUrl: 'scripts2/components/new-location/new-location.html',
     bindings: {
       identifier:'=',
     },
@@ -29,7 +29,7 @@
         if (vm.location.$id){
             LocationService.update(vm.location)
             $location.path('/location/' + vm.location.$id);
-        }else {
+        } else {
             LocationService.create(vm.location).then(function (data) {
                 $location.path('/location/' + data.key());
             }, function (err) {

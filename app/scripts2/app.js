@@ -14,6 +14,9 @@ angular.module('accessopolisApp', ['ngRoute', 'firebase'])
       .when('/', {
         template: '<ap-search-box></ap-search-box>'
       }).
+      when('/add-new-location', {
+        template: '<ap-add-new-location></ap-add-new-location>'
+      }).
       when('/location/:identifier', {
         template: '<ap-location identifier="identifier"></ap-location>',
         controller: ['$routeParams', '$scope', function($routeParams, $scope) {
@@ -26,13 +29,18 @@ angular.module('accessopolisApp', ['ngRoute', 'firebase'])
               $scope.identifier = $routeParams.identifier;
           }]
       })
+      .when('/location/:identifier/media', {
+        template: '<ap-location-media identifier="identifier"></ap-location-media>',
+        controller: ['$routeParams', '$scope', function($routeParams, $scope) {
+          $scope.identifier = $routeParams.identifier;
+        }]
+      })
       .when('/new-location', {
         template: '<ap-new-location></ap-new-location>',
         controller: ['$routeParams', '$scope', function($routeParams, $scope) {
             $scope.text = '';
         }]
     });
-
   }])
 
 
