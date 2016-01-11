@@ -1,5 +1,6 @@
 <div class="container accessopolis-bg-white" style="margin-top: 30px; margin-bottom: 30px">
     <div class="">
+      {{apNewLocation}}
         <div class="page-header">
             <h1 data-translate>accessopolis.insert-new-location</h1>
         </div>
@@ -24,7 +25,7 @@
 
             <div class="form-group">
                 <label data-translate for="address">accessopolis.location.address</label>
-                <input type="text" class="form-control" id="address" data-autocomplete-address name="address" data-ng-model="apNewLocation.location.address" required="required" minlength="5"/>
+                <input type="text" class="form-control" id="address" data-autocomplete-address="apNewLocation.onAddressSelected" name="address" data-ng-model="apNewLocation.location.address" required="required" minlength="5"/>
                 <div class="text-danger" data-ng-messages="newLocationForm.address.$error" data-ng-if="newLocationForm.address.$touched">
                     <p data-ng-message="minlength"><span translate="accessopolis.error.minlength"></span></p>
                     <p data-ng-message="maxlength"><span translate="accessopolis.error.maxlength"></span></p>
