@@ -36,11 +36,8 @@ angular.module('accessopolisApp', ['ngRoute', 'firebase'])
         }]
       })
       .when('/new-location', {
-        template: '<ap-new-location></ap-new-location>',
-        controller: ['$routeParams', '$scope', function($routeParams, $scope) {
-            $scope.text = '';
-        }]
-    });
+        template: '<ap-new-location></ap-new-location>'
+      });
   }])
 
 

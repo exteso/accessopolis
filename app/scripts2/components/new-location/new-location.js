@@ -3,10 +3,6 @@
   angular.module('accessopolisApp').component('apNewLocation', {
 
     templateUrl: 'scripts2/components/new-location/new-location.html',
-    bindings: {
-      identifier:'=',
-    },
-
     controller: ['$location', 'LocationService', 'Auth', function($location, LocationService, Auth) {
       var vm = this;
 
