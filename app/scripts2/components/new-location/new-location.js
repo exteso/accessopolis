@@ -27,10 +27,18 @@
         if(!frm.$valid) {
             return;
         }
-
-        LocationService
-          .create(vm.location)
-          .then(function (data) {$location.path('/location/' + data.key());}, function (err) {alert(err);})
+        if (vm.location.$id) {
+            LocationService.update(vm.location)
+            $location.path('/location/' + vm.location.$id);
+        } else {
+            LocationService
+                .create(vm.location)
+                .then(function (data) {
+                    $location.path('/location/' + data.key());
+                }, function (err) {
+                    alert(err);
+                })
+        }
       };
 
       function onAddressSelected(address) {
