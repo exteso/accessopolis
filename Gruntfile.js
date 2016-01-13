@@ -340,7 +340,7 @@ module.exports = function (grunt) {
         files: [{
           expand: true,
           cwd: '<%= yeoman.dist %>',
-          src: ['*.html', 'views/{,*/}*.html'],
+          src: ['*.html', 'views/{,*/}*.html', 'scripts2/components/{,*/}*.html'],
           dest: '<%= yeoman.dist %>'
         }]
       }
@@ -380,6 +380,7 @@ module.exports = function (grunt) {
             '*.html',
             'views/{,*/}*.html',
             'scripts/feature/{,*/}*.html',
+            'scripts2/components/{,*/}*.html',
             'scripts2/components/{,*/}*.css',
             'images/{,*/}*.{webp}',
             'styles/fonts/{,*/}*.*',
