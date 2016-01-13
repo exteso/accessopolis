@@ -711,10 +711,19 @@ function UserService(Auth, $q, $firebaseObject, Ref, $firebaseArray) {
         if(!frm.$valid) {
             return;
         }
-
-        LocationService
-          .create(vm.location)
-          .then(function (data) {$location.path('/location/' + data.key());}, function (err) {alert(err);})
+        if (vm.location.$id) {
+            Location.update(vm.location).then(function (data) {
+                $location.path('/location/' + vm.location.$id);
+            })
+        } else {
+            LocationService
+                .create(vm.location)
+                .then(function (data) {
+                    $location.path('/location/' + data.key());
+                }, function (err) {
+                    alert(err);
+                })
+        }
       };
 
       function onAddressSelected(address) {
