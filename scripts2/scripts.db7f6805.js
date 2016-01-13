@@ -6,24 +6,41 @@ angular.module('accessopolisApp', ['ngRoute', 'firebase'])
   .constant('IMGUR_API_KEY', 'Client-ID 7a37861e931f779')
   .constant('GOOGLE_API_KEY', 'AIzaSyCbm7ot6UqPk9I7sQVu3Z3PeU7hvwT0pbU')
   //firebase related conf
-  .constant('FBURL', 'https://accessopolis.firebaseio.com')
+  .constant('FBURL', 'https://accessopolis-dev.firebaseio.com')
   .constant('SIMPLE_LOGIN_PROVIDERS', ['google'])
-  
+
   .config(['$routeProvider', function($routeProvider) {
     $routeProvider
       .when('/', {
         template: '<ap-search-box></ap-search-box>'
+      }).
+      when('/add-new-location', {
+        template: '<ap-add-new-location></ap-add-new-location>'
       }).
       when('/location/:identifier', {
         template: '<ap-location identifier="identifier"></ap-location>',
         controller: ['$routeParams', '$scope', function($routeParams, $scope) {
           $scope.identifier = $routeParams.identifier;
         }]
+      })
+      .when('/location/:identifier/edit',{
+          template: '<ap-new-location identifier="identifier"></ap-new-location>',
+          controller: ['$routeParams', '$scope', function($routeParams, $scope) {
+              $scope.identifier = $routeParams.identifier;
+          }]
+      })
+      .when('/location/:identifier/media', {
+        template: '<ap-location-media identifier="identifier"></ap-location-media>',
+        controller: ['$routeParams', '$scope', function($routeParams, $scope) {
+          $scope.identifier = $routeParams.identifier;
+        }]
+      })
+      .when('/new-location', {
+        template: '<ap-new-location></ap-new-location>'
       });
-  
   }])
-  
-  
+
+
   //firebase related objects
   .factory('Ref', ['$window', 'FBURL', function($window, FBURL) {
     return new $window.Firebase(FBURL);
@@ -32,29 +49,142 @@ angular.module('accessopolisApp', ['ngRoute', 'firebase'])
     return $firebaseAuth(Ref);
   }]);
   //
-  
-  
+
+
+})();
+
+/**
+ * @ngdoc function
+ * @name accessopolisApp.directive:ngShowAuth
+ * @description
+ * # ngShowAuthDirective
+ * A directive that shows elements only when user is logged in. It also waits for Auth
+ * to be initialized so there is no initial flashing of incorrect state.
+ */
+angular.module('accessopolisApp')
+  .directive('ngShowAuth', ['Auth', '$timeout', function (Auth, $timeout) {
+    'use strict';
+
+    return {
+      restrict: 'A',
+      link: function(scope, el) {
+        el.addClass('ng-cloak'); // hide until we process it
+
+        function update() {
+          // sometimes if ngCloak exists on same element, they argue, so make sure that
+          // this one always runs last for reliability
+          $timeout(function () {
+            el.toggleClass('ng-cloak', !Auth.$getAuth());
+          }, 0);
+        }
+
+        Auth.$onAuth(update);
+        update();
+      }
+    };
+  }]);
+
+
+/**
+ * @ngdoc function
+ * @name accessopolisApp.directive:ngHideAuth
+ * @description
+ * # ngHideAuthDirective
+ * A directive that shows elements only when user is logged out. It also waits for Auth
+ * to be initialized so there is no initial flashing of incorrect state.
+ */
+angular.module('accessopolisApp')
+  .directive('ngHideAuth', ['Auth', '$timeout', function (Auth, $timeout) {
+    'use strict';
+
+    return {
+      restrict: 'A',
+      link: function(scope, el) {
+        el.addClass('ng-cloak'); // hide until we process it
+        function update() {
+          // sometimes if ngCloak exists on same element, they argue, so make sure that
+          // this one always runs last for reliability
+          $timeout(function () {
+            el.toggleClass('ng-cloak', !!Auth.$getAuth());
+          }, 0);
+        }
+
+        Auth.$onAuth(update);
+        update();
+      }
+    };
+  }]);
+
+(function() {
+    "use strict";
+    
+    angular.module('accessopolisApp').directive('autocompleteAddress', function() {
+      return {
+                restrict: 'A',
+                scope: { callback:'&autocompleteAddress' },
+                link: function(scope, element, attrs) {
+                    var watcher = scope.$watch(function() {
+                        return accessopolis.googleMapReady;
+                    }, function(val) {
+                        if(val) {
+                            watcher();//remove watcher                            
+                            var autocomplete = new google.maps.places.Autocomplete(element[0], {types: ['geocode']});
+                            autocomplete.addListener('place_changed', function() {
+                              var place = autocomplete.getPlace();
+                              if (place.geometry) {
+                      					scope.$evalAsync(function() {scope.callback()(place);});
+                              }
+                            });
+                        }
+                    });
+                }
+            }
+    });
+    
 })();
 
 (function() {
 
-angular.module('accessopolisApp').service('UserService', ['$q', '$firebaseObject', 'Ref', '$firebaseArray', UserService]);
+angular.module('accessopolisApp').service('UserService', ['Auth', '$q', '$firebaseObject', 'Ref', '$firebaseArray', UserService]);
 
+function UserService(Auth, $q, $firebaseObject, Ref, $firebaseArray) {
 
-function UserService($q, $firebaseObject, Ref, $firebaseArray) {
+    var user;
+    var profile;
 
-  function find(id) {
-        return $q(function(resolve, reject) {
-            $firebaseObject(Ref.child('users/'+id)).$loaded(function(val) {
+    Auth.$onAuth(function (authData) {
+        if (authData) {
+            user = Auth.$getAuth();
+            find(user.uid).then(function(profileFromDB){
+                profile = profileFromDB;
+            })
+        } else {
+            user = undefined;
+            profile = undefined;
+        }
+    });
+
+    function getUser() {
+        return user;
+    }
+
+    function getProfile() {
+        return profile;
+    }
+
+    function find(id) {
+        return $q(function (resolve, reject) {
+            $firebaseObject(Ref.child('users/' + id)).$loaded(function (val) {
                 resolve(val);
             });
         });
     };
-    
+
     //
     this.find = find;
+    this.getUser = getUser;
+    this.getProfile = getProfile;
 }
-
 })();
 
 
@@ -215,10 +345,19 @@ function UserService($q, $firebaseObject, Ref, $firebaseArray) {
                    '<li ng-repeat="found in apSearchResultList.found">',
                      '<ap-search-result result="found"></ap-search-result>',
                    '</li>',
+
                  '</ul>',
+                '</div>',
+                '<div class="row">',
+                  '<div data-ng-if="apSearchResultList.found.length==0" class="text-center alert alert-info col-md-12">',
+                    '<h1 data-translate>accessopolis.location.not-found</h1>',
+                    '<a href="#/new-location" class="btn btn-lg btn-success" ng-show-auth="">',
+                    '<i class="fa fa-plus"></i> <span data-translate>accessopolis.location.new</span></a>',
+                '</div>',
                '</div></div>'].join('')
+
   })
-  
+
 })();
 
 (function() {
@@ -266,47 +405,66 @@ function UserService($q, $firebaseObject, Ref, $firebaseArray) {
 (function() {
 
   angular.module('accessopolisApp').component('apLocation', {
-  
+
     template: topTemplate() + bodyTemplate(),
     bindings: {
       identifier:'=',
     },
-    controller: ['$location', 'LocationService', 'Auth', function($location, LocationService, Auth) {
+    controller: ['$location', 'LocationService', 'Auth', 'UserService', function($location, LocationService, Auth, UserService) {
       var vm = this;
-      
-      Auth.$onAuth(function(authData) {
-        vm.isAuth = !!authData;
-      });
-        
-      
+
       LocationService.find(this.identifier).then(function(location) {
         vm.location = location;
       });
-      
+
       LocationService.getComments(this.identifier).then(function(comments) {
         vm.comments = comments;
       });
-      
+
       LocationService.getMedia(this.identifier).then(function(media) {
         vm.media = media;
       });
-      
+
+      function isCurrentUser(user){
+          return Auth.$getAuth().uid == user;
+      }
+
+      function isAdmin(){
+        return UserService.getProfile() && UserService.getProfile().isAdmin;
+      }
+
       function backToHome() {
         $location.path('/');
       }
-      
+
       function addNewComment() {
         vm.savingComment = true;
-        
+
         vm.comments.$add({text: vm.newComment, userId : Auth.$getAuth().uid}).then(function() {
           vm.newComment = null;
           vm.savingComment = false;
-        });        
+        });
       };
-      
-      
+
+      function updateComment(comment) {
+          vm.savingComment = true;
+          LocationService.updateComment(this.identifier, comment).then(function() {
+              vm.savingComment = false;
+          },function(error){
+              alert("Error while updating a comment. "+error);
+          });
+      };
+
+      function edit(location) {
+          $location.path('/location/'+location.$id+'/edit');
+      };
+
       this.backToHome = backToHome;
       this.addNewComment = addNewComment;
+      this.updateComment = updateComment;
+      this.isCurrentUser = isCurrentUser;
+      this.isAdmin = isAdmin;
+      this.edit = edit;
     }]
   })
 
@@ -317,6 +475,9 @@ function UserService($q, $firebaseObject, Ref, $firebaseArray) {
             '<div class="accessopolis-location-detail-back col-md-12 col-sm-12 col-xs-12">',
                 '<button type="button" data-ng-click="apLocation.backToHome()" class="btn btn-primary btn-xs">',
                     '<span class="fa fa-chevron-left"></span> <span>Torna alla lista</span>',
+                '</button>',
+                '<button type="button" data-ng-if="apLocation.isAdmin()" ng-show-auth data-ng-click="apLocation.edit(apLocation.location)" class="btn btn-primary btn-xs">',
+                    '<span class="fa fa-edit"></span> <span data-translate>accessopolis.edit-location</span>',
                 '</button>',
             '</div>',
             '<div class="accessopolis-location-detail-header col-md-12 col-sm-12 col-xs-12">',
@@ -330,7 +491,7 @@ function UserService($q, $firebaseObject, Ref, $firebaseArray) {
     '</div>'
     ].join('');
   }
-  
+
   function bodyTemplate() {
     return ['<div class="col-xs-12">',
               '<div class="container accessopolis-location-detail-content">',
@@ -345,8 +506,8 @@ function UserService($q, $firebaseObject, Ref, $firebaseArray) {
               '</div>',
             '</div>'].join('');
   }
-  
-  
+
+
   function commentTemplate() {
     return ['<li class="list-group-item" ng-repeat="comment in apLocation.comments track by comment.$id" style="float: left; width: 100%;">',
               '<div style="width: 50px; height: 50px; float: left; ">',
@@ -354,13 +515,16 @@ function UserService($q, $firebaseObject, Ref, $firebaseArray) {
                   '<ap-avatar user-id="comment.userId"></ap-avatar>',
                 '</div>',
               '</div>',
-              '<div style="float: left; height: 50px; line-height: 50px; margin-left: 10px; " ng-bind="::comment.text"></div>',
-            '</li>',
+              '<div ng-if="!comment.editMode" style="float: left; height: 50px; line-height: 50px; margin-left: 10px; " ng-bind="::comment.text"></div>',
+              '<input ng-if="comment.editMode"  type="text" class="form-control"  ng-model="comment.text" ng-blur="apLocation.updateComment(comment)">',
+              '<span ng-if="apLocation.isAdmin() || apLocation.isCurrentUser(comment.userId)" class="fa fa-trash" ng-click="apLocation.comments.$remove(comment)" style="float: right; margin-right: 10px; "></span>',
+              '<span class="fa fa-edit" ng-click="comment.editMode = !comment.editMode" style="float: right; margin-right: 10px; "></span>',
+        '</li>',
             '<li ng-if="apLocation.comments.length == 0">Nessun commento!</li>'].join('');
   }
-  
+
   function insertCommentTemplate() {
-    return ['<div class="col-md-12 col-sm-12 col-xs-12" ng-if="apLocation.isAuth">',
+    return ['<div class="col-md-12 col-sm-12 col-xs-12" ng-show-auth>',
                     '<form ng-submit="apLocation.addNewComment()">',
                         '<div class="form-group">',
                             '<input type="text" class="form-control" placeholder="Il vostro commento..." ng-model="apLocation.newComment">',
@@ -369,20 +533,20 @@ function UserService($q, $firebaseObject, Ref, $firebaseArray) {
                     '</form>',
                 '</div>'].join('');
   }
-  
+
   function imagesAndLocationTemplate() {
     return ['<div class="col-xs-12 col-md-6 ap-location-media">',mediaTemplate(),'</div>',
             '<div class="col-xs-12 col-md-6 ap-location-google-map" data-ng-if="apLocation.location">',
               locationTemplate(),
             '</div>'].join('');
   }
-  
-  
+
+
   function mediaTemplate() {
     return ['<div><img ng-if="apLocation.media[0]" ng-src="{{apLocation.media[0].imageThumbnailUrl}}" class="img-responsive center-block"></div>'].join('');
   }
-  
-  
+
+
   function locationTemplate() {
     return ['<a href="https://google.com/maps?z=12&t=m&q=loc:{{apLocation.location.lat}}+{{apLocation.location.long}}" title="{{apLocation.location.text}}, {{apLocation.location.address}}" target="_blank">',
               '<div class="hidden-xs" style="height:400px;width:400px; background-image: url(\'https://maps.googleapis.com/maps/api/staticmap?center={{apLocation.location.lat}},{{apLocation.location.long}}&zoom=15&size=400x400&maptype=roadmap&markers=color:red%7Clabel:C%7C{{apLocation.location.lat}},{{apLocation.location.long}}\'); background-size: cover"></div>',
@@ -400,7 +564,7 @@ function UserService($q, $firebaseObject, Ref, $firebaseArray) {
 
 
   function LocationService($q, $firebaseObject, Ref, $firebaseArray) {
-  
+
     function find(id) {
         return $q(function(resolve, reject) {
             $firebaseObject(Ref.child('locations/'+id)).$loaded(function(val) {
@@ -408,6 +572,10 @@ function UserService($q, $firebaseObject, Ref, $firebaseArray) {
             });
         });
     }
+
+    function create(location) {
+          return $firebaseArray(Ref.child('locations')).$add(location);
+      };
 
     function getComments(id) {
         return $q(function(resolve, reject) {
@@ -424,7 +592,7 @@ function UserService($q, $firebaseObject, Ref, $firebaseArray) {
           });
         });
     }
-    
+
     function getVideos(id) {
       return $q(function(resolve, reject) {
           $firebaseArray(Ref.child('videos/'+id)).$loaded(function(val) {
@@ -432,23 +600,23 @@ function UserService($q, $firebaseObject, Ref, $firebaseArray) {
           });
         });
     }
-    
+
     function getMedia(id) {
       return $q.all([getImages(id), getVideos(id)]).then(function(imagesAndVideos) {
-      
+
         var medias = [];
         angular.forEach(imagesAndVideos[0], function(image) {
           image.imageThumbnailUrl = image.imageUrl;
           image.mediaType = 'image';
           medias.push(image);
         });
-        
+
         angular.forEach(imagesAndVideos[1], function(video) {
           image.imageThumbnailUrl = image.thumbnail.replace(/default.+$/,"0.jpg");
           image.mediaType = 'video';
           medias.push(video);
         });
-        
+
         return medias;
       });
     }
@@ -473,7 +641,32 @@ function UserService($q, $firebaseObject, Ref, $firebaseArray) {
         //FIXME
         return $firebaseArray(Ref.child('ratings')).$add(newRate);
     }
-    
+
+    function updateComment(locationId, comment) {
+        return $q(function(resolve, reject) {
+            getComments(locationId).then(function(comments) {
+                var dbComment = comments.$getRecord(comment.$id);
+                dbComment.text = comment.text;
+                dbComment.editMode = false;
+                comments.$save(dbComment).then(function() {
+                    // data has been saved to our database
+                    resolve(dbComment);
+                },function(error){
+                    reject(error);
+                });
+            });
+        });
+    }
+      //TODO: This method should be moved to a MenuService
+      function loadNavigationElements() {
+          return $q(function(resolve, reject) {
+              $firebaseArray(Ref.child('categories')).$loaded(function(val) {
+                  var subtypes = _.chain(val).map('subcategory').flatten().uniq().value();
+                  resolve(subtypes);
+              });
+          });
+      }
+
     //
     this.find = find;
     this.getComments = getComments;
@@ -482,9 +675,67 @@ function UserService($q, $firebaseObject, Ref, $firebaseArray) {
     this.create = create;
     this.rate = rate;
     this.getMedia = getMedia;
+    this.updateComment = updateComment;
+    this.loadNavigationElements = loadNavigationElements;
   }
 
-    
+
+})();
+
+(function() {
+
+  angular.module('accessopolisApp').component('apNewLocation', {
+
+    templateUrl: 'scripts2/components/new-location/new-location.html',
+    bindings: {
+      identifier:'=',
+    },
+    controller: ['$location', 'LocationService', 'Auth', function($location, LocationService, Auth) {
+      var vm = this;
+
+      Auth.$onAuth(function(authData) {
+        vm.isAuth = !!authData;
+      });
+
+      if (this.identifier) {
+          LocationService.find(this.identifier).then(function (location) {
+              vm.location = location;
+          });
+      }
+
+      LocationService.loadNavigationElements().then(function(subtypes){
+        vm.subtypes = subtypes;
+      });
+
+      function save(frm) {
+        if(!frm.$valid) {
+            return;
+        }
+
+        LocationService
+          .create(vm.location)
+          .then(function (data) {$location.path('/location/' + data.key());}, function (err) {alert(err);})
+      };
+
+      function onAddressSelected(address) {
+        vm.location = vm.location || {};
+        vm.location.address = address.formatted_address;
+        vm.location.lat = address.geometry.location.lat();
+        vm.location.long = address.geometry.location.lng();
+      };
+
+
+      function backToHome() {
+        $location.path('/');
+      }
+
+      this.backToHome = backToHome;
+      this.save = save;
+      this.onAddressSelected = onAddressSelected;
+
+    }]
+  })
+
 })();
 
 (function() {
