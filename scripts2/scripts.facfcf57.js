@@ -712,9 +712,8 @@ function UserService(Auth, $q, $firebaseObject, Ref, $firebaseArray) {
             return;
         }
         if (vm.location.$id) {
-            Location.update(vm.location).then(function (data) {
-                $location.path('/location/' + vm.location.$id);
-            })
+            LocationService.update(vm.location)
+            $location.path('/location/' + vm.location.$id);
         } else {
             LocationService
                 .create(vm.location)
